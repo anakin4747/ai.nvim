@@ -25,4 +25,17 @@ describe(":Ai command", function()
         assert(#bufs_before == #bufs_after -1)
     end)
 
+    it("opens a new vertical window", function()
+        local wins_before = vim.api.nvim_list_wins()
+        local width_before = vim.api.nvim_win_get_width(0)
+
+        vim.cmd('vertical Ai')
+
+        local wins_after = vim.api.nvim_list_wins()
+        local width_after = vim.api.nvim_win_get_width(0)
+
+        assert(#wins_before == #wins_after -1)
+        assert(width_after < width_before, "Expected a vertical split")
+    end)
+
 end)
