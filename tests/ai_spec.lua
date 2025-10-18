@@ -38,4 +38,16 @@ describe(":Ai command", function()
         assert(width_after < width_before, "Expected a vertical split")
     end)
 
+    it("accepts a prompt as an argument", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai make me toast')
+        end)
+    end)
+
+    it("accepts a prompt as an argument with a vertical prefix", function()
+        assert.has_no.errors(function()
+            vim.cmd('vertical Ai make me toast')
+        end)
+    end)
+
 end)
