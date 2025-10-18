@@ -15,4 +15,14 @@ describe(":Ai command", function()
         assert(height_after < height_before, "Expected a horizontal split")
     end)
 
+    it("creates a new buffer", function()
+        local bufs_before = vim.api.nvim_list_bufs()
+
+        vim.cmd('Ai')
+
+        local bufs_after = vim.api.nvim_list_bufs()
+
+        assert(#bufs_before == #bufs_after -1)
+    end)
+
 end)
