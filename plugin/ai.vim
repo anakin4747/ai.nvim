@@ -1,2 +1,2 @@
 
-command! Ai split
+command! Ai call ai#chat()
