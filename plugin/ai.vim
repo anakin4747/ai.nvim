@@ -1,2 +1,2 @@
 
-command! Ai call ai#chat()
+command! Ai call ai#chat(<q-mods>)
