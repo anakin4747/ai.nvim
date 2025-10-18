@@ -1,0 +1,2 @@
+
+command! Ai split
