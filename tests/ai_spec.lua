@@ -2,12 +2,17 @@ require("plenary.busted")
 
 describe(":Ai command", function()
 
-    it("opens a new horizontal chat", function()
-        assert(true)
-    end)
+    it("opens a new horizontal window", function()
+        local wins_before = vim.api.nvim_list_wins()
+        local height_before = vim.api.nvim_win_get_height(0)
 
-    it("opens a vertical chat with :vertical prefix", function()
-        assert(true)
+        vim.cmd('Ai')
+
+        local wins_after = vim.api.nvim_list_wins()
+        local height_after = vim.api.nvim_win_get_height(0)
+
+        assert(#wins_before == #wins_after -1)
+        assert(height_after < height_before, "Expected a horizontal split")
     end)
 
 end)
