@@ -1,2 +1,2 @@
 
-command! -nargs=* Ai call ai#chat(<q-mods>, "<args>")
+command! -nargs=* Ai call ai#main("<mods>", "<args>")
