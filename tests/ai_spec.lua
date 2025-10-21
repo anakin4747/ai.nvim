@@ -109,4 +109,10 @@ describe(":Ai command", function()
         assert(vim.tbl_contains(lines, "make me toast"))
     end)
 
+    it("does not error when used with a !", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai!')
+        end)
+    end)
+
 end)
