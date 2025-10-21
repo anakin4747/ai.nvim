@@ -1,5 +1,5 @@
 
-function! ai#main(bang, mods = "", prompt = "", line1 = 0, line2 = 0) abort
+function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
 
     if exists("g:i_am_in_a_test")
         let chat_cache_dir = $"{stdpath("run")}/ai.nvim/chats"
@@ -15,9 +15,11 @@ function! ai#main(bang, mods = "", prompt = "", line1 = 0, line2 = 0) abort
 
     let bufnr = s:open_chat(chat_path, a:mods)
 
-    call appendbufline(bufnr, "$", a:prompt)
+    if a:prompt != ""
+        call appendbufline(bufnr, "$", a:prompt)
+    endi
 
-    if a:line1 != 0 && a:line2 != 0
+    if a:line1 != a:line2
         let lines = getbufline(original_buf, a:line1, a:line2)
         call appendbufline(bufnr, "$", lines)
     endi

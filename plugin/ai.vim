@@ -1,7 +1,7 @@
 
 command!
     \ -nargs=*
-    \ -range=0
+    \ -range
     \ -bang
     \ Ai
-    \ call ai#main("<bang>", "<mods>", "<args>", <line1>, <line2>)
+    \ call ai#main("<bang>", <line1>, <line2>, "<mods>", "<args>")
