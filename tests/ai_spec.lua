@@ -21,7 +21,7 @@ describe(":Ai command", function()
         local wins_after = vim.api.nvim_list_wins()
         local height_after = vim.api.nvim_win_get_height(0)
 
-        assert(#wins_before == #wins_after - 1)
+        assert.equal(#wins_before, #wins_after - 1)
         assert(height_after < height_before, "Expected a horizontal split")
     end)
 
@@ -32,7 +32,7 @@ describe(":Ai command", function()
 
         local bufs_after = vim.api.nvim_list_bufs()
 
-        assert(#bufs_before == #bufs_after - 1)
+        assert.are.same(#bufs_before, #bufs_after - 1)
     end)
 
     it("opens a new vertical window", function()
@@ -44,7 +44,7 @@ describe(":Ai command", function()
         local wins_after = vim.api.nvim_list_wins()
         local width_after = vim.api.nvim_win_get_width(0)
 
-        assert(#wins_before == #wins_after - 1)
+        assert.equal(#wins_before, #wins_after - 1)
         assert(width_after < width_before, "Expected a vertical split")
     end)
 
@@ -122,7 +122,7 @@ describe(":Ai command", function()
         vim.cmd('Ai')
         local second_bufnr = vim.api.nvim_get_current_buf()
 
-        assert(first_bufnr == second_bufnr)
+        assert.equal(first_bufnr, second_bufnr)
     end)
 
     it("uses a new buffer when used with a !", function()
@@ -132,7 +132,7 @@ describe(":Ai command", function()
         vim.cmd('Ai!')
         local second_bufnr = vim.api.nvim_get_current_buf()
 
-        assert(first_bufnr ~= second_bufnr)
+        assert.not_equal(first_bufnr, second_bufnr)
     end)
 
 end)
