@@ -1,5 +1,5 @@
 
-function! ai#main(mods = "", prompt = "", line1 = 0, line2 = 0)
+function! ai#main(bang, mods = "", prompt = "", line1 = 0, line2 = 0)
 
     let original_buf = bufnr()
 
