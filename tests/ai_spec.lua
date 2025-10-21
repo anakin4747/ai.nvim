@@ -2,6 +2,16 @@ require("plenary.busted")
 
 describe(":Ai command", function()
 
+    after_each(function()
+        local current_buf = vim.api.nvim_get_current_buf()
+        for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+            if bufnr ~= current_buf and vim.api.nvim_buf_is_loaded(bufnr) then
+                vim.api.nvim_buf_delete(bufnr, { force = true })
+            end
+        end
+        vim.cmd("silent! only")
+    end)
+
     it("opens a new horizontal window", function()
         local wins_before = vim.api.nvim_list_wins()
         local height_before = vim.api.nvim_win_get_height(0)
