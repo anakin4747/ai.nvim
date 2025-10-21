@@ -115,4 +115,24 @@ describe(":Ai command", function()
         end)
     end)
 
+    it("reuses the last buffer", function()
+        vim.cmd('Ai')
+        local first_bufnr = vim.api.nvim_get_current_buf()
+
+        vim.cmd('Ai')
+        local second_bufnr = vim.api.nvim_get_current_buf()
+
+        assert(first_bufnr == second_bufnr)
+    end)
+
+    it("uses a new buffer when used with a !", function()
+        vim.cmd('Ai')
+        local first_bufnr = vim.api.nvim_get_current_buf()
+
+        vim.cmd('Ai!')
+        local second_bufnr = vim.api.nvim_get_current_buf()
+
+        assert(first_bufnr ~= second_bufnr)
+    end)
+
 end)
