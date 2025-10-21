@@ -1,6 +1,7 @@
 
 function! ai#main(mods = "", prompt = "")
     let bufnr = s:open_chat(a:mods)
+    call appendbufline(bufnr, "$", a:prompt)
 endf
 
 function! s:open_chat(mods = "")
