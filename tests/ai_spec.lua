@@ -131,4 +131,44 @@ describe(":Ai command", function()
         assert.are.same(lines, { '' })
     end)
 
+    it("wraps ranges in codeblocks if filetype is set", function()
+        vim.cmd('edit /tmp/test.lua')
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "line 1",
+            "line 2",
+            "line 3",
+        })
+        vim.bo.filetype = "lua"
+
+        vim.cmd('1,3Ai')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "```lua",
+            "line 1",
+            "line 2",
+            "line 3",
+            "```"
+        }, lines)
+    end)
+
+    it("does not wrap ranges in codeblocks if filetype is not set", function()
+        vim.cmd('enew')
+
+        local expected = {
+            "line 1",
+            "line 2",
+            "line 3",
+        }
+
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, expected)
+
+        vim.cmd('1,3Ai')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same(expected, lines)
+    end)
+
 end)
