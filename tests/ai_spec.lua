@@ -60,6 +60,14 @@ describe(":Ai command", function()
         end)
     end)
 
+    it("passes the prompt to the buffer", function()
+        vim.cmd('Ai make me toast')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "make me toast"))
+    end)
+
     it("accepts a range without error", function()
         vim.api.nvim_buf_set_lines(0, 0, -1, false, { "a", "b", "c", "d" })
 
