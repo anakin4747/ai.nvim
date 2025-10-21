@@ -125,4 +125,10 @@ describe(":Ai command", function()
         assert.not_equal(first_bufnr, second_bufnr)
     end)
 
+    it("creates an empty new chat with ! and no args or range", function()
+        vim.cmd('Ai!')
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        assert.are.same(lines, { '' })
+    end)
+
 end)
