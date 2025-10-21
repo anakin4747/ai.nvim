@@ -50,4 +50,12 @@ describe(":Ai command", function()
         end)
     end)
 
+    it("accepts a range without error", function()
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, { "a", "b", "c", "d" })
+
+        assert.has_no.errors(function()
+            vim.cmd('1,3Ai')
+        end)
+    end)
+
 end)
