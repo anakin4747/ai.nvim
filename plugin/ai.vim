@@ -1,2 +1,6 @@
 
-command! -nargs=* Ai call ai#main("<mods>", "<args>")
+command!
+    \ -nargs=*
+    \ -range=0
+    \ Ai
+    \ call ai#main("<mods>", "<args>")
