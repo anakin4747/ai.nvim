@@ -76,4 +76,20 @@ describe(":Ai command", function()
         end)
     end)
 
+    it("passes the selected range to the buffer", function()
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "De La Soul",
+            "Wu-Tang",
+            "C-Murder",
+            "A Tribe Called Quest",
+        })
+
+        vim.cmd('2,3Ai')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "Wu-Tang"))
+        assert(vim.tbl_contains(lines, "C-Murder"))
+    end)
+
 end)
