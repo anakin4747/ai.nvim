@@ -153,4 +153,26 @@ describe(":Ai command", function()
         }, lines)
     end)
 
+    it("wraps ranges in codeblocks", function()
+        vim.cmd('edit /tmp/test')
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "line 1",
+            "line 2",
+            "line 3",
+        })
+        vim.bo.filetype = ""
+
+        vim.cmd('1,3Ai')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "```",
+            "line 1",
+            "line 2",
+            "line 3",
+            "```"
+        }, lines)
+    end)
+
 end)
