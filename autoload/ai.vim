@@ -14,6 +14,7 @@ function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
     endi
 
     let original_buf = bufnr()
+    let original_filetype = &filetype
 
     let bufnr = s:open_chat(chat_path, a:mods)
 
@@ -22,7 +23,9 @@ function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
     endi
 
     if a:line1 != a:line2
-        let lines = getbufline(original_buf, a:line1, a:line2)
+        let lines = [$"```{original_filetype}"]
+        let lines += getbufline(original_buf, a:line1, a:line2)
+        let lines += ["```"]
         call appendbufline(bufnr, "$", lines)
     endi
 

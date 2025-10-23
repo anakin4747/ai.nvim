@@ -148,6 +148,7 @@ describe(":Ai command", function()
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
         assert.are.same({
+            "",
             "```lua",
             "line 1",
             "line 2",
@@ -170,6 +171,7 @@ describe(":Ai command", function()
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
         assert.are.same({
+            "",
             "```",
             "line 1",
             "line 2",
