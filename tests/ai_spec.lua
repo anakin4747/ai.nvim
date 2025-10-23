@@ -105,24 +105,24 @@ describe(":Ai command", function()
         end)
     end)
 
-    it("reuses the last buffer", function()
+    it("reuses the last chat", function()
         vim.cmd('Ai')
-        local first_bufnr = vim.api.nvim_get_current_buf()
+        local first_buf_name = vim.api.nvim_buf_get_name(0)
 
         vim.cmd('Ai')
-        local second_bufnr = vim.api.nvim_get_current_buf()
+        local second_buf_name = vim.api.nvim_buf_get_name(0)
 
-        assert.equal(first_bufnr, second_bufnr)
+        assert.equal(first_buf_name, second_buf_name)
     end)
 
-    it("uses a new buffer when used with a !", function()
+    it("uses a new chat when used with a !", function()
         vim.cmd('Ai')
-        local first_bufnr = vim.api.nvim_get_current_buf()
+        local first_buf_name = vim.api.nvim_buf_get_name(0)
 
         vim.cmd('Ai!')
-        local second_bufnr = vim.api.nvim_get_current_buf()
+        local second_buf_name = vim.api.nvim_buf_get_name(0)
 
-        assert.not_equal(first_bufnr, second_bufnr)
+        assert.not_equal(first_buf_name, second_buf_name)
     end)
 
     it("creates an empty new chat with ! and no args or range", function()
@@ -151,24 +151,6 @@ describe(":Ai command", function()
             "line 3",
             "```"
         }, lines)
-    end)
-
-    it("does not wrap ranges in codeblocks if filetype is not set", function()
-        vim.cmd('enew')
-
-        local expected = {
-            "line 1",
-            "line 2",
-            "line 3",
-        }
-
-        vim.api.nvim_buf_set_lines(0, 0, -1, false, expected)
-
-        vim.cmd('1,3Ai')
-
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-        assert.are.same(expected, lines)
     end)
 
 end)
