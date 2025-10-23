@@ -10,6 +10,7 @@ describe(":Ai command", function()
             end
         end
         vim.cmd("silent! only")
+        vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
     end)
 
     it("opens a new horizontal window", function()
@@ -108,6 +109,8 @@ describe(":Ai command", function()
     it("reuses the last chat", function()
         vim.cmd('Ai')
         local first_buf_name = vim.api.nvim_buf_get_name(0)
+
+        vim.cmd('write')
 
         vim.cmd('Ai')
         local second_buf_name = vim.api.nvim_buf_get_name(0)

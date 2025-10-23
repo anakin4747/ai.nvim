@@ -1,7 +1,7 @@
 
 function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
 
-    let chats_dir = s:get_chats_dir()
+    let chats_dir = ai#get_chats_dir()
 
     if !isdirectory(chats_dir)
         call mkdir(chats_dir, "p")
@@ -28,7 +28,7 @@ function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
 
 endf
 
-function! s:get_chats_dir()
+function! ai#get_chats_dir()
     if exists("g:i_am_in_a_test")
         return $"{stdpath("run")}/ai.nvim/chats"
     endi
@@ -50,7 +50,16 @@ function! s:last_chat_exists(chats_dir)
 endf
 
 function! s:new_chat_path(chats_dir)
-    return $"{a:chats_dir}/ai-chat-{localtime()}.md"
+    let chat_path = $"{a:chats_dir}/ai-chat-{localtime()}.md"
+
+    if exists("g:i_am_in_a_test")
+        " need to randomize the path for tests since they run in too quick
+        " succession causing tests to fail when in reality this will never
+        " need to run in such quick succession
+        let chat_path .= $".{rand(srand()) % 1000000}.test"
+    endi
+
+    return chat_path
 endf
 
 function! s:open_chat(chat_path, mods = "")
