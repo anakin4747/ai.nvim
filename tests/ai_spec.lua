@@ -131,7 +131,7 @@ describe(":Ai command", function()
     it("creates an empty new chat with ! and no args or range", function()
         vim.cmd('Ai!')
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-        assert.are.same(lines, { '' })
+        assert.are.same(lines, { '# ME', '' })
     end)
 
     it("wraps ranges in codeblocks if filetype is set", function()
@@ -148,6 +148,7 @@ describe(":Ai command", function()
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
         assert.are.same({
+            "# ME",
             "",
             "```lua",
             "line 1",
@@ -171,6 +172,7 @@ describe(":Ai command", function()
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
         assert.are.same({
+            "# ME",
             "",
             "```",
             "line 1",

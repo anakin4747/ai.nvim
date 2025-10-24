@@ -18,6 +18,9 @@ function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
 
     let bufnr = s:open_chat(chat_path, a:mods)
 
+    call setbufline(bufnr, 1, "# ME")
+    call setbufline(bufnr, 2, "")
+
     if a:prompt != ""
         call appendbufline(bufnr, "$", a:prompt)
     endi
