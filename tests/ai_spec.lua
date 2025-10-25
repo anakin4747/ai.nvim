@@ -110,7 +110,7 @@ describe(":Ai command", function()
         vim.cmd('Ai')
         local first_buf_name = vim.api.nvim_buf_get_name(0)
 
-        vim.cmd('write')
+        vim.cmd('silent! write')
 
         vim.cmd('Ai')
         local second_buf_name = vim.api.nvim_buf_get_name(0)
