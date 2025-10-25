@@ -182,4 +182,28 @@ describe(":Ai command", function()
         }, lines)
     end)
 
+    it("reuses the last chat window", function()
+        vim.cmd("Ai")
+        local expected = vim.api.nvim_get_current_win()
+
+        vim.cmd("silent! write")
+
+        vim.cmd("Ai")
+        local actual = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected, actual)
+    end)
+
+    it("reuses the last chat window with a !", function()
+        vim.cmd("Ai")
+        local expected = vim.api.nvim_get_current_win()
+
+        vim.cmd("silent! write")
+
+        vim.cmd("Ai!")
+        local actual = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected, actual)
+    end)
+
 end)

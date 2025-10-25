@@ -69,6 +69,33 @@ function! s:new_chat_path(chats_dir)
 endf
 
 function! s:open_chat(chat_path, mods = "")
-    execute $"{a:mods} split {a:chat_path}"
+
+    let open_chat = s:get_open_chat_winnr()
+
+    if open_chat
+        execute $"{open_chat}wincmd w"
+        execute $"{a:mods} edit {a:chat_path}"
+    else
+        execute $"{a:mods} split {a:chat_path}"
+    endi
+
     return bufnr()
+endf
+
+function! s:get_open_chat_winnr()
+
+    let wincount = winnr('$')
+    for win in range(1, wincount)
+        let bufnr = winbufnr(win)
+        if bufnr == -1
+            continue
+        endi
+
+        let fname = bufname(bufnr)
+        if fname =~# 'ai.nvim/chats/ai-chat-\d\+\.md'
+            return win
+        endif
+    endfo
+
+    return 0
 endf
