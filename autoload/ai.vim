@@ -74,7 +74,7 @@ function! s:open_chat(chat_path, mods = "")
 
     if open_chat
         execute $"{open_chat}wincmd w"
-        execute $"{a:mods} edit {a:chat_path}"
+        execute $"{a:mods} silent! edit {a:chat_path}"
     else
         execute $"{a:mods} split {a:chat_path}"
     endi
