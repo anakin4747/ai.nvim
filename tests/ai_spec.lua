@@ -180,4 +180,12 @@ describe(":Ai command", function()
         assert.are.same(expected, actual)
     end)
 
+    it("puts cursor at the bottom of a chat", function()
+        vim.cmd("Ai")
+
+        local expected = vim.api.nvim_buf_line_count(0)
+        local actual = vim.api.nvim_win_get_cursor(0)[1]
+        assert.are.same(expected, actual)
+    end)
+
 end)

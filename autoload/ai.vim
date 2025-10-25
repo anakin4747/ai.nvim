@@ -32,6 +32,8 @@ function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
         call appendbufline(bufnr, "$", lines)
     endi
 
+    normal! G
+
 endf
 
 function! ai#get_chats_dir()
