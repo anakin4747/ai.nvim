@@ -33,6 +33,66 @@ describe(":Ai command", function()
         assert(vim.tbl_contains(lines, "make me toast"))
     end)
 
+    it("reuses the last chat", function()
+        vim.cmd('Ai')
+        local first_buf_name = vim.api.nvim_buf_get_name(0)
+
+        vim.cmd('silent! write')
+
+        vim.cmd('Ai')
+        local second_buf_name = vim.api.nvim_buf_get_name(0)
+
+        assert.equal(first_buf_name, second_buf_name)
+    end)
+
+    it("reuses the last chat window", function()
+        vim.cmd("Ai")
+        local expected = vim.api.nvim_get_current_win()
+
+        vim.cmd("silent! write")
+
+        vim.cmd("Ai")
+        local actual = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected, actual)
+    end)
+
+    it("puts cursor at the bottom of a chat", function()
+        vim.cmd("Ai")
+
+        local expected = vim.api.nvim_buf_line_count(0)
+        local actual = vim.api.nvim_win_get_cursor(0)[1]
+        assert.are.same(expected, actual)
+    end)
+
+    it("does not error when used with a !", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai!')
+        end)
+    end)
+
+    it("uses a new chat when used with a !", function()
+        vim.cmd('Ai')
+        local first_buf_name = vim.api.nvim_buf_get_name(0)
+
+        vim.cmd('Ai!')
+        local second_buf_name = vim.api.nvim_buf_get_name(0)
+
+        assert.not_equal(first_buf_name, second_buf_name)
+    end)
+
+    it("reuses the last chat window with a !", function()
+        vim.cmd("Ai")
+        local expected = vim.api.nvim_get_current_win()
+
+        vim.cmd("silent! write")
+
+        vim.cmd("Ai!")
+        local actual = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected, actual)
+    end)
+
     it("accepts a range without error", function()
         vim.api.nvim_buf_set_lines(0, 0, -1, false, { "a", "b", "c", "d" })
 
@@ -72,40 +132,6 @@ describe(":Ai command", function()
         assert(vim.tbl_contains(lines, "Wu-Tang"))
         assert(vim.tbl_contains(lines, "C-Murder"))
         assert(vim.tbl_contains(lines, "make me toast"))
-    end)
-
-    it("does not error when used with a !", function()
-        assert.has_no.errors(function()
-            vim.cmd('Ai!')
-        end)
-    end)
-
-    it("reuses the last chat", function()
-        vim.cmd('Ai')
-        local first_buf_name = vim.api.nvim_buf_get_name(0)
-
-        vim.cmd('silent! write')
-
-        vim.cmd('Ai')
-        local second_buf_name = vim.api.nvim_buf_get_name(0)
-
-        assert.equal(first_buf_name, second_buf_name)
-    end)
-
-    it("uses a new chat when used with a !", function()
-        vim.cmd('Ai')
-        local first_buf_name = vim.api.nvim_buf_get_name(0)
-
-        vim.cmd('Ai!')
-        local second_buf_name = vim.api.nvim_buf_get_name(0)
-
-        assert.not_equal(first_buf_name, second_buf_name)
-    end)
-
-    it("creates an empty new chat with ! and no args or range", function()
-        vim.cmd('Ai!')
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-        assert.are.same(lines, { '# ME', '' })
     end)
 
     it("wraps ranges in codeblocks if filetype is set", function()
@@ -156,38 +182,6 @@ describe(":Ai command", function()
         }, lines)
     end)
 
-    it("reuses the last chat window", function()
-        vim.cmd("Ai")
-        local expected = vim.api.nvim_get_current_win()
-
-        vim.cmd("silent! write")
-
-        vim.cmd("Ai")
-        local actual = vim.api.nvim_get_current_win()
-
-        assert.are.same(expected, actual)
-    end)
-
-    it("reuses the last chat window with a !", function()
-        vim.cmd("Ai")
-        local expected = vim.api.nvim_get_current_win()
-
-        vim.cmd("silent! write")
-
-        vim.cmd("Ai!")
-        local actual = vim.api.nvim_get_current_win()
-
-        assert.are.same(expected, actual)
-    end)
-
-    it("puts cursor at the bottom of a chat", function()
-        vim.cmd("Ai")
-
-        local expected = vim.api.nvim_buf_line_count(0)
-        local actual = vim.api.nvim_win_get_cursor(0)[1]
-        assert.are.same(expected, actual)
-    end)
-
     it("works for single line ranges", function()
         vim.cmd('edit /tmp/test')
         vim.api.nvim_buf_set_lines(0, 0, -1, false, {
@@ -208,4 +202,11 @@ describe(":Ai command", function()
             "```"
         }, lines)
     end)
+
+    it("creates an empty new chat with ! and no args or range", function()
+        vim.cmd('Ai!')
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        assert.are.same(lines, { '# ME', '' })
+    end)
+
 end)
