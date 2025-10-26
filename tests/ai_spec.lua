@@ -1,27 +1,23 @@
 require("plenary.busted")
 
+local function teardown()
+    local current_buf = vim.api.nvim_get_current_buf()
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+        if bufnr ~= current_buf and vim.api.nvim_buf_is_loaded(bufnr) then
+            vim.api.nvim_buf_delete(bufnr, { force = true })
+        end
+    end
+    vim.cmd("silent! only")
+    vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
+end
+
 describe(":Ai command", function()
 
-    after_each(function()
-        local current_buf = vim.api.nvim_get_current_buf()
-        for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-            if bufnr ~= current_buf and vim.api.nvim_buf_is_loaded(bufnr) then
-                vim.api.nvim_buf_delete(bufnr, { force = true })
-            end
-        end
-        vim.cmd("silent! only")
-        vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
-    end)
+    after_each(teardown)
 
     it("accepts a prompt as an argument", function()
         assert.has_no.errors(function()
             vim.cmd('Ai make me toast')
-        end)
-    end)
-
-    it("accepts a prompt as an argument with a vertical prefix", function()
-        assert.has_no.errors(function()
-            vim.cmd('vertical Ai make me toast')
         end)
     end)
 
@@ -64,6 +60,11 @@ describe(":Ai command", function()
         local actual = vim.api.nvim_win_get_cursor(0)[1]
         assert.are.same(expected, actual)
     end)
+end)
+
+describe(":Ai! command", function()
+
+    after_each(teardown)
 
     it("does not error when used with a !", function()
         assert.has_no.errors(function()
@@ -92,6 +93,17 @@ describe(":Ai command", function()
 
         assert.are.same(expected, actual)
     end)
+
+    it("creates an empty new chat with ! and no args or range", function()
+        vim.cmd('Ai!')
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        assert.are.same(lines, { '# ME', '' })
+    end)
+end)
+
+describe(":'<,'>Ai command", function()
+
+    after_each(teardown)
 
     it("accepts a range without error", function()
         vim.api.nvim_buf_set_lines(0, 0, -1, false, { "a", "b", "c", "d" })
@@ -202,11 +214,15 @@ describe(":Ai command", function()
             "```"
         }, lines)
     end)
+end)
 
-    it("creates an empty new chat with ! and no args or range", function()
-        vim.cmd('Ai!')
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-        assert.are.same(lines, { '# ME', '' })
+describe(":vertical Ai command", function()
+
+    after_each(teardown)
+
+    it("accepts a prompt as an argument with a vertical prefix", function()
+        assert.has_no.errors(function()
+            vim.cmd('vertical Ai make me toast')
+        end)
     end)
-
 end)
