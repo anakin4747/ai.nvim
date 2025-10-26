@@ -11,17 +11,17 @@ local function teardown()
     vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
 end
 
-describe(":Ai command", function()
+describe(":Ai", function()
 
     after_each(teardown)
 
-    it("accepts a prompt as an argument", function()
+    it("<prompt> accepts a prompt as an argument", function()
         assert.has_no.errors(function()
             vim.cmd('Ai make me toast')
         end)
     end)
 
-    it("passes the prompt to the buffer", function()
+    it("<prompt> passes the prompt to the buffer", function()
         vim.cmd('Ai make me toast')
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -29,7 +29,7 @@ describe(":Ai command", function()
         assert(vim.tbl_contains(lines, "make me toast"))
     end)
 
-    it("reuses the last chat", function()
+    it("reuses the last chat name", function()
         vim.cmd('Ai')
         local first_buf_name = vim.api.nvim_buf_get_name(0)
 
@@ -53,7 +53,7 @@ describe(":Ai command", function()
         assert.are.same(expected, actual)
     end)
 
-    it("puts cursor at the bottom of a chat", function()
+    it("puts cursor at the bottom of the chat", function()
         vim.cmd("Ai")
 
         local expected = vim.api.nvim_buf_line_count(0)
@@ -62,17 +62,17 @@ describe(":Ai command", function()
     end)
 end)
 
-describe(":Ai! command", function()
+describe(":Ai!", function()
 
     after_each(teardown)
 
-    it("does not error when used with a !", function()
+    it("does not error", function()
         assert.has_no.errors(function()
             vim.cmd('Ai!')
         end)
     end)
 
-    it("uses a new chat when used with a !", function()
+    it("creates a new chat", function()
         vim.cmd('Ai')
         local first_buf_name = vim.api.nvim_buf_get_name(0)
 
@@ -82,7 +82,7 @@ describe(":Ai! command", function()
         assert.not_equal(first_buf_name, second_buf_name)
     end)
 
-    it("reuses the last chat window with a !", function()
+    it("reuses the last chat", function()
         vim.cmd("Ai")
         local expected = vim.api.nvim_get_current_win()
 
@@ -94,14 +94,14 @@ describe(":Ai! command", function()
         assert.are.same(expected, actual)
     end)
 
-    it("creates an empty new chat with ! and no args or range", function()
+    it("creates an empty chat ", function()
         vim.cmd('Ai!')
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         assert.are.same(lines, { '# ME', '' })
     end)
 end)
 
-describe(":'<,'>Ai command", function()
+describe(":'<,'>Ai", function()
 
     after_each(teardown)
 
@@ -216,7 +216,7 @@ describe(":'<,'>Ai command", function()
     end)
 end)
 
-describe(":vertical Ai command", function()
+describe(":vert Ai", function()
 
     after_each(teardown)
 
