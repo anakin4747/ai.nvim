@@ -1,5 +1,5 @@
 
-function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
+function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
     let chats_dir = ai#get_chats_dir()
 
@@ -25,7 +25,7 @@ function! ai#main(bang, line1, line2, mods = "", prompt = "") abort
         call appendbufline(bufnr, "$", a:prompt)
     endi
 
-    if a:line1 != a:line2
+    if a:range
         let lines = [$"```{original_filetype}"]
         let lines += getbufline(original_buf, a:line1, a:line2)
         let lines += ["```"]

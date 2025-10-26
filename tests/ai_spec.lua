@@ -188,4 +188,24 @@ describe(":Ai command", function()
         assert.are.same(expected, actual)
     end)
 
+    it("works for single line ranges", function()
+        vim.cmd('edit /tmp/test')
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "line 1",
+            "line 2",
+            "line 3",
+        })
+
+        vim.cmd('2Ai')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "```",
+            "line 2",
+            "```"
+        }, lines)
+    end)
 end)
