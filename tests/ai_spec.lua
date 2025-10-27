@@ -1,4 +1,5 @@
 require("plenary.busted")
+local stub = require('luassert.stub')
 
 local function teardown()
     local current_buf = vim.api.nvim_get_current_buf()
@@ -60,6 +61,14 @@ describe(":Ai", function()
         local actual = vim.api.nvim_win_get_cursor(0)[1]
         assert.are.same(expected, actual)
     end)
+
+    it("can submit a chat", function()
+        local submit_chat_stub = stub(vim.fn, 'providers#copilot#submit_chat')
+        vim.cmd('Ai')
+        assert.stub(submit_chat_stub).was_called()
+        submit_chat_stub:revert()
+    end)
+
 end)
 
 describe(":Ai!", function()
