@@ -101,6 +101,18 @@ describe(":Ai!", function()
     end)
 end)
 
+describe(":Ai! copilot", function()
+
+    after_each(teardown)
+
+    it("sets the provider to copilot", function()
+
+        vim.cmd('Ai! copilot sample chat')
+
+        assert(vim.g.ai_provider, "copilot")
+    end)
+end)
+
 describe(":'<,'>Ai", function()
 
     after_each(teardown)
