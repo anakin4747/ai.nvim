@@ -134,7 +134,7 @@ describe(":Ai!", function()
         assert.not_equal(first_buf_name, second_buf_name)
     end)
 
-    it("creates an empty chat ", function()
+    it("creates an empty chat", function()
         vim.cmd('Ai!')
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         assert.are.same(lines, { '# ME', '' })
@@ -267,7 +267,7 @@ describe(":vert Ai", function()
     end)
 end)
 
-describe("providers#get", function()
+describe("providers#get()", function()
 
     after_each(teardown)
 
@@ -278,7 +278,7 @@ describe("providers#get", function()
     end)
 end)
 
-describe("providers#get_all_models", function()
+describe("providers#get_all_models()", function()
 
     after_each(teardown)
 
