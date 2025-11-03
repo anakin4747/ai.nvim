@@ -287,3 +287,25 @@ describe("providers#get_models", function()
         assert.same(expected, actual)
     end)
 end)
+
+describe("providers#get_all_models", function()
+
+    after_each(teardown)
+
+    it("returns a list of all models for all providers", function()
+        local expected = {
+           'Claude Haiku 4.5',
+           'Claude Sonnet 4',
+           'Claude Sonnet 4.5',
+           'GPT-4.1',
+           'GPT-4o',
+           'GPT-5',
+           'GPT-5 mini',
+           'Gemini 2.5 Pro',
+        }
+
+        local actual = vim.fn['providers#get_all_models']()
+
+        assert.same(expected, actual)
+    end)
+end)
