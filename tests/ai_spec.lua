@@ -201,7 +201,7 @@ describe(":'<,'>Ai", function()
         assert(vim.tbl_contains(lines, "C-Murder"))
     end)
 
-    it("passes the selected range and arguments to the buffer", function()
+    it("<prompt> passes the selected range and <prompt> to the buffer", function()
         vim.api.nvim_buf_set_lines(0, 0, -1, false, {
             "De La Soul",
             "Wu-Tang",
