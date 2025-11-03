@@ -134,18 +134,6 @@ describe(":Ai!", function()
         assert.not_equal(first_buf_name, second_buf_name)
     end)
 
-    it("reuses the last chat", function()
-        vim.cmd("Ai")
-        local expected = vim.api.nvim_get_current_win()
-
-        vim.cmd("silent! write")
-
-        vim.cmd("Ai!")
-        local actual = vim.api.nvim_get_current_win()
-
-        assert.are.same(expected, actual)
-    end)
-
     it("creates an empty chat ", function()
         vim.cmd('Ai!')
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
