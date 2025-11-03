@@ -42,6 +42,8 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
     normal! G
 
+    silent! write
+
 endf
 
 function! ai#get_chats_dir()
