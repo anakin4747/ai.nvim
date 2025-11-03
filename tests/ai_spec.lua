@@ -15,20 +15,6 @@ describe(":Ai", function()
 
     after_each(teardown)
 
-    it("<prompt> accepts a prompt as an argument", function()
-        assert.has_no.errors(function()
-            vim.cmd('Ai make me toast')
-        end)
-    end)
-
-    it("<prompt> passes the prompt to the buffer", function()
-        vim.cmd('Ai make me toast')
-
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-        assert(vim.tbl_contains(lines, "make me toast"))
-    end)
-
     it("reuses the last chat name", function()
         vim.cmd('Ai')
         local first_buf_name = vim.api.nvim_buf_get_name(0)
@@ -53,12 +39,78 @@ describe(":Ai", function()
         assert.are.same(expected, actual)
     end)
 
-    it("puts cursor at the bottom of the chat", function()
+    it("puts the cursor at the bottom of the chat", function()
         vim.cmd("Ai")
 
         local expected = vim.api.nvim_buf_line_count(0)
         local actual = vim.api.nvim_win_get_cursor(0)[1]
         assert.are.same(expected, actual)
+    end)
+end)
+
+describe(":Ai <prompt>", function()
+
+    after_each(teardown)
+
+    it("accepts a prompt as an argument", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai make me toast')
+        end)
+    end)
+
+    it("passes the prompt to the buffer", function()
+        vim.cmd('Ai make me toast')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "make me toast"))
+    end)
+end)
+
+describe(":Ai <model>", function()
+
+    after_each(teardown)
+
+    it("sets the model to <model>", function()
+
+        vim.cmd('Ai claude-haiku-4.5 sample chat')
+
+        assert(vim.g.ai_model, "claude-haiku-4.5")
+    end)
+
+    it("does not pass <model> to the chat", function()
+
+        vim.cmd('Ai claude-haiku-4.5 sample chat')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "sample chat"
+        }, lines)
+    end)
+end)
+
+describe(":Ai <tab>", function()
+
+    after_each(teardown)
+
+    it("completes the first arg with models", function()
+        local completion = vim.fn['ai#completion']("", "Ai ", "")
+
+        assert(vim.tbl_contains(vim.split(completion, "\n"), "gemini-2.5-pro"))
+    end)
+end)
+
+describe(":Ai <model> <tab>", function()
+
+    after_each(teardown)
+
+    it("does not complete anything after first argument", function()
+        local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
+
+        assert.same("", completion)
     end)
 end)
 
@@ -98,31 +150,6 @@ describe(":Ai!", function()
         vim.cmd('Ai!')
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         assert.are.same(lines, { '# ME', '' })
-    end)
-end)
-
-describe(":Ai! <model>", function()
-
-    after_each(teardown)
-
-    it("sets the model to <model>", function()
-
-        vim.cmd('Ai! claude-haiku-4.5 sample chat')
-
-        assert(vim.g.ai_model, "claude-haiku-4.5")
-    end)
-
-    it("does not pass <model> to the chat", function()
-
-        vim.cmd('Ai! claude-haiku-4.5 sample chat')
-
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-        assert.are.same({
-            "# ME",
-            "",
-            "sample chat"
-        }, lines)
     end)
 end)
 
@@ -282,22 +309,5 @@ describe("providers#get_all_models", function()
         local actual = vim.fn['providers#get_all_models']()
 
         assert.same(expected, actual)
-    end)
-end)
-
-describe("tab", function()
-
-    after_each(teardown)
-
-    it("completes models as first argument", function()
-        local completion = vim.fn['ai#completion']("", "Ai ", "")
-
-        assert(vim.tbl_contains(vim.split(completion, "\n"), "gemini-2.5-pro"))
-    end)
-
-    it("does not complete anything after first argument", function()
-        local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
-
-        assert.same("", completion)
     end)
 end)
