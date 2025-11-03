@@ -309,3 +309,26 @@ describe("providers#get_all_models", function()
         assert.same(expected, actual)
     end)
 end)
+
+describe("tab", function()
+
+    after_each(teardown)
+
+    it("completes models as first argument", function()
+        local completion = vim.fn['ai#completion']("", "Ai ", "")
+
+        assert(vim.tbl_contains(vim.split(completion, "\n"), "gemini-2.5-pro"))
+    end)
+
+    it("completes providers as first argument", function()
+        local completion = vim.fn['ai#completion']("", "Ai ", "")
+
+        assert(vim.tbl_contains(vim.split(completion, "\n"), "copilot"))
+    end)
+
+    it("does not complete anything after first argument", function()
+        local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
+
+        assert.same("", completion)
+    end)
+end)
