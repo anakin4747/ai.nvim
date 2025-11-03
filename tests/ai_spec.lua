@@ -154,6 +154,12 @@ describe(":Ai <model>", function()
             "sample chat"
         }, lines)
     end)
+
+    it("<tab> does not complete after first argument", function()
+        local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
+
+        assert.same("", completion)
+    end)
 end)
 
 describe(":Ai <tab>", function()
@@ -164,17 +170,6 @@ describe(":Ai <tab>", function()
         local completion = vim.fn['ai#completion']("", "Ai ", "")
 
         assert(vim.tbl_contains(vim.split(completion, "\n"), "gemini-2.5-pro"))
-    end)
-end)
-
-describe(":Ai <model> <tab>", function()
-
-    after_each(teardown)
-
-    it("does not complete anything after first argument", function()
-        local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
-
-        assert.same("", completion)
     end)
 end)
 
