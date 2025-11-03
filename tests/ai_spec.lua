@@ -9,6 +9,7 @@ local function teardown()
     end
     vim.cmd("silent! only")
     vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
+    vim.g.ai_provider = ""
 end
 
 describe(":Ai", function()
