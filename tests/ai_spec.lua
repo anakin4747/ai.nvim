@@ -127,6 +127,31 @@ describe(":Ai! <provider>", function()
     end)
 end)
 
+describe(":Ai! <model>", function()
+
+    after_each(teardown)
+
+    it("sets the model to <model>", function()
+
+        vim.cmd('Ai! claude-haiku-4.5 sample chat')
+
+        assert(vim.g.ai_model, "claude-haiku-4.5")
+    end)
+
+    it("does not pass <model> to the chat", function()
+
+        vim.cmd('Ai! claude-haiku-4.5 sample chat')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "sample chat"
+        }, lines)
+    end)
+end)
+
 describe(":'<,'>Ai", function()
 
     after_each(teardown)
