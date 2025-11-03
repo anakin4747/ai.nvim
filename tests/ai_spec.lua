@@ -9,7 +9,6 @@ local function teardown()
     end
     vim.cmd("silent! only")
     vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
-    vim.g.ai_provider = ""
 end
 
 describe(":Ai", function()
@@ -99,31 +98,6 @@ describe(":Ai!", function()
         vim.cmd('Ai!')
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         assert.are.same(lines, { '# ME', '' })
-    end)
-end)
-
-describe(":Ai! <provider>", function()
-
-    after_each(teardown)
-
-    it("sets the provider to <provider>", function()
-
-        vim.cmd('Ai! copilot sample chat')
-
-        assert(vim.g.ai_provider, "copilot")
-    end)
-
-    it("does not pass <provider> to the chat", function()
-
-        vim.cmd('Ai! copilot sample chat')
-
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-        assert.are.same({
-            "# ME",
-            "",
-            "sample chat"
-        }, lines)
     end)
 end)
 
@@ -343,12 +317,6 @@ describe("tab", function()
         local completion = vim.fn['ai#completion']("", "Ai ", "")
 
         assert(vim.tbl_contains(vim.split(completion, "\n"), "gemini-2.5-pro"))
-    end)
-
-    it("completes providers as first argument", function()
-        local completion = vim.fn['ai#completion']("", "Ai ", "")
-
-        assert(vim.tbl_contains(vim.split(completion, "\n"), "copilot"))
     end)
 
     it("does not complete anything after first argument", function()
