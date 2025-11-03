@@ -12,3 +12,11 @@ endf
 function! providers#get_models(provider = g:ai_provider)
     return call($"providers#{a:provider}#get_models", [])
 endf
+
+function! providers#get_all_models()
+    let models = []
+    for provider in providers#get()
+        let models += call($"providers#{provider}#get_models", [])
+    endfo
+    return models
+endf
