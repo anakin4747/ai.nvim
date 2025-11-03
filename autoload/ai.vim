@@ -119,3 +119,13 @@ function! s:check_prompt_for_provider(prompt)
 
     return ""
 endf
+
+function! ai#completion(arglead, cmdline, curpos)
+    let arg_count = a:cmdline->split()->len()
+
+    if arg_count == 1
+        return join(providers#get() + providers#get_all_models(), "\n")
+    endi
+
+    return ""
+endf

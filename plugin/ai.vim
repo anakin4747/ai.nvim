@@ -2,6 +2,7 @@
 let g:ai_provider = ""
 
 command!
+    \ -complete=custom,ai#completion
     \ -nargs=*
     \ -range
     \ -bang
