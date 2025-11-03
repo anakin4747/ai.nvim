@@ -310,11 +310,11 @@ describe("providers#get()", function()
     end)
 end)
 
-describe("providers#get_all_models()", function()
+describe("providers#get_models()", function()
 
     after_each(teardown)
 
-    it("returns a list of all models for all providers", function()
+    it("returns all models for all providers", function()
         local expected = {
             'claude-haiku-4.5',
             'claude-sonnet-4',
@@ -326,7 +326,7 @@ describe("providers#get_all_models()", function()
             'gpt-5-mini',
         }
 
-        local actual = vim.fn['providers#get_all_models']()
+        local actual = vim.fn['providers#get_models']()
 
         assert.same(expected, actual)
     end)

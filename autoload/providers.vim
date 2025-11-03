@@ -9,7 +9,7 @@ function! providers#get()
         \ })
 endf
 
-function! providers#get_all_models()
+function! providers#get_models()
     let models = []
     for provider in providers#get()
         let models += call($"providers#{provider}#get_models", [])
