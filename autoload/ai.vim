@@ -113,15 +113,9 @@ endf
 function! s:check_prompt_for_provider(prompt)
     let provider = get(split(a:prompt), 0, "")
 
-    if empty(provider)
-        return ""
-    endif
-
-    let provider_path = globpath(&rtp, $"autoload/providers/{provider}.vim", 1)
-
-    if empty(provider_path)
-        return ""
+    if index(providers#get(), provider) != -1
+        return provider
     endi
 
-    return provider
+    return ""
 endf
