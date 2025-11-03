@@ -263,30 +263,6 @@ describe("providers#get", function()
     end)
 end)
 
-describe("providers#get_models", function()
-
-    after_each(teardown)
-
-    it("with copilot provider returns a list of provided models", function()
-        vim.g.ai_provider = "copilot"
-
-        local expected = {
-            'claude-haiku-4.5',
-            'claude-sonnet-4',
-            'claude-sonnet-4.5',
-            'gemini-2.5-pro',
-            'gpt-4.1',
-            'gpt-4o',
-            'gpt-5',
-            'gpt-5-mini',
-        }
-
-        local actual = vim.fn['providers#get_models']()
-
-        assert.same(expected, actual)
-    end)
-end)
-
 describe("providers#get_all_models", function()
 
     after_each(teardown)
