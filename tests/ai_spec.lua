@@ -102,18 +102,18 @@ describe(":Ai!", function()
     end)
 end)
 
-describe(":Ai! copilot", function()
+describe(":Ai! <provider>", function()
 
     after_each(teardown)
 
-    it("sets the provider to copilot", function()
+    it("sets the provider to <provider>", function()
 
         vim.cmd('Ai! copilot sample chat')
 
         assert(vim.g.ai_provider, "copilot")
     end)
 
-    it("provider does not get passed to the chat", function()
+    it("does not pass <provider> to the chat", function()
 
         vim.cmd('Ai! copilot sample chat')
 
