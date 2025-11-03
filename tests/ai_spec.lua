@@ -251,3 +251,14 @@ describe(":vert Ai", function()
         end)
     end)
 end)
+
+describe("providers#get", function()
+
+    after_each(teardown)
+
+    it("returns a list of providers", function()
+        local expected = { "copilot" }
+        local actual = vim.fn['providers#get']()
+        assert.same(expected, actual)
+    end)
+end)
