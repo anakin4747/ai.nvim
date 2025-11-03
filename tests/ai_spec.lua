@@ -19,8 +19,6 @@ describe(":Ai", function()
         vim.cmd('Ai')
         local first_buf_name = vim.api.nvim_buf_get_name(0)
 
-        vim.cmd('silent! write')
-
         vim.cmd('Ai')
         local second_buf_name = vim.api.nvim_buf_get_name(0)
 
@@ -30,8 +28,6 @@ describe(":Ai", function()
     it("reuses the last chat window", function()
         vim.cmd("Ai")
         local expected = vim.api.nvim_get_current_win()
-
-        vim.cmd("silent! write")
 
         vim.cmd("Ai")
         local actual = vim.api.nvim_get_current_win()
