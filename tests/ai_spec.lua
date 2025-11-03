@@ -103,8 +103,27 @@ describe(":Ai <prompt>", function()
         end)
     end)
 
-    it("passes the prompt to the buffer", function()
+    it("passes <prompt> to the buffer", function()
         vim.cmd('Ai make me toast')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "make me toast"))
+    end)
+end)
+
+describe(":Ai! <prompt>", function()
+
+    after_each(teardown)
+
+    it("accepts a prompt as an argument", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai! make me toast')
+        end)
+    end)
+
+    it("passes <prompt> to the buffer", function()
+        vim.cmd('Ai! make me toast')
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
