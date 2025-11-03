@@ -15,6 +15,12 @@ describe(":Ai", function()
 
     after_each(teardown)
 
+    it("does not error", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai')
+        end)
+    end)
+
     it("reuses the last chat name", function()
         vim.cmd('Ai')
         local first_buf_name = vim.api.nvim_buf_get_name(0)
@@ -37,6 +43,49 @@ describe(":Ai", function()
 
     it("puts the cursor at the bottom of the chat", function()
         vim.cmd("Ai")
+
+        local expected = vim.api.nvim_buf_line_count(0)
+        local actual = vim.api.nvim_win_get_cursor(0)[1]
+        assert.are.same(expected, actual)
+    end)
+end)
+
+describe(":Ai!", function()
+
+    after_each(teardown)
+
+    it("does not error", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai!')
+        end)
+    end)
+
+    it("creates a new empty chat", function()
+        vim.cmd('Ai')
+        local first_buf_name = vim.api.nvim_buf_get_name(0)
+
+        vim.cmd('Ai!')
+        local second_buf_name = vim.api.nvim_buf_get_name(0)
+
+        assert.not_equal(first_buf_name, second_buf_name)
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same(lines, { '# ME', '' })
+    end)
+
+    it("reuses the last chat window", function()
+        vim.cmd("Ai")
+        local expected = vim.api.nvim_get_current_win()
+
+        vim.cmd("Ai!")
+        local actual = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected, actual)
+    end)
+
+    it("puts the cursor at the bottom of the chat", function()
+        vim.cmd("Ai!")
 
         local expected = vim.api.nvim_buf_line_count(0)
         local actual = vim.api.nvim_win_get_cursor(0)[1]
@@ -107,33 +156,6 @@ describe(":Ai <model> <tab>", function()
         local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
 
         assert.same("", completion)
-    end)
-end)
-
-describe(":Ai!", function()
-
-    after_each(teardown)
-
-    it("does not error", function()
-        assert.has_no.errors(function()
-            vim.cmd('Ai!')
-        end)
-    end)
-
-    it("creates a new chat", function()
-        vim.cmd('Ai')
-        local first_buf_name = vim.api.nvim_buf_get_name(0)
-
-        vim.cmd('Ai!')
-        local second_buf_name = vim.api.nvim_buf_get_name(0)
-
-        assert.not_equal(first_buf_name, second_buf_name)
-    end)
-
-    it("creates an empty chat", function()
-        vim.cmd('Ai!')
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-        assert.are.same(lines, { '# ME', '' })
     end)
 end)
 
