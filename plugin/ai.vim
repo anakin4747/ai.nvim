@@ -1,5 +1,5 @@
 
-let g:ai_provider = ""
+let g:ai_model = ""
 
 command!
     \ -complete=custom,ai#completion

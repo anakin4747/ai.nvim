@@ -2,9 +2,9 @@
 function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
     let prompt = a:prompt
-    let provider_passed = s:check_prompt_for_provider(prompt)
-    if provider_passed != ""
-        let g:ai_provider = provider_passed
+    let model_passed = s:check_prompt_for_model(prompt)
+    if model_passed != ""
+        let g:ai_model = model_passed
         " remove first word from prompt
         let prompt = join(split(prompt)[1:])
     endi
@@ -110,11 +110,11 @@ function! s:get_open_chat_winnr()
     return 0
 endf
 
-function! s:check_prompt_for_provider(prompt)
-    let provider = get(split(a:prompt), 0, "")
+function! s:check_prompt_for_model(prompt)
+    let model = get(split(a:prompt), 0, "")
 
-    if index(providers#get(), provider) != -1
-        return provider
+    if index(providers#get_all_models(), model) != -1
+        return model
     endi
 
     return ""
