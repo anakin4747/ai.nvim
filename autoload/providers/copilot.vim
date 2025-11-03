@@ -3,7 +3,7 @@ function! providers#copilot#get_models()
     return s:get_models_response().data
         \ ->copy()
         \ ->filter({_, v -> v.model_picker_enabled})
-        \ ->map({_, v -> v.name})
+        \ ->map({_, v -> v.id})
         \ ->sort()
 endf
 

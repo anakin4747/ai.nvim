@@ -272,14 +272,14 @@ describe("providers#get_models", function()
         vim.g.ai_provider = "copilot"
 
         local expected = {
-           'Claude Haiku 4.5',
-           'Claude Sonnet 4',
-           'Claude Sonnet 4.5',
-           'GPT-4.1',
-           'GPT-4o',
-           'GPT-5',
-           'GPT-5 mini',
-           'Gemini 2.5 Pro',
+            'claude-haiku-4.5',
+            'claude-sonnet-4',
+            'claude-sonnet-4.5',
+            'gemini-2.5-pro',
+            'gpt-4.1',
+            'gpt-4o',
+            'gpt-5',
+            'gpt-5-mini',
         }
 
         local actual = vim.fn['providers#get_models']()
@@ -294,14 +294,14 @@ describe("providers#get_all_models", function()
 
     it("returns a list of all models for all providers", function()
         local expected = {
-           'Claude Haiku 4.5',
-           'Claude Sonnet 4',
-           'Claude Sonnet 4.5',
-           'GPT-4.1',
-           'GPT-4o',
-           'GPT-5',
-           'GPT-5 mini',
-           'Gemini 2.5 Pro',
+            'claude-haiku-4.5',
+            'claude-sonnet-4',
+            'claude-sonnet-4.5',
+            'gemini-2.5-pro',
+            'gpt-4.1',
+            'gpt-4o',
+            'gpt-5',
+            'gpt-5-mini',
         }
 
         local actual = vim.fn['providers#get_all_models']()
