@@ -111,6 +111,19 @@ describe(":Ai! copilot", function()
 
         assert(vim.g.ai_provider, "copilot")
     end)
+
+    it("provider does not get passed to the chat", function()
+
+        vim.cmd('Ai! copilot sample chat')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "sample chat"
+        }, lines)
+    end)
 end)
 
 describe(":'<,'>Ai", function()
