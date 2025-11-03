@@ -1,6 +1,11 @@
 
 function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
+    let provider_passed = s:check_prompt_for_provider(a:prompt)
+    if provider_passed != ""
+        let g:ai_provider = provider_passed
+    endi
+
     let chats_dir = ai#get_chats_dir()
 
     if !isdirectory(chats_dir)
@@ -100,4 +105,20 @@ function! s:get_open_chat_winnr()
     endfo
 
     return 0
+endf
+
+function! s:check_prompt_for_provider(prompt)
+    let provider = get(split(a:prompt), 0, "")
+
+    if empty(provider)
+        return ""
+    endif
+
+    let provider_path = globpath(&rtp, $"autoload/providers/{provider}.vim", 1)
+
+    if empty(provider_path)
+        return ""
+    endi
+
+    return provider
 endf

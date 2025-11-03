@@ -1,4 +1,6 @@
 
+let g:ai_provider = ""
+
 command!
     \ -nargs=*
     \ -range
