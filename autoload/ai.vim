@@ -1,9 +1,12 @@
 
 function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
-    let provider_passed = s:check_prompt_for_provider(a:prompt)
+    let prompt = a:prompt
+    let provider_passed = s:check_prompt_for_provider(prompt)
     if provider_passed != ""
         let g:ai_provider = provider_passed
+        " remove first word from prompt
+        let prompt = join(split(prompt)[1:])
     endi
 
     let chats_dir = ai#get_chats_dir()
@@ -26,8 +29,8 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
     call setbufline(bufnr, 1, "# ME")
     call setbufline(bufnr, 2, "")
 
-    if a:prompt != ""
-        call appendbufline(bufnr, "$", a:prompt)
+    if prompt != ""
+        call appendbufline(bufnr, "$", prompt)
     endi
 
     if a:range
