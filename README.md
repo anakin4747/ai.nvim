@@ -36,4 +36,11 @@ So you will need to have a locking mechanism so that you do not edit the
 buffer will its doing its handshake, or you can have a way so that it will
 always just append the most recent file.
 
+Soon you will need to investigate how to dynamically generate tests to account
+for every comination of every feature
+
+    bang vs no bang
+    range vs modifiers vs no prefix
+    prompt vs no prompt
+    model vs no model
 
