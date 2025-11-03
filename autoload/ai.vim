@@ -115,7 +115,7 @@ endf
 function! s:check_prompt_for_model(prompt)
     let model = get(split(a:prompt), 0, "")
 
-    if index(providers#get_all_models(), model) != -1
+    if index(providers#get_models(), model) != -1
         return model
     endi
 
@@ -126,7 +126,7 @@ function! ai#completion(arglead, cmdline, curpos)
     let arg_count = a:cmdline->split()->len()
 
     if arg_count == 1
-        return providers#get_all_models()->join("\n")
+        return providers#get_models()->join("\n")
     endi
 
     return ""
