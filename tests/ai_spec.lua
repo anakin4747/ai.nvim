@@ -153,6 +153,17 @@ describe(":Ai <model>", function()
         assert(vim.g.ai_model, "claude-haiku-4.5")
     end)
 
+    it("does not go to a chat", function()
+        local expected_buf = vim.api.nvim_get_current_buf()
+        local expected_win = vim.api.nvim_get_current_win()
+        vim.cmd('Ai claude-haiku-4.5')
+        local actual_buf = vim.api.nvim_get_current_buf()
+        local actual_win = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected_buf, actual_buf)
+        assert.are.same(expected_win, actual_win)
+    end)
+
     describe("<prompt>", function()
         it("does not pass <model> to the chat", function()
 
