@@ -7,6 +7,10 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
         let g:ai_model = model_passed
         " remove first word from prompt
         let prompt = join(split(prompt)[1:])
+
+        if prompt == ""
+            return
+        endi
     endi
 
     let chats_dir = ai#get_chats_dir()
