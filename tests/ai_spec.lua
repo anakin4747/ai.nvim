@@ -148,22 +148,24 @@ describe(":Ai <model>", function()
 
     it("sets the model to <model>", function()
 
-        vim.cmd('Ai claude-haiku-4.5 sample chat')
+        vim.cmd('Ai claude-haiku-4.5')
 
         assert(vim.g.ai_model, "claude-haiku-4.5")
     end)
 
-    it("does not pass <model> to the chat", function()
+    describe("<prompt>", function()
+        it("does not pass <model> to the chat", function()
 
-        vim.cmd('Ai claude-haiku-4.5 sample chat')
+            vim.cmd('Ai claude-haiku-4.5 sample chat')
 
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+            local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
-        assert.are.same({
-            "# ME",
-            "",
-            "sample chat"
-        }, lines)
+            assert.are.same({
+                "# ME",
+                "",
+                "sample chat"
+            }, lines)
+        end)
     end)
 
     it("<tab> does not complete after first argument", function()
