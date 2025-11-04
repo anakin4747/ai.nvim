@@ -135,7 +135,7 @@ describe(":Ai <tab>", function()
 
     after_each(teardown)
 
-    it("completes the first arg with models", function()
+    it("completes the first argument with models", function()
         local completion = vim.fn['ai#completion']("", "Ai ", "")
 
         assert(vim.tbl_contains(vim.split(completion, "\n"), "gemini-2.5-pro"))
