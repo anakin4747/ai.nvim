@@ -1,5 +1,7 @@
 require("plenary.busted")
 
+local this_repo = vim.fn.expand('<sfile>:p:h')
+
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
         vim.api.nvim_buf_delete(bufnr, { force = true })
@@ -358,7 +360,7 @@ describe("ai#get_cache_dir", function()
     end)
 
     it("returns directory in ./tests/cache under test", function()
-        local expected = vim.fn.expand('<sfile>:p:h') .. "/tests/cache"
+        local expected = this_repo .. "/tests/cache"
         local actual = vim.fn['ai#get_cache_dir']()
         assert.are_match(expected, actual)
     end)
