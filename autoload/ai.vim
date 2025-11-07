@@ -50,6 +50,14 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
 endf
 
+function! ai#get_cache_dir()
+    if exists("g:i_am_in_a_test")
+        return $"{expand('<sfile>:p:h')}/tests/cache/ai.nvim/chats"
+    endi
+
+    return $"{stdpath("cache")}/ai.nvim/chats"
+endf
+
 function! ai#get_chats_dir()
     if exists("g:i_am_in_a_test")
         return $"{stdpath("run")}/ai.nvim/chats"
