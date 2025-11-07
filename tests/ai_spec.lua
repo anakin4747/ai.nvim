@@ -1,11 +1,8 @@
 require("plenary.busted")
 
 local function teardown()
-    local current_buf = vim.api.nvim_get_current_buf()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-        if bufnr ~= current_buf and vim.api.nvim_buf_is_loaded(bufnr) then
-            vim.api.nvim_buf_delete(bufnr, { force = true })
-        end
+        vim.api.nvim_buf_delete(bufnr, { force = true })
     end
     vim.cmd("silent! only")
     vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
