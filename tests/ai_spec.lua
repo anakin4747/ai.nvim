@@ -363,3 +363,32 @@ describe("ai#get_cache_dir", function()
         assert.are_match(expected, actual)
     end)
 end)
+
+describe("providers#copilot#get_token()", function()
+
+    after_each(teardown)
+
+    it("gets cached token if token is not expired", function()
+        local mocked_localtime = "1762500000"
+
+        local expected = "tid=26ed118a917717416828d326959f9925;ol=ee6c7ed075ac72bdc85918363ea14d53;exp=1762537346;sku=copilot_for_business_seat_quota;proxy-ep=proxy.business.githubcopilot.com;st=dotcom;ssc=1;chat=1;sn=1;malfil=1;editor_preview_features=1;agent_mode=1;mcp=1;ccr=1;8kp=1;ip=209.52.88.83;asn=AS852:0208a35acc36a3a4863c58d141071b367fa89db5e3f1bddfd72fcbe845bfcb3e"
+
+        local actual = vim.fn['providers#copilot#get_token'](
+            mocked_localtime
+        )
+
+        assert.equal(expected, actual)
+    end)
+
+    it("gets a new token if token is expired", function()
+        local mocked_localtime = "1762600000"
+
+        local expected = "tid=26ed118a917717416828d326959f9925;ol=ee6c7ed075ac72bdc85918363ea14d53;exp=1762537346;sku=copilot_for_business_seat_quota;proxy-ep=proxy.business.githubcopilot.com;st=dotcom;ssc=1;chat=1;sn=1;malfil=1;editor_preview_features=1;agent_mode=1;mcp=1;ccr=1;8kp=1;ip=209.52.88.83;asn=AS852:0208a35acc36a3a4863c58d141071b367fa89db5e3f1bddfd72fcbe845bfcb3e"
+
+        local actual = vim.fn['providers#copilot#get_token'](
+            mocked_localtime
+        )
+
+        assert.not_equal(expected, actual)
+    end)
+end)
