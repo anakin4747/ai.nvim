@@ -23,12 +23,12 @@ describe(":Ai", function()
 
     it("reuses the last chat name", function()
         vim.cmd('Ai')
-        local first_buf_name = vim.api.nvim_buf_get_name(0)
+        local expected = vim.api.nvim_buf_get_name(0)
 
         vim.cmd('Ai')
-        local second_buf_name = vim.api.nvim_buf_get_name(0)
+        local actual = vim.api.nvim_buf_get_name(0)
 
-        assert.equal(first_buf_name, second_buf_name)
+        assert.equal(expected, actual)
     end)
 
     it("reuses the last chat window", function()
@@ -62,16 +62,17 @@ describe(":Ai!", function()
 
     it("creates a new empty chat", function()
         vim.cmd('Ai')
-        local first_buf_name = vim.api.nvim_buf_get_name(0)
+        local old_name = vim.api.nvim_buf_get_name(0)
 
         vim.cmd('Ai!')
-        local second_buf_name = vim.api.nvim_buf_get_name(0)
+        local new_name = vim.api.nvim_buf_get_name(0)
 
-        assert.not_equal(first_buf_name, second_buf_name)
+        assert.not_equal(old_name, new_name)
 
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        local expected = { '# ME', '' }
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
-        assert.are.same(lines, { '# ME', '' })
+        assert.are.same(expected, actual)
     end)
 
     it("reuses the last chat window", function()
@@ -266,7 +267,7 @@ describe(":'<,'>Ai", function()
 
         vim.cmd('1,3Ai')
 
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
         assert.are.same({
             "# ME",
@@ -276,7 +277,7 @@ describe(":'<,'>Ai", function()
             "line 2",
             "line 3",
             "```"
-        }, lines)
+        }, actual)
     end)
 
     it("works for single line ranges", function()
@@ -289,7 +290,7 @@ describe(":'<,'>Ai", function()
 
         vim.cmd('2Ai')
 
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
         assert.are.same({
             "# ME",
@@ -297,7 +298,7 @@ describe(":'<,'>Ai", function()
             "```",
             "line 2",
             "```"
-        }, lines)
+        }, actual)
     end)
 end)
 
