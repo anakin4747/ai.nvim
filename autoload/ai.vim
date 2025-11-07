@@ -52,14 +52,14 @@ endf
 
 function! ai#get_cache_dir()
     if exists("g:i_am_in_a_test")
-        return $"{expand('<sfile>:p:h')}/tests/cache"
+        return $"{expand('<sfile>:p:h')}/tests/cache/ai.nvim"
     endi
 
-    return $"{stdpath("cache")}"
+    return $"{stdpath("cache")}/ai.nvim"
 endf
 
 function! ai#get_chats_dir()
-    return $"{ai#get_cache_dir()}/ai.nvim/chats"
+    return $"{ai#get_cache_dir()}/chats"
 endf
 
 function! ai#get_last_chat_path(chats_dir = ai#get_chats_dir())
