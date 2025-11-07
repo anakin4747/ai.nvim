@@ -345,3 +345,24 @@ describe("providers#get_models()", function()
         assert.same(expected, actual)
     end)
 end)
+
+describe("ai#get_cache_dir", function()
+
+    after_each(teardown)
+
+    it("returns directory in ~/.cache", function()
+        vim.g.i_am_in_a_test = nil
+
+        local expected = ".cache"
+        local actual = vim.fn['ai#get_cache_dir']()
+        assert.are_match(expected, actual)
+
+        vim.g.i_am_in_a_test = true
+    end)
+
+    it("returns directory in ./tests/cache under test", function()
+        local expected = vim.fn.expand('<sfile>:p:h') .. "/tests/cache"
+        local actual = vim.fn['ai#get_cache_dir']()
+        assert.are_match(expected, actual)
+    end)
+end)
