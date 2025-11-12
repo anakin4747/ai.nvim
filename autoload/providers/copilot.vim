@@ -14,7 +14,7 @@ endf
 
 " naming is now inconsistent about the two different keys
 function! providers#copilot#get_token(localtime = localtime())
-    let token_json_path = $"{ai#get_cache_dir()}/providers/copilot/token.json"
+    let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
     let token_json = token_json_path->readfile()->join("\n")->json_decode()
 
     if token_json.expires_at > a:localtime
@@ -50,7 +50,7 @@ function! s:get_remote_token()
 endf
 
 function! s:save_remote_token()
-    let token_json_path = $"{ai#get_cache_dir()}/providers/copilot/token.json"
+    let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
     let json = [s:get_remote_token()->json_encode()]
     return json->writefile(token_json_path)
 endf
