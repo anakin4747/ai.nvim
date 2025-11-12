@@ -12,7 +12,6 @@ function! s:get_models_response()
     return json_path->readfile()->join("\n")->json_decode()
 endf
 
-
 " naming is now inconsistent about the two different keys
 function! providers#copilot#get_token(localtime = localtime())
     let token_json_path = $"{ai#get_cache_dir()}/providers/copilot/token.json"
@@ -34,7 +33,6 @@ function! s:get_local_token()
 endf
 
 function! s:get_remote_token()
-
     let copilot_url = "https://api.github.com/copilot_internal/v2/token"
     let local_token = s:get_local_token()
 
