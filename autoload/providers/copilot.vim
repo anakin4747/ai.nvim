@@ -8,8 +8,7 @@ function! providers#copilot#get_models()
 endf
 
 function! s:get_models_response()
-    " TODO: replace test fixture with API call
-    let json_path = $"{expand('<sfile>:p:h')}/tests/fixtures/copilot/get_models_response.json"
+    let json_path = $"{ai#nvim_get_dir()}/providers/copilot/models.json"
     return json_path->readfile()->join("\n")->json_decode()
 endf
 
@@ -23,7 +22,8 @@ function! providers#copilot#get_token(localtime = localtime())
         return token_json.token
     endi
 
-    return "TODO: do network side of getting token"
+    call s:save_remote_token()
+    return providers#copilot#get_token(a:localtime)
 endf
 
 function! s:get_local_token()
@@ -47,5 +47,12 @@ function! s:get_remote_token()
         \       --silent
         \"
 
-    return system(cmd)->trim()
+    let remote_token_json = system(cmd)->trim()->json_decode()
+    return remote_token_json
+endf
+
+function! s:save_remote_token()
+    let token_json_path = $"{ai#get_cache_dir()}/providers/copilot/token.json"
+    let json = [s:get_remote_token()->json_encode()]
+    return json->writefile(token_json_path)
 endf
