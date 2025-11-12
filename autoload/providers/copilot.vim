@@ -12,3 +12,14 @@ function! s:get_models_response()
     let json_path = $"{expand('<sfile>:p:h')}/tests/fixtures/copilot/get_models_response.json"
     return json_path->readfile()->join("\n")->json_decode()
 endf
+
+function! providers#copilot#get_token(localtime = localtime())
+    let token_json_path = $"{ai#get_cache_dir()}/providers/copilot/token.json"
+    let token_json = token_json_path->readfile()->join("\n")->json_decode()
+
+    if token_json.expires_at > a:localtime
+        return token_json.token
+    endi
+
+    return "TODO: do network side of getting token"
+endf

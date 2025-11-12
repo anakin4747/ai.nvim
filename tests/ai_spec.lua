@@ -8,6 +8,9 @@ local function teardown()
     end
     vim.cmd("silent! only")
     vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
+
+    vim.g.i_am_in_a_test = true
+    vim.g.ai_cache_dir = nil
 end
 
 describe(":Ai", function()
@@ -355,14 +358,13 @@ describe("ai#get_cache_dir", function()
         local expected = ".cache"
         local actual = vim.fn['ai#get_cache_dir']()
         assert.are_match(expected, actual)
-
-        vim.g.i_am_in_a_test = true
     end)
 
-    it("returns directory in ./tests/cache under test", function()
-        local expected = this_repo .. "/tests/cache"
+    it("returns the directory specified by g:ai_cache_dir under test", function()
+        vim.g.ai_cache_dir = this_repo .. "/tests/fixtures/cache"
+
         local actual = vim.fn['ai#get_cache_dir']()
-        assert.are_match(expected, actual)
+        assert.are_match(vim.g.ai_cache_dir, actual)
     end)
 end)
 
