@@ -51,8 +51,12 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 endf
 
 function! ai#get_cache_dir()
+    if exists("g:ai_cache_dir")
+        return g:ai_cache_dir
+    endi
+
     if exists("g:i_am_in_a_test")
-        return $"{expand('<sfile>:p:h')}/tests/cache/ai.nvim"
+        return $"{expand('<sfile>:p:h')}/tests/fixtures/cache/ai.nvim"
     endi
 
     return $"{stdpath("cache")}/ai.nvim"
