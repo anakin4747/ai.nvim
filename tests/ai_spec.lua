@@ -1,6 +1,7 @@
 require("plenary.busted")
 
 local this_repo = vim.fn.expand('<sfile>:p:h')
+local default_mock_dir = this_repo .. "/tests/fixtures/ai.nvim"
 
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -10,7 +11,7 @@ local function teardown()
     vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
 
     vim.g.i_am_in_a_test = true
-    vim.g.ai_cache_dir = nil
+    vim.g.ai_dir = default_mock_dir
 end
 
 describe(":Ai", function()
@@ -348,23 +349,26 @@ describe("providers#get_models()", function()
     end)
 end)
 
-describe("ai#get_cache_dir", function()
+describe("ai#nvim_get_dir()", function()
 
     after_each(teardown)
 
-    it("returns directory in ~/.cache", function()
+    it("returns a normal state directory", function()
         vim.g.i_am_in_a_test = nil
 
-        local expected = ".cache"
-        local actual = vim.fn['ai#get_cache_dir']()
-        assert.are_match(expected, actual)
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.are_match('.local/state', actual)
     end)
 
-    it("returns the directory specified by g:ai_cache_dir under test", function()
-        vim.g.ai_cache_dir = this_repo .. "/tests/fixtures/cache"
+    it("returns the default mock directory under test", function()
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.equal(default_mock_dir, actual)
+    end)
 
-        local actual = vim.fn['ai#get_cache_dir']()
-        assert.are_match(vim.g.ai_cache_dir, actual)
+    it("returns a specific mock directory under test if specified", function()
+        vim.g.ai_dir = this_repo .. "/tests/fixtures/specific-test-case/ai.nvim"
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.equal(vim.g.ai_dir, actual)
     end)
 end)
 
