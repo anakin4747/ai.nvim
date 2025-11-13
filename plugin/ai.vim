@@ -1,5 +1,7 @@
 
 let g:ai_model = ""
+"let g:ai_dir = ""
+"let g:ai_home_dir = ""
 
 command!
     \ -complete=custom,ai#completion
