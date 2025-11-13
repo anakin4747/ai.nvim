@@ -3,6 +3,8 @@ require("plenary.busted")
 local this_repo = vim.fn.expand('<sfile>:p:h')
 local default_mock_dir = this_repo .. "/tests/fixtures/ai.nvim"
 
+vim.g.ai_dir = default_mock_dir
+
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
         vim.api.nvim_buf_delete(bufnr, { force = true })
