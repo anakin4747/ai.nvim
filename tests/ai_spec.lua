@@ -13,6 +13,8 @@ local function teardown()
     vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
 
     vim.g.i_am_in_a_test = true
+
+    vim.system({ "git", "restore", vim.g.ai_dir }):wait()
     vim.g.ai_dir = default_mock_dir
 end
 
