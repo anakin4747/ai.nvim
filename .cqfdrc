@@ -1,0 +1,8 @@
+[project]
+org='anakin4747'
+name='ai_nvim'
+
+[build]
+command="make"
+
+# vi: ft=ini
