@@ -59,11 +59,11 @@ function! ai#get_home_dir()
 endf
 
 function! ai#nvim_get_dir()
-    if exists("g:ai_dir")
-        return g:ai_dir
+    if !exists("g:i_am_in_a_test")
+        return $"{stdpath("state")}/ai.nvim"
     endi
 
-    return $"{stdpath("state")}/ai.nvim"
+    return g:ai_dir
 endf
 
 function! ai#get_chats_dir()
