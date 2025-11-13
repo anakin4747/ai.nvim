@@ -4,6 +4,8 @@ local this_repo = vim.fn.expand('<sfile>:p:h')
 local default_mock_dir = this_repo .. "/tests/fixtures/ai.nvim"
 
 vim.g.ai_dir = default_mock_dir
+-- support mocking home dir
+vim.g.ai_home_dir = os.getenv("HOME")
 
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
