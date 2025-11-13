@@ -50,6 +50,14 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
 endf
 
+function! ai#get_home_dir()
+    if exists("g:ai_home_dir")
+        return g:ai_home_dir
+    endi
+
+    return expand("$HOME")
+endf
+
 function! ai#nvim_get_dir()
     if exists("g:ai_dir")
         return g:ai_dir
