@@ -3,6 +3,6 @@ org='anakin4747'
 name='ai_nvim'
 
 [build]
-command="make"
+command="make cloc"
 
 # vi: ft=ini
