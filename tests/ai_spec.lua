@@ -322,6 +322,29 @@ describe(":vert Ai", function()
     end)
 end)
 
+describe("ai#nvim_get_dir()", function()
+
+    after_each(teardown)
+
+    it("returns a normal ai.nvim directory", function()
+        vim.g.i_am_in_a_test = nil
+
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.are_match('.local/state', actual)
+    end)
+
+    it("returns the default mock directory under test", function()
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.equal(default_mock_dir, actual)
+    end)
+
+    it("returns a specific mock directory under test if specified", function()
+        vim.g.ai_dir = this_repo .. "/tests/fixtures/specific-test-case/ai.nvim"
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.equal(vim.g.ai_dir, actual)
+    end)
+end)
+
 describe("providers#get()", function()
 
     after_each(teardown)
@@ -352,29 +375,6 @@ describe("providers#get_models()", function()
         local actual = vim.fn['providers#get_models']()
 
         assert.same(expected, actual)
-    end)
-end)
-
-describe("ai#nvim_get_dir()", function()
-
-    after_each(teardown)
-
-    it("returns a normal state directory", function()
-        vim.g.i_am_in_a_test = nil
-
-        local actual = vim.fn['ai#nvim_get_dir']()
-        assert.are_match('.local/state', actual)
-    end)
-
-    it("returns the default mock directory under test", function()
-        local actual = vim.fn['ai#nvim_get_dir']()
-        assert.equal(default_mock_dir, actual)
-    end)
-
-    it("returns a specific mock directory under test if specified", function()
-        vim.g.ai_dir = this_repo .. "/tests/fixtures/specific-test-case/ai.nvim"
-        local actual = vim.fn['ai#nvim_get_dir']()
-        assert.equal(vim.g.ai_dir, actual)
     end)
 end)
 
