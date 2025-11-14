@@ -30,7 +30,7 @@ function! providers#copilot#get_token(localtime = g:ai_localtime)
 endf
 
 function! s:get_local_token()
-    let apps_json_path = $"{ai#get_home_dir()}/.config/github-copilot/apps.json"
+    let apps_json_path = $"{expand("$HOME")}/.config/github-copilot/apps.json"
     let apps_json = apps_json_path->readfile()->join("\n")->json_decode()
     let top_dict = keys(apps_json)[0]
     return apps_json[top_dict]['oauth_token']
