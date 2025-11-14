@@ -3,6 +3,10 @@ require("plenary.busted")
 local this_repo = vim.fn.expand('<sfile>:p:h')
 local default_mock_dir = this_repo .. "/tests/fixtures/ai.nvim"
 
+local function fixture_dir(test_name)
+    return this_repo .. "/tests/fixtures/" .. test_name .. "/ai.nvim"
+end
+
 vim.g.ai_dir = default_mock_dir
 -- support mocking home dir
 vim.g.ai_home_dir = os.getenv("HOME")
@@ -378,28 +382,41 @@ describe("providers#get_models()", function()
     end)
 end)
 
-describe("providers#copilot#get_token()", function()
+local stub = require('luassert.stub')
+
+describe(":Ai copilot <prompt>", function()
 
     after_each(teardown)
 
-    it("gets cached token if token is not expired", function()
-        local mocked_localtime = "1762500000"
+    it("gets cached token if token is not expired on submit", function()
+        vim.g.ai_dir = fixture_dir("non-expired-remote-token")
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        local old_token_json = vim.fn.readfile(token_path)
 
-        local expected = "tid=26ed118a917717416828d326959f9925;ol=ee6c7ed075ac72bdc85918363ea14d53;exp=1762537346;sku=copilot_for_business_seat_quota;proxy-ep=proxy.business.githubcopilot.com;st=dotcom;ssc=1;chat=1;sn=1;malfil=1;editor_preview_features=1;agent_mode=1;mcp=1;ccr=1;8kp=1;ip=209.52.88.83;asn=AS852:0208a35acc36a3a4863c58d141071b367fa89db5e3f1bddfd72fcbe845bfcb3e"
+        vim.cmd('Ai copilot wow')
+        vim.fn['providers#submit_chat']()
 
-        local actual = vim.fn['providers#copilot#get_token'](mocked_localtime)
-
-        assert.equal(expected, actual)
+        local new_token_json = vim.fn.readfile(token_path)
+        assert.are.same(old_token_json, new_token_json)
     end)
 
-    it("gets a new token if token is expired", function()
-        local mocked_localtime = "1762600000"
+    it("gets a new token if token is expired on submit", function()
+        vim.g.ai_dir = fixture_dir("expired-remote-token")
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        local old_token_json = vim.fn.readfile(token_path)
 
-        local unexpected = "tid=26ed118a917717416828d326959f9925;ol=ee6c7ed075ac72bdc85918363ea14d53;exp=1762537346;sku=copilot_for_business_seat_quota;proxy-ep=proxy.business.githubcopilot.com;st=dotcom;ssc=1;chat=1;sn=1;malfil=1;editor_preview_features=1;agent_mode=1;mcp=1;ccr=1;8kp=1;ip=209.52.88.83;asn=AS852:0208a35acc36a3a4863c58d141071b367fa89db5e3f1bddfd72fcbe845bfcb3e"
+        local curl_stub = stub(vim.fn, 'ai#curl')
+        local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
+        local stubbed_curl_response = vim.fn.readfile(new_token_fixture)
+        curl_stub.returns(stubbed_curl_response)
 
-        local actual = vim.fn['providers#copilot#get_token'](mocked_localtime)
+        vim.cmd('Ai copilot wow')
+        vim.fn['providers#submit_chat']()
 
-        assert.are_match("^tid=%w+", actual)
-        assert.not_equal(unexpected, actual)
+        local new_token_json = vim.fn.readfile(token_path)
+        assert.are.not_same(old_token_json, new_token_json)
+        assert.are.same(stubbed_curl_response, new_token_json)
+        assert.stub(curl_stub).was_called()
+        curl_stub:revert()
     end)
 end)
