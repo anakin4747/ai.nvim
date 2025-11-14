@@ -1,6 +1,14 @@
 TESTS_INIT = tests/minimal_init.lua
 TESTS_DIR = tests/
 
+.PHONY: cqfd
+cqfd: cqfd_init
+	cqfd
+
+.PHONY: cqfd_init
+cqfd_init:
+	cqfd init
+
 .PHONY: cloc
 cloc: test
 	@which cloc &> /dev/null || ( printf "\033[32mYou don't have cloc installed\033[0m\n" && exit 1 )

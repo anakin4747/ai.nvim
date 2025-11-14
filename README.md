@@ -8,20 +8,20 @@ of 8.
 
 ## TDD
 
-This project uses Plenary Busted for its test suite. Either install it yourself
-or use the Dockerfile at `.cqfd/docker/Dockerfile`.
+This project uses Plenary Busted for its test suite and
+[`cqfd`](https://github.com/savoirfairelinux/cqfd) for reproducible setups
+inside docker.
 
-To run the tests run:
+To run the tests with cqfd:
 
 ```sh
 make
 ```
 
-Or you can use [`cqfd`](https://github.com/savoirfairelinux/cqfd):
+To run the tests without cqfd:
 
 ```sh
-cqfd init
-cqfd
+make test
 ```
 
 Currently the tests look something like this:
