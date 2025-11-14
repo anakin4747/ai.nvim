@@ -147,3 +147,14 @@ function! ai#completion(arglead, cmdline, curpos)
 
     return ""
 endf
+
+function! ai#curl(url, method, headers)
+    return system($"
+        \   curl
+        \       --request {a:method}
+        \       --url {a:url}
+        \       --silent
+        \       {a:headers}
+        \
+        \")
+endf
