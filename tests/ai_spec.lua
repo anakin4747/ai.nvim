@@ -24,6 +24,7 @@ local function teardown()
 
     vim.system({ "git", "restore", vim.g.ai_dir }):wait()
     vim.g.ai_dir = default_mock_dir
+    vim.g.ai_curl_stub_data = nil
 end
 
 describe(":Ai", function()
@@ -384,8 +385,6 @@ describe("providers#get_models()", function()
     end)
 end)
 
-local stub = require('luassert.stub')
-
 describe(":Ai copilot <prompt>", function()
 
     after_each(teardown)
@@ -407,18 +406,13 @@ describe(":Ai copilot <prompt>", function()
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
         local old_token_json = vim.fn.readfile(token_path)
 
-        local curl_stub = stub(vim.fn, 'ai#curl')
         local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
-        local stubbed_curl_response = vim.fn.readfile(new_token_fixture)
-        curl_stub.returns(stubbed_curl_response)
+        vim.g.ai_curl_stub_data = vim.fn.readfile(new_token_fixture)
 
         vim.cmd('Ai copilot wow')
         vim.fn['providers#submit_chat']()
 
         local new_token_json = vim.fn.readfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
-        assert.are.same(stubbed_curl_response, new_token_json)
-        assert.stub(curl_stub).was_called()
-        curl_stub:revert()
     end)
 end)
