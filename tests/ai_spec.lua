@@ -11,6 +11,8 @@ vim.g.ai_dir = default_mock_dir
 -- support mocking home dir
 vim.g.ai_home_dir = os.getenv("HOME")
 
+vim.g.ai_localtime = 1763098419
+
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
         vim.api.nvim_buf_delete(bufnr, { force = true })
