@@ -4,5 +4,6 @@ name='ai_nvim'
 
 [build]
 command="make cloc"
+docker_run_args="-v $HOME/.config/github-copilot/apps.json:$HOME/.config/github-copilot/apps.json"
 
 # vi: ft=ini
