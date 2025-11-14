@@ -1,4 +1,8 @@
 
+function! providers#copilot#submit_chat()
+    call providers#copilot#get_token()
+endf
+
 function! providers#copilot#get_models()
     return s:get_models_response().data
         \ ->copy()
@@ -36,16 +40,12 @@ function! s:get_remote_token()
     let copilot_url = "https://api.github.com/copilot_internal/v2/token"
     let local_token = s:get_local_token()
 
-    let cmd = $"
-        \   curl
-        \       --request GET
-        \       --url '{copilot_url}'
-        \       --header 'Authorization: Bearer {local_token}'
-        \       --header 'Accept: application/json'
-        \       --silent
+    let headers = $"
+        \   --header 'Authorization: Bearer {local_token}'
+        \   --header 'Accept: application/json'
         \"
 
-    let remote_token_json = system(cmd)->trim()->json_decode()
+    let remote_token_json = ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
     return remote_token_json
 endf
 
