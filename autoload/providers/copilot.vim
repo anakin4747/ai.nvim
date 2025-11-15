@@ -19,6 +19,12 @@ endf
 " naming is now inconsistent about the two different keys
 function! providers#copilot#get_token(localtime = g:ai_localtime)
     let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
+
+    if !filereadable(token_json_path)
+        call s:save_remote_token()
+        return providers#copilot#get_token(a:localtime)
+    endi
+
     let token_json = token_json_path->readfile()->join("\n")->json_decode()
 
     if token_json.expires_at > a:localtime
