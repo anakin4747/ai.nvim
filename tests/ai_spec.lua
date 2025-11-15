@@ -26,7 +26,6 @@ local function teardown()
         vim.api.nvim_buf_delete(bufnr, { force = true })
     end
     vim.cmd("silent! only")
-    vim.fn.delete(vim.fn['ai#get_chats_dir'](), 'rf')
 
     vim.g.i_am_in_a_test = true
 

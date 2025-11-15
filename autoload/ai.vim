@@ -13,7 +13,7 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
         endi
     endi
 
-    let chats_dir = ai#get_chats_dir()
+    let chats_dir = $"{ai#nvim_get_dir()}/chats"
 
     if !isdirectory(chats_dir)
         call mkdir(chats_dir, "p")
@@ -56,10 +56,6 @@ function! ai#nvim_get_dir()
     endi
 
     return g:ai_dir
-endf
-
-function! ai#get_chats_dir()
-    return $"{ai#nvim_get_dir()}/chats"
 endf
 
 function! ai#get_last_chat_path(chats_dir = ai#get_chats_dir())
