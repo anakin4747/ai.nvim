@@ -30,6 +30,7 @@ local function teardown()
 
     vim.g.i_am_in_a_test = true
 
+    vim.system({ "git", "clean", "-fq", vim.g.ai_dir }):wait()
     vim.system({ "git", "restore", vim.g.ai_dir }):wait()
     vim.g.ai_dir = default_mock_dir
     vim.g.ai_curl_stub_data = nil
@@ -422,6 +423,33 @@ describe(":Ai copilot <prompt>", function()
 
         local new_token_json = readjsonfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
+        assert.are.same(
+            vim.json.decode(vim.g.ai_curl_stub_data),
+            vim.json.decode(new_token_json)
+        )
+    end)
+
+    it("gets a new token if no token exists on submit", function()
+        vim.g.ai_dir = fixture_dir("no-token")
+
+        local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
+        vim.g.ai_curl_stub_data = readjsonfile(new_token_fixture)
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+
+        assert(vim.fn.filereadable(token_path) == 0)
+
+        vim.cmd('Ai copilot wow')
+        vim.fn['providers#submit_chat']()
+
+        assert(vim.fn.filereadable(token_path) == 1)
+
+        local new_token_json = readjsonfile(token_path)
+
+        assert.has_no.errors(function()
+            vim.json.decode(new_token_json)
+        end)
+
         assert.are.same(
             vim.json.decode(vim.g.ai_curl_stub_data),
             vim.json.decode(new_token_json)
