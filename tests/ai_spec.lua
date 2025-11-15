@@ -7,6 +7,14 @@ local function fixture_dir(test_name)
     return this_repo .. "/tests/fixtures/" .. test_name .. "/ai.nvim"
 end
 
+local function readjsonfile(path)
+    local stat = vim.uv.fs_stat(path)
+    local fd = vim.uv.fs_open(path, "r", tonumber('444', 8))
+    local data = vim.uv.fs_read(fd, stat.size):gsub("%z", "")
+    vim.uv.fs_close(fd)
+    return data
+end
+
 vim.g.ai_dir = default_mock_dir
 
 vim.g.ai_localtime = 1763098419
@@ -392,27 +400,31 @@ describe(":Ai copilot <prompt>", function()
     it("gets cached token if token is not expired on submit", function()
         vim.g.ai_dir = fixture_dir("non-expired-remote-token")
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-        local old_token_json = vim.fn.readfile(token_path)
+        local old_token_json = readjsonfile(token_path)
 
         vim.cmd('Ai copilot wow')
         vim.fn['providers#submit_chat']()
 
-        local new_token_json = vim.fn.readfile(token_path)
+        local new_token_json = readjsonfile(token_path)
         assert.are.same(old_token_json, new_token_json)
     end)
 
     it("gets a new token if token is expired on submit", function()
         vim.g.ai_dir = fixture_dir("expired-remote-token")
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-        local old_token_json = vim.fn.readfile(token_path)
+        local old_token_json = readjsonfile(token_path)
 
         local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
-        vim.g.ai_curl_stub_data = vim.fn.readfile(new_token_fixture)
+        vim.g.ai_curl_stub_data = readjsonfile(new_token_fixture)
 
         vim.cmd('Ai copilot wow')
         vim.fn['providers#submit_chat']()
 
-        local new_token_json = vim.fn.readfile(token_path)
+        local new_token_json = readjsonfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
+        assert.are.same(
+            vim.json.decode(vim.g.ai_curl_stub_data),
+            vim.json.decode(new_token_json)
+        )
     end)
 end)

@@ -142,7 +142,7 @@ endf
 
 function! ai#curl(url, method, headers)
     if exists("g:ai_curl_stub_data")
-        return g:ai_curl_stub_data->join("\n")
+        return g:ai_curl_stub_data
     endi
 
     return system($"
