@@ -394,7 +394,7 @@ describe("providers#get_models()", function()
     end)
 end)
 
-describe(":Ai copilot <prompt>", function()
+describe(":Ai gpt-4.1 <prompt>", function()
 
     after_each(teardown)
 
@@ -403,7 +403,7 @@ describe(":Ai copilot <prompt>", function()
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
         local old_token_json = readjsonfile(token_path)
 
-        vim.cmd('Ai copilot wow')
+        vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
 
         local new_token_json = readjsonfile(token_path)
@@ -418,7 +418,7 @@ describe(":Ai copilot <prompt>", function()
         local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
         vim.g.ai_curl_stub_data = readjsonfile(new_token_fixture)
 
-        vim.cmd('Ai copilot wow')
+        vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
 
         local new_token_json = readjsonfile(token_path)
@@ -439,7 +439,7 @@ describe(":Ai copilot <prompt>", function()
 
         assert(vim.fn.filereadable(token_path) == 0)
 
-        vim.cmd('Ai copilot wow')
+        vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
 
         assert(vim.fn.filereadable(token_path) == 1)
