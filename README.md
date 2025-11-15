@@ -86,6 +86,13 @@ Vimscript teaches you more about vim than lua does. Vimscript also has the
 best developer experience a language could offer due to the immediate in-editor
 documentation for the entire language. Which doesn't work as well with lua.
 
+I love Lua but some of the following reasons are why I dislike lua:
+- `error()` truncates filepaths
+- 0 is truthy
+- 1 based indexing
+- 2 space indenting is the norm
+- `vim.fn.readfile()` in lua != `readfile()` in vimscript
+
 # TODO
 
 - buffer locking? maybe
