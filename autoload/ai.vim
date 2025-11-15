@@ -104,8 +104,7 @@ endf
 
 function! s:get_open_chat_winnr()
 
-    let wincount = winnr('$')
-    for win in range(1, wincount)
+    for win in range(1, winnr('$'))
         let bufnr = winbufnr(win)
         if bufnr == -1
             continue
