@@ -38,8 +38,7 @@ endf
 function! s:get_local_token()
     let apps_json_path = $"{expand("$HOME")}/.config/github-copilot/apps.json"
     let apps_json = apps_json_path->readfile()->join("\n")->json_decode()
-    let top_dict = keys(apps_json)[0]
-    return apps_json[top_dict]['oauth_token']
+    return keys(apps_json)[0]['oauth_token']
 endf
 
 function! s:get_remote_token()
@@ -51,8 +50,7 @@ function! s:get_remote_token()
         \   --header 'Accept: application/json'
         \"
 
-    let remote_token_json = ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
-    return remote_token_json
+    return ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
 endf
 
 function! s:save_remote_token()
