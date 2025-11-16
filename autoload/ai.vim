@@ -136,16 +136,11 @@ function! ai#completion(arglead, cmdline, curpos)
 endf
 
 function! ai#curl(url, method, headers)
-    if exists("g:ai_curl_stub_data")
-        return g:ai_curl_stub_data
-    endi
-
     return system($"
         \   curl
         \       --request {a:method}
         \       --url {a:url}
         \       --silent
         \       {a:headers}
-        \
         \")
 endf
