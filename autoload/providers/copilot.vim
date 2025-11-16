@@ -1,27 +1,27 @@
 
 function! providers#copilot#submit_chat()
-    call providers#copilot#get_token()
+    call s:get_token()
 endf
 
 function! providers#copilot#get_models()
-    return s:get_models_response().data
+    return s:get_models().data
         \ ->copy()
         \ ->filter({_, v -> v.model_picker_enabled})
         \ ->map({_, v -> v.id})
         \ ->sort()
 endf
 
-function! s:get_models_response()
+function! s:get_models()
     let json_path = $"{ai#nvim_get_dir()}/providers/copilot/models.json"
     return json_path->readfile()->join("\n")->json_decode()
 endf
 
-function! providers#copilot#get_token(localtime = g:ai_localtime)
+function! s:get_token(localtime = g:ai_localtime)
     let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
 
     if !filereadable(token_json_path)
         call s:save_remote_token()
-        return providers#copilot#get_token(a:localtime)
+        return s:get_token(a:localtime)
     endi
 
     let token_json = token_json_path->readfile()->join("\n")->json_decode()
@@ -31,7 +31,7 @@ function! providers#copilot#get_token(localtime = g:ai_localtime)
     endi
 
     call s:save_remote_token()
-    return providers#copilot#get_token(a:localtime)
+    return s:get_token(a:localtime)
 endf
 
 function! s:get_local_token()
