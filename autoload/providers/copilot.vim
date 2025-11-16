@@ -16,7 +16,6 @@ function! s:get_models_response()
     return json_path->readfile()->join("\n")->json_decode()
 endf
 
-" naming is now inconsistent about the two different keys
 function! providers#copilot#get_token(localtime = g:ai_localtime)
     let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
 
