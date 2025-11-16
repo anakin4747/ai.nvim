@@ -12,8 +12,38 @@ function! providers#copilot#get_models()
 endf
 
 function! s:get_models()
-    let json_path = $"{ai#nvim_get_dir()}/providers/copilot/models.json"
-    return json_path->readfile()->join("\n")->json_decode()
+    let models_json_path = $"{ai#nvim_get_dir()}/providers/copilot/models.json"
+
+    if !filereadable(models_json_path)
+        call s:save_models()
+    endi
+
+    return models_json_path->readfile()->join("\n")->json_decode()
+endf
+
+function! s:save_models()
+    let models_json_path = $"{ai#nvim_get_dir()}/providers/copilot/models.json"
+    let json = [s:curl_models()->json_encode()]
+    return json->writefile(models_json_path)
+endf
+
+function! s:curl_models()
+    if exists("g:copilot_curl_models_mock")
+        return g:copilot_curl_models_mock->trim()->json_decode()
+    endi
+
+    let copilot_url = "https://api.business.githubcopilot.com/models"
+    let token = s:get_token()
+
+    let headers = $"
+        \   --header 'Authorization: Bearer {token}'
+        \   --header 'Accept: application/json'
+        \   --header 'Content-Type: application/json'
+        \   --header 'Copilot-Integration-Id: vscode-chat'
+        \   --header 'Editor-Version: Neovim/0.11.0'
+        \"
+
+    return ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
 endf
 
 function! s:get_token(localtime = g:ai_localtime)
