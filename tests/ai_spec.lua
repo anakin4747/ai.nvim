@@ -34,6 +34,7 @@ local function teardown()
     vim.system({ "git", "restore", vim.g.ai_dir }):wait()
     vim.g.ai_dir = default_mock_dir
     vim.g.copilot_curl_token_mock = nil
+    vim.g.copilot_curl_models_mock = nil
 end
 
 describe(":Ai", function()
@@ -501,5 +502,33 @@ describe(":Ai gpt-4.1 <prompt>", function()
 
         local new_models_mtime = vim.uv.fs_stat(models_path).mtime
         assert.are.not_same(old_models_mtime, new_models_mtime)
+    end)
+
+    it("gets new models if no models exist on submit", function()
+        vim.g.ai_dir = fixture_dir("no-models")
+
+        -- mock curling of models
+        local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
+        vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
+
+        -- ensure models.json does not exist
+        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
+        assert(vim.fn.filereadable(models_path) == 0)
+
+        vim.cmd('Ai gpt-4.1 wow')
+        vim.fn['providers#submit_chat']()
+
+        assert(vim.fn.filereadable(models_path) == 1)
+
+        local new_models_json = readjsonfile(models_path)
+
+        assert.has_no.errors(function()
+            vim.json.decode(new_models_json)
+        end)
+
+        assert.are.same(
+            vim.json.decode(vim.g.copilot_curl_models_mock),
+            vim.json.decode(new_models_json)
+        )
     end)
 end)
