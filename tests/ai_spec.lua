@@ -19,7 +19,8 @@ vim.g.ai_dir = default_mock_dir
 
 vim.g.ai_localtime = 1763098419
 
-vim.g.ai_curl_stub_data = nil
+vim.g.copilot_curl_token_mock = nil
+vim.g.copilot_curl_models_mock = nil
 
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -32,7 +33,7 @@ local function teardown()
     vim.system({ "git", "clean", "-fq", vim.g.ai_dir }):wait()
     vim.system({ "git", "restore", vim.g.ai_dir }):wait()
     vim.g.ai_dir = default_mock_dir
-    vim.g.ai_curl_stub_data = nil
+    vim.g.copilot_curl_token_mock = nil
 end
 
 describe(":Ai", function()
@@ -415,7 +416,7 @@ describe(":Ai gpt-4.1 <prompt>", function()
         local old_token_json = readjsonfile(token_path)
 
         local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
-        vim.g.ai_curl_stub_data = readjsonfile(new_token_fixture)
+        vim.g.copilot_curl_token_mock = readjsonfile(new_token_fixture)
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
@@ -423,7 +424,7 @@ describe(":Ai gpt-4.1 <prompt>", function()
         local new_token_json = readjsonfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
         assert.are.same(
-            vim.json.decode(vim.g.ai_curl_stub_data),
+            vim.json.decode(vim.g.copilot_curl_token_mock),
             vim.json.decode(new_token_json)
         )
     end)
@@ -432,7 +433,7 @@ describe(":Ai gpt-4.1 <prompt>", function()
         vim.g.ai_dir = fixture_dir("no-token")
 
         local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
-        vim.g.ai_curl_stub_data = readjsonfile(new_token_fixture)
+        vim.g.copilot_curl_token_mock = readjsonfile(new_token_fixture)
 
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
 
@@ -450,7 +451,7 @@ describe(":Ai gpt-4.1 <prompt>", function()
         end)
 
         assert.are.same(
-            vim.json.decode(vim.g.ai_curl_stub_data),
+            vim.json.decode(vim.g.copilot_curl_token_mock),
             vim.json.decode(new_token_json)
         )
     end)

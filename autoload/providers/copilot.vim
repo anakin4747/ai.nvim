@@ -41,7 +41,11 @@ function! s:get_local_token()
     return keys(apps_json)[0]['oauth_token']
 endf
 
-function! s:get_remote_token()
+function! s:curl_remote_token()
+    if exists("g:copilot_curl_token_mock")
+        return g:copilot_curl_token_mock->trim()->json_decode()
+    endi
+
     let copilot_url = "https://api.github.com/copilot_internal/v2/token"
     let local_token = s:get_local_token()
 
@@ -55,6 +59,6 @@ endf
 
 function! s:save_remote_token()
     let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
-    let json = [s:get_remote_token()->json_encode()]
+    let json = [s:curl_remote_token()->json_encode()]
     return json->writefile(token_json_path)
 endf
