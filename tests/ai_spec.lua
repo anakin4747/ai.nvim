@@ -380,12 +380,12 @@ describe("providers#get_models()", function()
     it("returns all models for all providers", function()
         local expected = {
             'claude-haiku-4.5',
-            'claude-sonnet-4',
             'claude-sonnet-4.5',
             'gemini-2.5-pro',
             'gpt-4.1',
             'gpt-4o',
             'gpt-5',
+            'gpt-5-codex',
             'gpt-5-mini',
         }
 
