@@ -30,8 +30,8 @@ local function teardown()
 
     vim.g.i_am_in_a_test = true
 
-    vim.system({ "git", "clean", "-fq", vim.g.ai_dir }):wait()
-    vim.system({ "git", "restore", vim.g.ai_dir }):wait()
+    vim.system({ "git", "clean", "-fq", vim.g.ai_dir, default_mock_dir }):wait()
+    vim.system({ "git", "restore", vim.g.ai_dir, default_mock_dir }):wait()
     vim.g.ai_dir = default_mock_dir
     vim.g.copilot_curl_token_mock = nil
     vim.g.copilot_curl_models_mock = nil
