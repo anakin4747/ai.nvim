@@ -51,6 +51,7 @@ function! s:get_token(localtime = g:ai_localtime)
 
     if !filereadable(token_json_path)
         call s:save_remote_token()
+        call s:save_models()
         return s:get_token(a:localtime)
     endi
 
@@ -61,6 +62,7 @@ function! s:get_token(localtime = g:ai_localtime)
     endi
 
     call s:save_remote_token()
+    call s:save_models()
     return s:get_token(a:localtime)
 endf
 
