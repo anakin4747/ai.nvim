@@ -135,12 +135,34 @@ function! ai#completion(arglead, cmdline, curpos)
     return ""
 endf
 
-function! ai#curl(url, method, headers)
-    return system($"
-        \   curl
-        \       --request {a:method}
-        \       --url {a:url}
-        \       --silent
-        \       {a:headers}
-        \")
+function! s:make_curl_cmd(url, method, headers, body = "")
+    let cmd = [
+        \   "curl",
+        \       "--request", a:method,
+        \       "--url", a:url,
+        \       "--silent",
+        \]
+
+    if type(a:headers) != v:t_list
+        throw "a:headers is not a list"
+    endi
+
+    for h in a:headers
+        let cmd += ["--header", h]
+    endfo
+
+    if type(a:body) != v:t_string
+        throw "a:body is not a string"
+    endi
+
+    if a:body != ""
+        let cmd += ["--data", a:body]
+    endi
+
+    return cmd
+endf
+
+function! ai#curl(url, method, headers, body = "", on_stdout = v:null)
+    let cmd = s:make_curl_cmd(a:url, a:method, a:headers, a:body)
+    return system(cmd)
 endf
