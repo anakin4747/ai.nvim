@@ -35,13 +35,13 @@ function! s:curl_models()
     let copilot_url = "https://api.business.githubcopilot.com/models"
     let token = s:get_token()
 
-    let headers = $"
-        \   --header 'Authorization: Bearer {token}'
-        \   --header 'Accept: application/json'
-        \   --header 'Content-Type: application/json'
-        \   --header 'Copilot-Integration-Id: vscode-chat'
-        \   --header 'Editor-Version: Neovim/0.11.0'
-        \"
+    let headers = [
+        \   $"authorization: Bearer {token}",
+        \   $"accept: application/json",
+        \   $"content-type: application/json",
+        \   $"copilot-integration-id: vscode-chat",
+        \   $"editor-version: neovim/0.11.0",
+        \]
 
     return ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
 endf
@@ -80,10 +80,10 @@ function! s:curl_remote_token()
     let copilot_url = "https://api.github.com/copilot_internal/v2/token"
     let local_token = s:get_local_token()
 
-    let headers = $"
-        \   --header 'Authorization: Bearer {local_token}'
-        \   --header 'Accept: application/json'
-        \"
+    let headers = [
+        \   $"authorization: Bearer {local_token}",
+        \   $"accept: application/json",
+        \]
 
     return ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
 endf
