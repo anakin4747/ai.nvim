@@ -1,6 +1,15 @@
 
 function! providers#copilot#submit_chat()
     call s:get_token()
+    let response = s:get_chat_data()
+
+    let lines = ['', $"# AI.NVIM {g:ai_model}", '']
+
+    for line in response->split("\n")
+        let lines += [line]
+    endfo
+
+    call appendbufline(bufnr(), "$", lines)
 endf
 
 function! providers#copilot#get_models()
@@ -92,4 +101,88 @@ function! s:save_remote_token()
     let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
     let json = [s:curl_remote_token()->json_encode()]
     return json->writefile(token_json_path)
+endf
+
+function! s:get_new_message()
+    let lnum = 0
+    for i in reverse(range(1, line('$')))
+      if getline(i) =~# '^# ME$'
+        let lnum = i
+        break
+      endi
+    endfo
+
+    return getline(lnum + 1, '$')
+        \ ->join("\n")
+        \ ->trim()
+endf
+
+function! s:get_chat_data()
+    let response = s:get_new_message()->s:curl_chat_data()
+
+    let data = ""
+
+    for line in response->split("\n")
+        if line !~ '^data: ' || line =~ 'DONE'
+            continue
+        endi
+
+        let json = line
+            \ ->substitute('^data: ', '', '')
+            \ ->json_decode()
+
+        if empty(json.choices)
+           continue
+        endi
+
+        if type(json.choices[0].delta.content) != v:t_string
+            continue
+        endi
+
+        let data .= json.choices[0].delta.content
+    endfo
+
+    return data
+endf
+
+function! s:curl_chat_data(message)
+    if exists("g:copilot_curl_chat_mock")
+        return g:copilot_curl_chat_mock
+    endi
+
+    let copilot_url = "https://api.business.githubcopilot.com/chat/completions"
+    let temperature = 0.1
+    let n = 1
+    let messages = [
+        \   { 'role': 'system', 'content': 'Never print emojis. I will ask you for code. Only respond with the code in markdown codeblocks. If I want more details I will ask you to clarify.'},
+        \   { 'role': 'user', 'content': a:message }
+        \]
+    let max_tokens = 16384
+    let stream = v:true
+    let top_p = 1
+    let model = 'gpt-4.1'
+
+    let body = json_encode(#{
+        \   temperature: temperature,
+        \   n: n,
+        \   messages: messages,
+        \   max_tokens: max_tokens,
+        \   stream: stream,
+        \   top_p: top_p,
+        \   model: model
+        \})
+    let content_length = len(body)
+
+    let token = s:get_token()
+
+    let headers = [
+        \   $"authorization: Bearer {token}",
+        \   $"accept: application/json",
+        \   $"content-type: application/json",
+        \   $"copilot-integration-id: vscode-chat",
+        \   $"editor-version: neovim/0.11.0",
+        \   $"content-length: {content_length}",
+        \]
+
+    return ai#curl(copilot_url, "POST", headers, body)
 endf
