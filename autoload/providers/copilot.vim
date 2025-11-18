@@ -1,5 +1,5 @@
 
-function! providers#copilot#submit_chat()
+function! providers#copilot#submit_chat() abort
     call s:get_token()
     let response = s:get_chat_data()
 
@@ -12,7 +12,7 @@ function! providers#copilot#submit_chat()
     call appendbufline(bufnr(), "$", lines)
 endf
 
-function! providers#copilot#get_models()
+function! providers#copilot#get_models() abort
     return s:get_models().data
         \ ->copy()
         \ ->filter({_, v -> v.model_picker_enabled})
@@ -20,7 +20,7 @@ function! providers#copilot#get_models()
         \ ->sort()
 endf
 
-function! s:get_models()
+function! s:get_models() abort
     let models_json_path = $"{ai#nvim_get_dir()}/providers/copilot/models.json"
 
     if !filereadable(models_json_path)
@@ -30,13 +30,13 @@ function! s:get_models()
     return models_json_path->readfile()->join("\n")->json_decode()
 endf
 
-function! s:save_models()
+function! s:save_models() abort
     let models_json_path = $"{ai#nvim_get_dir()}/providers/copilot/models.json"
     let json = [s:curl_models()->json_encode()]
     return json->writefile(models_json_path)
 endf
 
-function! s:curl_models()
+function! s:curl_models() abort
     if exists("g:copilot_curl_models_mock")
         return g:copilot_curl_models_mock->trim()->json_decode()
     endi
@@ -55,7 +55,7 @@ function! s:curl_models()
     return ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
 endf
 
-function! s:get_token(localtime = g:ai_localtime)
+function! s:get_token(localtime = g:ai_localtime) abort
     let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
 
     if !filereadable(token_json_path)
@@ -75,13 +75,13 @@ function! s:get_token(localtime = g:ai_localtime)
     return s:get_token(a:localtime)
 endf
 
-function! s:get_local_token()
+function! s:get_local_token() abort
     let apps_json_path = $"{expand("$HOME")}/.config/github-copilot/apps.json"
     let apps_json = apps_json_path->readfile()->join("\n")->json_decode()
     return keys(apps_json)[0]['oauth_token']
 endf
 
-function! s:curl_remote_token()
+function! s:curl_remote_token() abort
     if exists("g:copilot_curl_token_mock")
         return g:copilot_curl_token_mock->trim()->json_decode()
     endi
@@ -97,13 +97,13 @@ function! s:curl_remote_token()
     return ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
 endf
 
-function! s:save_remote_token()
+function! s:save_remote_token() abort
     let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
     let json = [s:curl_remote_token()->json_encode()]
     return json->writefile(token_json_path)
 endf
 
-function! s:get_new_message()
+function! s:get_new_message() abort
     let lnum = 0
     for i in reverse(range(1, line('$')))
       if getline(i) =~# '^# ME$'
@@ -117,7 +117,7 @@ function! s:get_new_message()
         \ ->trim()
 endf
 
-function! s:get_chat_data()
+function! s:get_chat_data() abort
     let response = s:get_new_message()->s:curl_chat_data()
 
     let data = ""
@@ -145,7 +145,7 @@ function! s:get_chat_data()
     return data
 endf
 
-function! s:curl_chat_data(message)
+function! s:curl_chat_data(message) abort
     if exists("g:copilot_curl_chat_mock")
         return g:copilot_curl_chat_mock
     endi

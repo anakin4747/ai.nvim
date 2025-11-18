@@ -1,5 +1,5 @@
 
-function! providers#get()
+function! providers#get() abort
     return globpath(&rtp, 'autoload/providers/*.vim', 1)
         \ ->split()
         \ ->sort()
@@ -9,7 +9,7 @@ function! providers#get()
         \ })
 endf
 
-function! providers#get_models()
+function! providers#get_models() abort
     let models = []
     for provider in providers#get()
         let models += call($"providers#{provider}#get_models", [])
@@ -17,7 +17,7 @@ function! providers#get_models()
     return models
 endf
 
-function! providers#get_provider_from_model(model = g:ai_model)
+function! providers#get_provider_from_model(model = g:ai_model) abort
     for provider in providers#get()
         let models = call($"providers#{provider}#get_models", [])
         if index(models, a:model) != -1
@@ -27,6 +27,6 @@ function! providers#get_provider_from_model(model = g:ai_model)
     return ''
 endf
 
-function! providers#submit_chat(provider = providers#get_provider_from_model())
+function! providers#submit_chat(provider = providers#get_provider_from_model()) abort
     call call($"providers#{a:provider}#submit_chat", [])
 endf
