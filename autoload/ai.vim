@@ -50,7 +50,7 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
 endf
 
-function! ai#nvim_get_dir()
+function! ai#nvim_get_dir() abort
     if !exists("g:i_am_in_a_test")
         return $"{stdpath("state")}/ai.nvim"
     endi
@@ -58,7 +58,7 @@ function! ai#nvim_get_dir()
     return g:ai_dir
 endf
 
-function! ai#get_last_chat_path(chats_dir = ai#get_chats_dir())
+function! ai#get_last_chat_path(chats_dir = ai#get_chats_dir()) abort
     let last_chat = system($"ls -1t {a:chats_dir} | head -n1")->trim()
     if v:shell_error != 0 || last_chat == ""
         return ""
@@ -67,11 +67,11 @@ function! ai#get_last_chat_path(chats_dir = ai#get_chats_dir())
     return $"{a:chats_dir}/{last_chat}"
 endf
 
-function! s:last_chat_exists(chats_dir)
+function! s:last_chat_exists(chats_dir) abort
     return a:chats_dir->ai#get_last_chat_path()->filereadable()
 endf
 
-function! s:new_chat_path(chats_dir)
+function! s:new_chat_path(chats_dir) abort
     let chat_path = $"{a:chats_dir}/ai-chat-{localtime()}.md"
 
     if exists("g:i_am_in_a_test")
@@ -84,7 +84,7 @@ function! s:new_chat_path(chats_dir)
     return chat_path
 endf
 
-function! s:open_chat(chat_path, mods = "")
+function! s:open_chat(chat_path, mods = "") abort
 
     let open_chat = s:get_open_chat_winnr()
 
@@ -98,7 +98,7 @@ function! s:open_chat(chat_path, mods = "")
     return bufnr()
 endf
 
-function! s:get_open_chat_winnr()
+function! s:get_open_chat_winnr() abort
 
     for win in range(1, winnr('$'))
         let bufnr = winbufnr(win)
@@ -115,7 +115,7 @@ function! s:get_open_chat_winnr()
     return 0
 endf
 
-function! s:check_prompt_for_model(prompt)
+function! s:check_prompt_for_model(prompt) abort
     let model = get(split(a:prompt), 0, "")
 
     if index(providers#get_models(), model) != -1
@@ -125,7 +125,7 @@ function! s:check_prompt_for_model(prompt)
     return ""
 endf
 
-function! ai#completion(arglead, cmdline, curpos)
+function! ai#completion(arglead, cmdline, curpos) abort
     let arg_count = a:cmdline->split()->len()
 
     if arg_count == 1
@@ -135,7 +135,7 @@ function! ai#completion(arglead, cmdline, curpos)
     return ""
 endf
 
-function! s:make_curl_cmd(url, method, headers, body = "")
+function! s:make_curl_cmd(url, method, headers, body = "") abort
     let cmd = [
         \   "curl",
         \       "--request", a:method,
@@ -162,7 +162,7 @@ function! s:make_curl_cmd(url, method, headers, body = "")
     return cmd
 endf
 
-function! ai#curl(url, method, headers, body = "", on_stdout = v:null)
+function! ai#curl(url, method, headers, body = "", on_stdout = v:null) abort
     let cmd = s:make_curl_cmd(a:url, a:method, a:headers, a:body)
 
     if a:on_stdout != v:null
