@@ -21,6 +21,7 @@ vim.g.ai_localtime = 1763098419
 
 vim.g.copilot_curl_token_mock = nil
 vim.g.copilot_curl_models_mock = nil
+vim.g.copilot_curl_chat_mock = nil
 
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -35,6 +36,7 @@ local function teardown()
     vim.g.ai_dir = default_mock_dir
     vim.g.copilot_curl_token_mock = nil
     vim.g.copilot_curl_models_mock = nil
+    vim.g.copilot_curl_chat_mock = nil
 end
 
 describe(":Ai", function()
@@ -538,5 +540,29 @@ describe(":Ai gpt-4.1 <prompt>", function()
             vim.json.decode(vim.g.copilot_curl_models_mock),
             vim.json.decode(new_models_json)
         )
+    end)
+
+    it("populates the chat with a response", function()
+
+        -- mock chat data
+        local chat_data = default_mock_dir .. "/providers/copilot/chat.data"
+        vim.g.copilot_curl_chat_mock = readjsonfile(chat_data)
+
+        vim.cmd('Ai gpt-4.1 write me a hello world in lua')
+        vim.fn['providers#submit_chat']()
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            '# ME',
+            '',
+            'write me a hello world in lua',
+            '',
+            '# AI.NVIM gpt-4.1',
+            '',
+            '```lua',
+            'print("Hello, world!")',
+            '```',
+        }, lines)
     end)
 end)
