@@ -467,6 +467,37 @@ describe(":Ai gpt-4.1 <prompt>", function()
         )
     end)
 
+    it("gets a new token if token is malformed on submit", function()
+        vim.g.ai_dir = fixture_dir("bad-token")
+
+        local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
+        vim.g.copilot_curl_token_mock = readjsonfile(new_token_fixture)
+
+        -- mock curling of models
+        local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
+        vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+
+        vim.cmd('Ai gpt-4.1 wow')
+        vim.fn['providers#submit_chat']()
+
+        local new_token_json = readjsonfile(token_path)
+
+        local json
+
+        assert.has_no.errors(function()
+            json = vim.json.decode(new_token_json)
+        end)
+
+        assert.are.same(
+            vim.json.decode(vim.g.copilot_curl_token_mock),
+            json
+        )
+
+        assert.is_not_nil(json.expires_at)
+    end)
+
     it("gets new models if token is expired on submit", function()
         vim.g.ai_dir = fixture_dir("expired-remote-token-get-models")
 
