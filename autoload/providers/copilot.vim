@@ -31,7 +31,14 @@ function! s:get_models() abort
 endf
 
 function! s:save_models() abort
-    let models_json_path = $"{ai#nvim_get_dir()}/providers/copilot/models.json"
+    let copilot_dir = $"{ai#nvim_get_dir()}/providers/copilot"
+
+    if !filereadable(copilot_dir)
+        call mkdir(copilot_dir, "p")
+    endi
+
+    let models_json_path = $"{copilot_dir}/models.json"
+
     let json = [s:curl_models()->json_encode()]
     return json->writefile(models_json_path)
 endf
@@ -98,7 +105,14 @@ function! s:curl_remote_token() abort
 endf
 
 function! s:save_remote_token() abort
-    let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
+    let copilot_dir = $"{ai#nvim_get_dir()}/providers/copilot"
+
+    if !filereadable(copilot_dir)
+        call mkdir(copilot_dir, "p")
+    endi
+
+    let token_json_path = $"{copilot_dir}/token.json"
+
     let json = [s:curl_remote_token()->json_encode()]
     return json->writefile(token_json_path)
 endf
