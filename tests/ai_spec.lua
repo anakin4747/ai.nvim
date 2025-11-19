@@ -565,4 +565,28 @@ describe(":Ai gpt-4.1 <prompt>", function()
             '```',
         }, lines)
     end)
+
+    it("creates ai.nvim dir itself", function()
+        vim.g.ai_dir = fixture_dir("no-dir")
+
+        -- mock all data
+        local token_fixture = default_mock_dir .. "/providers/copilot/token.json"
+        vim.g.copilot_curl_token_mock = readjsonfile(token_fixture)
+        local models_fixture = default_mock_dir .. "/providers/copilot/models.json"
+        vim.g.copilot_curl_models_mock = readjsonfile(models_fixture)
+        local chat_fixture = default_mock_dir .. "/providers/copilot/chat.data"
+        vim.g.copilot_curl_chat_mock = readjsonfile(chat_fixture)
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        assert(vim.fn.filereadable(token_path) == 0)
+
+        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
+        assert(vim.fn.filereadable(models_path) == 0)
+
+        vim.cmd('Ai gpt-4.1 write me a hello world in lua')
+        vim.fn['providers#submit_chat']()
+
+        assert(vim.fn.filereadable(token_path) == 1)
+        assert(vim.fn.filereadable(models_path) == 1)
+    end)
 end)
