@@ -73,6 +73,11 @@ function! s:get_token(localtime = g:ai_localtime) abort
 
     let token_json = token_json_path->readfile()->join("\n")->json_decode()
 
+    if !exists("token_json.expires_at")
+        call s:save_remote_token()
+        return s:get_token(a:localtime)
+    endi
+
     if token_json.expires_at > a:localtime
         return token_json.token
     endi
