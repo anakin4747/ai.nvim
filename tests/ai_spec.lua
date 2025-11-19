@@ -594,6 +594,9 @@ describe(":Ai gpt-4.1 <prompt>", function()
             '```lua',
             'print("Hello, world!")',
             '```',
+            '',
+            '# ME',
+            '',
         }, lines)
     end)
 

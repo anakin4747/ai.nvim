@@ -9,6 +9,8 @@ function! providers#copilot#submit_chat() abort
         let lines += [line]
     endfo
 
+    let lines += ['', '# ME', '']
+
     call appendbufline(bufnr(), "$", lines)
 endf
 
