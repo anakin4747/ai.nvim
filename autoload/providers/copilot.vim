@@ -87,10 +87,10 @@ function! s:get_token(localtime = g:ai_localtime) abort
     return s:get_token(a:localtime)
 endf
 
-function! s:get_local_token() abort
+function! providers#copilot#get_local_token() abort
     let apps_json_path = $"{expand("$HOME")}/.config/github-copilot/apps.json"
     let apps_json = apps_json_path->readfile()->join("\n")->json_decode()
-    return keys(apps_json)[0]['oauth_token']
+    return apps_json[keys(apps_json)[0]]['oauth_token']
 endf
 
 function! s:curl_remote_token() abort
@@ -99,7 +99,7 @@ function! s:curl_remote_token() abort
     endi
 
     let copilot_url = "https://api.github.com/copilot_internal/v2/token"
-    let local_token = s:get_local_token()
+    let local_token = providers#copilot#get_local_token()
 
     let headers = [
         \   $"authorization: Bearer {local_token}",
