@@ -114,3 +114,40 @@ I love Lua but some of the following reasons are why I dislike lua:
 - do more fuzzing of function arguments and add more error handling when
   everything is more settled down and features are more firm
 
+- three tabs max of indentation in vimscript
+
+- add a test that gets a token if a chat submission returns an error saying
+  that the token is expired
+  ```
+  unauthorized: token expired
+  ```
+
+- make it so that the ai always wraps text outside of code blocks boxes at
+  &textwidth
+
+- figure out a way for the user to select all of the parameters of the
+  conversation currently hardcoded in the post command
+
+- add functionality to support livestreaming of contents or atleast
+  non-blocking
+
+- add `:Ai clean` to delete all chats
+- add `:Ai mrproper` to delete ai.nvim dir
+
+- add a test to ensure the cursor gets moved to the bottom of the chat after
+  getting chat response
+
+- maybe support `:Ai explain` to change the system prompt to asking for an
+  explanation instead of only for codeblocks like it is hardcoded to now
+
+- maybe support in file editing??? idk maybe not
+
+- image support in the future
+
+- investigate ACP
+
+- have a way to easily generate test fixtures from the data you send and
+  recieve to the chatbot
+
+- improve tab completion for :Ai <tab> since it doesn't complete if you already
+  begin typing an option like :Ai g<tab> does not complete anything
