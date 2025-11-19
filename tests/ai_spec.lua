@@ -621,3 +621,12 @@ describe(":Ai gpt-4.1 <prompt>", function()
         assert(vim.fn.filereadable(models_path) == 1)
     end)
 end)
+
+describe("providers#copilot#get_local_token()", function()
+
+    it("successfully gets oauth_token from apps.json", function()
+        local expected = "^ghu_[[:alnum:]]\\{36}$"
+        local actual = vim.fn['providers#copilot#get_local_token']()
+        assert(vim.fn.match(actual, expected) ~= -1)
+    end)
+end)
