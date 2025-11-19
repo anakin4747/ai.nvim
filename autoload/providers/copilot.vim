@@ -40,9 +40,10 @@ function! s:save_models() abort
     endi
 
     let models_json_path = $"{copilot_dir}/models.json"
-
-    let json = [s:curl_models()->json_encode()]
-    return json->writefile(models_json_path)
+    return s:curl_models()
+        \ ->json_encode()
+        \ ->split("\n")
+        \ ->writefile(models_json_path)
 endf
 
 function! s:curl_models() abort
@@ -119,9 +120,10 @@ function! s:save_remote_token() abort
     endi
 
     let token_json_path = $"{copilot_dir}/token.json"
-
-    let json = [s:curl_remote_token()->json_encode()]
-    return json->writefile(token_json_path)
+    return s:curl_remote_token()
+        \ ->json_encode()
+        \ ->split("\n")
+        \ ->writefile(token_json_path)
 endf
 
 function! s:get_new_message() abort
