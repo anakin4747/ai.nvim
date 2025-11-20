@@ -126,22 +126,8 @@ function! s:save_remote_token() abort
         \ ->writefile(token_json_path)
 endf
 
-function! s:get_new_message() abort
-    let lnum = 0
-    for i in reverse(range(1, line('$')))
-      if getline(i) =~# '^# ME$'
-        let lnum = i
-        break
-      endi
-    endfo
-
-    return getline(lnum + 1, '$')
-        \ ->join("\n")
-        \ ->trim()
-endf
-
 function! s:get_chat_data() abort
-    let response = s:get_new_message()->s:curl_chat_data()
+    let response = getline(0, '$')->providers#copilot#curl_chat()
 
     let data = ""
 
@@ -168,7 +154,7 @@ function! s:get_chat_data() abort
     return data
 endf
 
-function! s:curl_chat_data(message) abort
+function! providers#copilot#curl_chat(message) abort
     if exists("g:copilot_curl_chat_mock")
         return g:copilot_curl_chat_mock
     endi
@@ -177,7 +163,7 @@ function! s:curl_chat_data(message) abort
     let temperature = 0.1
     let n = 1
     let messages = [
-        \   { 'role': 'system', 'content': 'Never print emojis. I will ask you for code. Only respond with the code in markdown codeblocks. If I want more details I will ask you to clarify.'},
+        \   { 'role': 'system', 'content': 'I am sending you a markdown of our chat conversation. Use the previous interactions as context but focus on answering the most recent questions which will be at the bottom of the chat. Never print emojis. I will ask you for code. Only respond with the code in markdown codeblocks. If I want more details I will ask you to clarify.'},
         \   { 'role': 'user', 'content': a:message }
         \]
     let max_tokens = 16384
