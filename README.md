@@ -151,3 +151,29 @@ I love Lua but some of the following reasons are why I dislike lua:
 
 - improve tab completion for :Ai <tab> since it doesn't complete if you already
   begin typing an option like :Ai g<tab> does not complete anything
+
+- need to figure out how to proper send out the entire chat
+
+- So for logging I want to save everything sent and recieved
+
+- Seems to be bugs with the
+
+- just mock the server by having it serve the types of data that could be
+  recieved. this way the entire stack gets tested not just portions
+    - now you will be able to mock all the different things each endpoint can
+      return
+    - ooh and now that can be used to facilitate fuzzing
+
+- lookup table of the system prompt. Like `:Ai explain` could use a system
+  prompt that explains how they should explain. or the default system prompt
+  could be one that tells it only to respond with codeblocks and if the
+  codeblock already has a filetype after ``` then don't specify it in a
+  comment
+
+- first things first
+- add logging and a mechanism to save files for collecting test data (watch out
+  to disable such instrusive behaviour by default)
+- mapping the copilot endpoints
+
+redirect the hostname of the service to localhost to hit the server serving the
+dummy data
