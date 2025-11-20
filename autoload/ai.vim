@@ -164,6 +164,41 @@ endf
 
 function! ai#curl(url, method, headers, body = "") abort
     let cmd = s:make_curl_cmd(a:url, a:method, a:headers, a:body)
+    call ai#log("curl request", cmd->join(), "sh")
+    let response = system(cmd)
+    call ai#log("curl response", response, "json")
+    return response
+endf
 
-    return system(cmd)
+function! ai#log(msg, data, datatype = "") abort
+    let loggin = v:true
+
+    if !loggin
+        return
+    endi
+
+    let ai_dir = ai#nvim_get_dir()
+    let log_path = $"{ai_dir}/log.md"
+    let stacktrace = getstacktrace()
+
+    let log_msg = [
+        \ $"",
+        \ $"",
+        \ $"---START---",
+        \ $"{strftime('%Y-%m-%d %H:%M:%S')}",
+        \ $"stacktrace: '{stacktrace}'",
+        \ $"message: '{a:msg}'",
+        \]
+
+    if a:data != ""
+        let log_msg += ["", $"```{a:datatype}", a:data, "```"]
+    endi
+
+    let log_msg += ["----END----", ""]
+
+    if !filereadable(ai_dir)
+        call mkdir(ai_dir, "p")
+    endi
+
+    call writefile(log_msg, log_path, 'a')
 endf
