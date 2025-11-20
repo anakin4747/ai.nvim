@@ -171,6 +171,25 @@ describe(":Ai <tab>", function()
     end)
 end)
 
+describe(":Ai g<tab>", function()
+
+    after_each(teardown)
+
+    it("completes with models that start with g", function()
+        local expected = {
+            'gpt-4.1',
+            'gpt-4o',
+            'gpt-5',
+            'gpt-5-codex',
+            'gpt-5-mini',
+        }
+
+        local actual = vim.fn['ai#completion']("", "Ai g", "")
+
+        assert.are.same(expected, actual)
+    end)
+end)
+
 describe(":Ai <model>", function()
 
     after_each(teardown)
