@@ -162,15 +162,8 @@ function! s:make_curl_cmd(url, method, headers, body = "") abort
     return cmd
 endf
 
-function! ai#curl(url, method, headers, body = "", on_stdout = v:null) abort
+function! ai#curl(url, method, headers, body = "") abort
     let cmd = s:make_curl_cmd(a:url, a:method, a:headers, a:body)
-
-    if a:on_stdout != v:null
-        if type(a:on_stdout) != v:t_func
-            throw "a:on_stdout is not a function"
-        endi
-        return jobstart(cmd, #{on_stdout: a:on_stdout, stdout_buffered: v:true})
-    endi
 
     return system(cmd)
 endf
