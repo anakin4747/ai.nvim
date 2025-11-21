@@ -152,7 +152,7 @@ I love Lua but some of the following reasons are why I dislike lua:
 - improve tab completion for :Ai <tab> since it doesn't complete if you already
   begin typing an option like :Ai g<tab> does not complete anything
 
-- need to figure out how to proper send out the entire chat
+- need to figure out how to properly send out the entire chat
 
 - So for logging I want to save everything sent and recieved
 
@@ -177,3 +177,11 @@ I love Lua but some of the following reasons are why I dislike lua:
 
 redirect the hostname of the service to localhost to hit the server serving the
 dummy data
+
+for mocking data you need to have it serve up normal data but be able to switch
+out specific ones to throw bad test cases in
+
+- feature for sending the :messages content to send the errors in vim
+- :Ai messages <prompt> sends :messages along with the chat to capture neovim
+  errors
+
