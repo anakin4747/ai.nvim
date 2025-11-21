@@ -154,17 +154,21 @@ function! s:get_chat_data() abort
     return data
 endf
 
-function! providers#copilot#curl_chat(message) abort
+function! providers#copilot#curl_chat(messages) abort
     if exists("g:copilot_curl_chat_mock")
         return g:copilot_curl_chat_mock
+    endi
+
+    if type(a:messages) != v:t_list
+        throw "a:messages must be a list"
     endi
 
     let copilot_url = "https://api.business.githubcopilot.com/chat/completions"
     let temperature = 0.1
     let n = 1
     let messages = [
-        \   { 'role': 'system', 'content': 'I am sending you a markdown of our chat conversation. Use the previous interactions as context but focus on answering the most recent questions which will be at the bottom of the chat. Never print emojis. I will ask you for code. Only respond with the code in markdown codeblocks. If I want more details I will ask you to clarify.'},
-        \   { 'role': 'user', 'content': a:message }
+        \   { 'role': 'system', 'content': 'I am sending you a markdown of our chat conversation. Use the previous interactions as context but focus on answering the most recent questions which will be at the bottom of the chat. Never print emojis. I will ask you for code. Only respond with the code in markdown codeblocks. If I want more details I will ask you to clarify. Always limit the width of your output to 80 characters when reasonable.'},
+        \   { 'role': 'user', 'content': a:messages->join("\n") }
         \]
     let max_tokens = 16384
     let stream = v:true
