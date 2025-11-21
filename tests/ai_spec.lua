@@ -92,6 +92,8 @@ describe(":Ai!", function()
         vim.cmd('Ai')
         local old_name = vim.api.nvim_buf_get_name(0)
 
+        vim.wait(1000)
+
         vim.cmd('Ai!')
         local new_name = vim.api.nvim_buf_get_name(0)
 

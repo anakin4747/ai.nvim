@@ -87,16 +87,7 @@ function! s:last_chat_exists(chats_dir) abort
 endf
 
 function! s:new_chat_path(chats_dir) abort
-    let chat_path = $"{a:chats_dir}/ai-chat-{localtime()}.md"
-
-    if exists("g:i_am_in_a_test")
-        " need to randomize the path for tests since they run in too quick
-        " succession causing tests to fail when in reality this will never
-        " need to run in such quick succession
-        let chat_path .= $".{rand(srand()) % 1000000}.test"
-    endi
-
-    return chat_path
+    return $"{a:chats_dir}/ai-chat-{localtime()}.md"
 endf
 
 function! s:open_chat(chat_path, mods = "") abort
