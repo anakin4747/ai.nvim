@@ -4,10 +4,17 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
     let ai_dir = ai#nvim_get_dir()
 
     let prompt = a:prompt
+    let first_word = prompt->split()->get(0, "")
+    let commands = {
+        \ 'log': {'func': function('s:handle_log'), 'exit': v:true},
+        \ 'messages': {'func': function('s:handle_messages'), 'exit': v:true},
+        \}
 
-    if prompt->split()->get(0, "") == "log"
-        execute $"edit {ai_dir}/log.md"
-        return
+    if commands->has_key(first_word)
+        call call(commands[first_word]['func'], [])
+        if commands[first_word]->get('exit', v:false)
+            return
+        endi
     endi
 
     let model_passed = s:check_prompt_for_model(prompt)
@@ -215,4 +222,20 @@ function! ai#log(msg, data, datatype = "") abort
     endi
 
     call writefile(log_msg, log_path, 'a')
+endf
+
+function! s:handle_log() abort
+    execute $"edit {ai#nvim_get_dir()}/log.md"
+endf
+
+function! s:handle_messages() abort
+    redir => msg
+    silent! messages
+    redir END
+
+    let lines = ['```neovim_messages']
+    call extend(lines, split(msg, "\n"))
+    call add(lines, '```')
+
+    call appendbufline(bufnr(), "$", lines)
 endf
