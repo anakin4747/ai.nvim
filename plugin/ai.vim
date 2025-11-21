@@ -2,6 +2,11 @@
 let g:ai_model = "gpt-4.1"
 let g:ai_localtime = localtime()
 "let g:ai_dir = ""
+"
+let g:ai_commands = {
+    \ 'log': {'func': function('ai#handle_log'), 'exit': v:true},
+    \ 'messages': {'func': function('ai#handle_messages'), 'exit': v:true},
+    \}
 
 command!
     \ -complete=custom,ai#completion
