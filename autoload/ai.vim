@@ -1,18 +1,13 @@
-
 function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
     let ai_dir = ai#nvim_get_dir()
 
     let prompt = a:prompt
     let first_word = prompt->split()->get(0, "")
-    let commands = {
-        \ 'log': {'func': function('s:handle_log'), 'exit': v:true},
-        \ 'messages': {'func': function('s:handle_messages'), 'exit': v:true},
-        \}
 
-    if commands->has_key(first_word)
-        call call(commands[first_word]['func'], [])
-        if commands[first_word]->get('exit', v:false)
+    if g:ai_commands->has_key(first_word)
+        call call(g:ai_commands[first_word]['func'], [])
+        if g:ai_commands[first_word]->get('exit', v:false)
             return
         endi
     endi
@@ -134,7 +129,7 @@ function! ai#completion(arglead, cmdline, curpos) abort
     let arg_count = a:cmdline->split()->len()
 
     if arg_count == 1
-        return providers#get_models()->join("\n")
+        return [providers#get_models() + keys(g:ai_commands)]->join("\n")
     endi
 
     return ""
@@ -214,11 +209,11 @@ function! ai#log(msg, data, datatype = "") abort
     call writefile(log_msg, log_path, 'a')
 endf
 
-function! s:handle_log() abort
+function! ai#handle_log() abort
     execute $"edit {ai#nvim_get_dir()}/log.md"
 endf
 
-function! s:handle_messages() abort
+function! ai#handle_messages() abort
     redir => msg
     silent! messages
     redir END
