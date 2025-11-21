@@ -659,3 +659,30 @@ describe(":Ai log", function()
         assert.are_match("log.md", vim.api.nvim_buf_get_name(0))
     end)
 end)
+
+describe(":Ai messages", function()
+    it("sends the contents of :messages to the chat", function()
+
+        vim.cmd([[
+            messages clear
+            Ai
+            echomsg "hey1"
+            echomsg "hey2"
+            echomsg "hey3"
+        ]])
+
+        vim.cmd('Ai messages')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "```neovim_messages",
+            "hey1",
+            "hey2",
+            "hey3",
+            "```",
+        }, lines)
+    end)
+end)
