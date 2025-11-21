@@ -129,7 +129,7 @@ function! ai#completion(arglead, cmdline, curpos) abort
     let arg_count = a:cmdline->split()->len()
 
     if arg_count == 1
-        return [providers#get_models() + keys(g:ai_commands)]->join("\n")
+        return providers#get_models()->join("\n") . "\n" . keys(g:ai_commands)->join("\n")
     endi
 
     return ""
