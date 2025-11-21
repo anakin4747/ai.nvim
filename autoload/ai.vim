@@ -112,8 +112,7 @@ function! s:get_open_chat_winnr() abort
             continue
         endi
 
-        let fname = bufname(bufnr)
-        if fname =~# 'ai.nvim/chats/ai-chat-\d\+\.md'
+        if bufname(bufnr) =~# 'ai.nvim/chats/ai-chat-\d\+\.md'
             return win
         endif
     endfo
