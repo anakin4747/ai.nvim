@@ -1,7 +1,15 @@
 
 function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
+    let ai_dir = ai#nvim_get_dir()
+
     let prompt = a:prompt
+
+    if prompt->split()->get(0, "") == "log"
+        execute $"edit {ai_dir}/log.md"
+        return
+    endi
+
     let model_passed = s:check_prompt_for_model(prompt)
     if model_passed != ""
         let g:ai_model = model_passed
@@ -13,7 +21,7 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
         endi
     endi
 
-    let chats_dir = $"{ai#nvim_get_dir()}/chats"
+    let chats_dir = $"{ai_dir}/chats"
 
     if !isdirectory(chats_dir)
         call mkdir(chats_dir, "p")
@@ -179,16 +187,22 @@ function! ai#log(msg, data, datatype = "") abort
 
     let ai_dir = ai#nvim_get_dir()
     let log_path = $"{ai_dir}/log.md"
-    let stacktrace = getstacktrace()
 
-    let log_msg = [
-        \ $"",
-        \ $"",
+    let log_msg = ["", "",
         \ $"---START---",
         \ $"{strftime('%Y-%m-%d %H:%M:%S')}",
-        \ $"stacktrace: '{stacktrace}'",
         \ $"message: '{a:msg}'",
+        \ $"stacktrace:",
         \]
+
+    let stacktrace = getstacktrace()
+    for frame in stacktrace
+        let filepath = frame->get('filepath', '')
+        let lnum = frame->get('lnum', '')
+        let Func = frame->get('funcref', '')
+            \ ->string()->substitute("function('\\(.*\\)')", '\1()', '')
+        let log_msg += [$"  {filepath}:{lnum}:{Func}"]
+    endfo
 
     if a:data != ""
         let log_msg += ["", $"```{a:datatype}", a:data, "```"]
