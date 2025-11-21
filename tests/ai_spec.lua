@@ -655,6 +655,15 @@ describe("providers#copilot#get_local_token()", function()
     end)
 end)
 
+describe("providers#copilot#curl_chat()", function()
+
+    it("errors if message isn't a list", function()
+        assert.has.errors(function()
+            vim.fn['providers#copilot#curl_chat']("")
+        end)
+    end)
+end)
+
 describe(":Ai log", function()
     it("opens the log.md", function()
         vim.cmd('Ai log')
