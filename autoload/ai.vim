@@ -5,9 +5,10 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
     let prompt = a:prompt
     let first_word = prompt->split()->get(0, "")
 
-    if g:ai_commands->has_key(first_word)
-        call call(g:ai_commands[first_word]['func'], [])
-        if g:ai_commands[first_word]->get('exit', v:false)
+    let cmd = s:cmd_or_abbrev(first_word)
+    if cmd != ""
+        call call(g:ai_commands[cmd]['func'], [])
+        if g:ai_commands[cmd]->get('exit', v:false)
             return
         endi
     endi
@@ -58,6 +59,20 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
     silent! write
 
+endf
+
+function! s:cmd_or_abbrev(abbrev)
+    if empty(a:abbrev)
+        return ""
+    endi
+
+    for key in keys(g:ai_commands)
+        if stridx(key, a:abbrev) == 0
+            return key
+        endi
+    endfo
+
+    return ""
 endf
 
 function! ai#nvim_get_dir() abort
