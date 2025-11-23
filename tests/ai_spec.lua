@@ -648,6 +648,8 @@ end)
 
 describe("providers#copilot#get_local_token()", function()
 
+    after_each(teardown)
+
     it("successfully gets oauth_token from apps.json", function()
         local expected = "^ghu_[[:alnum:]]\\{36}$"
         local actual = vim.fn['providers#copilot#get_local_token']()
@@ -657,6 +659,8 @@ end)
 
 describe("providers#copilot#curl_chat()", function()
 
+    after_each(teardown)
+
     it("errors if message isn't a list", function()
         assert.has.errors(function()
             vim.fn['providers#copilot#curl_chat']("")
@@ -665,6 +669,9 @@ describe("providers#copilot#curl_chat()", function()
 end)
 
 describe(":Ai log", function()
+
+    after_each(teardown)
+
     it("opens the log.md", function()
         vim.cmd('Ai log')
         assert.are_match("log.md", vim.api.nvim_buf_get_name(0))
@@ -672,6 +679,9 @@ describe(":Ai log", function()
 end)
 
 describe(":Ai l", function()
+
+    after_each(teardown)
+
     it("opens the log.md", function()
         vim.cmd('Ai l')
         assert.are_match("log.md", vim.api.nvim_buf_get_name(0))
@@ -679,6 +689,9 @@ describe(":Ai l", function()
 end)
 
 describe(":Ai messages", function()
+
+    after_each(teardown)
+
     it("sends the contents of :messages to the chat", function()
 
         vim.cmd([[
@@ -702,6 +715,9 @@ describe(":Ai messages", function()
 end)
 
 describe(":Ai mes", function()
+
+    after_each(teardown)
+
     it("sends the contents of :messages to the chat", function()
 
         vim.cmd([[
