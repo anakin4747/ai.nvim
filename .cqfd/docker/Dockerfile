@@ -4,6 +4,7 @@ RUN pacman -Syu --noconfirm \
     cloc \
     curl \
     git \
+    jq \
     make \
     neovim \
     which
