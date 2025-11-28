@@ -3,7 +3,7 @@ org='anakin4747'
 name='ai_nvim'
 
 [build]
-command="make cloc"
+command="make tests"
 docker_run_args=" \
     -v $HOME/.config/github-copilot/apps.json:$HOME/.config/github-copilot/apps.json \
     --network none \
