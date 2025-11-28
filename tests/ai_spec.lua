@@ -39,9 +39,14 @@ local function teardown()
     vim.g.copilot_curl_chat_mock = nil
 end
 
-describe(":Ai", function()
+local function ai_describe(name, fn)
+    describe(name, function()
+        after_each(teardown)
+        fn()
+    end)
+end
 
-    after_each(teardown)
+ai_describe(":Ai", function()
 
     it("does not error", function()
         assert.has_no.errors(function()
@@ -78,9 +83,7 @@ describe(":Ai", function()
     end)
 end)
 
-describe(":Ai!", function()
-
-    after_each(teardown)
+ai_describe(":Ai!", function()
 
     it("does not error", function()
         assert.has_no.errors(function()
@@ -124,9 +127,7 @@ describe(":Ai!", function()
     end)
 end)
 
-describe(":Ai <prompt>", function()
-
-    after_each(teardown)
+ai_describe(":Ai <prompt>", function()
 
     it("accepts a prompt as an argument", function()
         assert.has_no.errors(function()
@@ -143,9 +144,7 @@ describe(":Ai <prompt>", function()
     end)
 end)
 
-describe(":Ai! <prompt>", function()
-
-    after_each(teardown)
+ai_describe(":Ai! <prompt>", function()
 
     it("accepts a prompt as an argument", function()
         assert.has_no.errors(function()
@@ -162,9 +161,7 @@ describe(":Ai! <prompt>", function()
     end)
 end)
 
-describe(":Ai <tab>", function()
-
-    after_each(teardown)
+ai_describe(":Ai <tab>", function()
 
     it("completes the first argument with models", function()
         local completion = vim.fn['ai#completion']("", "Ai ", "")
@@ -173,9 +170,7 @@ describe(":Ai <tab>", function()
     end)
 end)
 
-describe(":Ai g<tab>", function()
-
-    after_each(teardown)
+ai_describe(":Ai g<tab>", function()
 
     it("completes with models that start with g", function()
         local expected = {
@@ -192,9 +187,7 @@ describe(":Ai g<tab>", function()
     end)
 end)
 
-describe(":Ai <model>", function()
-
-    after_each(teardown)
+ai_describe(":Ai <model>", function()
 
     it("sets the model to <model>", function()
 
@@ -214,7 +207,7 @@ describe(":Ai <model>", function()
         assert.are.same(expected_win, actual_win)
     end)
 
-    describe("<prompt>", function()
+    ai_describe("<prompt>", function()
         it("does not pass <model> to the chat", function()
 
             vim.cmd('Ai claude-haiku-4.5 sample chat')
@@ -236,9 +229,7 @@ describe(":Ai <model>", function()
     end)
 end)
 
-describe(":'<,'>Ai", function()
-
-    after_each(teardown)
+ai_describe(":'<,'>Ai", function()
 
     it("accepts a range without error", function()
         vim.api.nvim_buf_set_lines(0, 0, -1, false, { "a", "b", "c", "d" })
@@ -351,9 +342,7 @@ describe(":'<,'>Ai", function()
     end)
 end)
 
-describe(":vert Ai", function()
-
-    after_each(teardown)
+ai_describe(":vert Ai", function()
 
     it("accepts a prompt as an argument with a vertical prefix", function()
         assert.has_no.errors(function()
@@ -362,9 +351,7 @@ describe(":vert Ai", function()
     end)
 end)
 
-describe("ai#nvim_get_dir()", function()
-
-    after_each(teardown)
+ai_describe("ai#nvim_get_dir()", function()
 
     it("returns a normal ai.nvim directory", function()
         vim.g.i_am_in_a_test = nil
@@ -385,9 +372,7 @@ describe("ai#nvim_get_dir()", function()
     end)
 end)
 
-describe("providers#get()", function()
-
-    after_each(teardown)
+ai_describe("providers#get()", function()
 
     it("returns a list of providers", function()
         local expected = { "copilot" }
@@ -396,9 +381,7 @@ describe("providers#get()", function()
     end)
 end)
 
-describe("providers#get_models()", function()
-
-    after_each(teardown)
+ai_describe("providers#get_models()", function()
 
     it("returns all models for all providers", function()
         local expected = {
@@ -418,9 +401,7 @@ describe("providers#get_models()", function()
     end)
 end)
 
-describe(":Ai gpt-4.1 <prompt>", function()
-
-    after_each(teardown)
+ai_describe(":Ai gpt-4.1 <prompt>", function()
 
     it("gets cached token if token is not expired on submit", function()
         vim.g.ai_dir = fixture_dir("non-expired-remote-token")
@@ -646,9 +627,7 @@ describe(":Ai gpt-4.1 <prompt>", function()
     end)
 end)
 
-describe("providers#copilot#get_local_token()", function()
-
-    after_each(teardown)
+ai_describe("providers#copilot#get_local_token()", function()
 
     it("successfully gets oauth_token from apps.json", function()
         local expected = "^ghu_[[:alnum:]]\\{36}$"
@@ -657,9 +636,7 @@ describe("providers#copilot#get_local_token()", function()
     end)
 end)
 
-describe("providers#copilot#curl_chat()", function()
-
-    after_each(teardown)
+ai_describe("providers#copilot#curl_chat()", function()
 
     it("errors if message isn't a list", function()
         assert.has.errors(function()
@@ -668,9 +645,7 @@ describe("providers#copilot#curl_chat()", function()
     end)
 end)
 
-describe(":Ai log", function()
-
-    after_each(teardown)
+ai_describe(":Ai log", function()
 
     it("opens the log.md", function()
         vim.cmd('Ai log')
@@ -678,9 +653,7 @@ describe(":Ai log", function()
     end)
 end)
 
-describe(":Ai l", function()
-
-    after_each(teardown)
+ai_describe(":Ai l", function()
 
     it("opens the log.md", function()
         vim.cmd('Ai l')
@@ -688,9 +661,7 @@ describe(":Ai l", function()
     end)
 end)
 
-describe(":Ai messages", function()
-
-    after_each(teardown)
+ai_describe(":Ai messages", function()
 
     it("sends the contents of :messages to the chat", function()
 
@@ -714,9 +685,7 @@ describe(":Ai messages", function()
     end)
 end)
 
-describe(":Ai mes", function()
-
-    after_each(teardown)
+ai_describe(":Ai mes", function()
 
     it("sends the contents of :messages to the chat", function()
 
