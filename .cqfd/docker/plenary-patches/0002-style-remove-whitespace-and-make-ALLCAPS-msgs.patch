@@ -19,7 +19,7 @@ index ed1b68d..892d848 100644
 -local FAIL = color_string("red", "Fail")
 -local PENDING = color_string("yellow", "Pending")
 +local SUCCESS = color_string("green", "SUCCESS")
-+local FAIL = color_string("red", "FAIL")
++local FAIL = color_string("red", "FAILURE")
 +local PENDING = color_string("yellow", "PENDING")
  
  local HEADER = string.rep("=", 40)

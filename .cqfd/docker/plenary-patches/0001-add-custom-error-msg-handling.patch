@@ -27,7 +27,7 @@ index 7fe7569..17cd94c 100644
 +          end
 +
 +          if info then
-+            location = string.format("ERROR %s:%d", path, info.currentline)
++            location = string.format("ERROR   %s:%d", path, info.currentline)
 +          end
 +
 +          print("\27[31m" .. location .. "\27[0m")
