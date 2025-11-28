@@ -51,7 +51,8 @@ function! s:curl_models() abort
         return g:copilot_curl_models_mock->trim()->json_decode()
     endi
 
-    let copilot_url = "https://api.business.githubcopilot.com/models"
+    let hostname = "api.business.githubcopilot.com"
+    let url_path = "/models"
     let token = s:get_token()
 
     let headers = [
@@ -62,7 +63,7 @@ function! s:curl_models() abort
         \   $"editor-version: neovim/0.11.0",
         \]
 
-    return ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
+    return ai#curl(hostname, url_path, "GET", headers)->trim()->json_decode()
 endf
 
 function! s:get_token(localtime = g:ai_localtime) abort
@@ -101,7 +102,8 @@ function! s:curl_remote_token() abort
         return g:copilot_curl_token_mock->trim()->json_decode()
     endi
 
-    let copilot_url = "https://api.github.com/copilot_internal/v2/token"
+    let hostname = "api.github.com"
+    let url_path = "/copilot_internal/v2/token"
     let local_token = providers#copilot#get_local_token()
 
     let headers = [
@@ -109,7 +111,7 @@ function! s:curl_remote_token() abort
         \   $"accept: application/json",
         \]
 
-    return ai#curl(copilot_url, "GET", headers)->trim()->json_decode()
+    return ai#curl(hostname, url_path, "GET", headers)->trim()->json_decode()
 endf
 
 function! s:save_remote_token() abort
@@ -163,7 +165,8 @@ function! providers#copilot#curl_chat(messages) abort
         throw "a:messages must be a list"
     endi
 
-    let copilot_url = "https://api.business.githubcopilot.com/chat/completions"
+    let hostname = "api.business.githubcopilot.com"
+    let url_path = "/chat/completions"
     let temperature = 0.1
     let n = 1
     let messages = [
@@ -197,5 +200,5 @@ function! providers#copilot#curl_chat(messages) abort
         \   $"content-length: {content_length}",
         \]
 
-    return ai#curl(copilot_url, "POST", headers, body)
+    return ai#curl(hostname, url_path, "POST", headers, body)
 endf
