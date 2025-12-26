@@ -1,5 +1,9 @@
+
+# TODO
+
 :Ai chats <chat> selects that chat
 :Ai chats lists all chats
+:Ai chats <tab> allows you to select old conversations
 :Ai clean deletes all chats
 :Ai mrproper deletes ai.nvim dir
 :Ai explain changes the system prompt to a more verbose one
@@ -11,8 +15,9 @@
 :Ai <model> <temperature|top_p|max_tokens|n|system_prompt> prints the value of that model's paramter
 :Ai <model> <temperature|top_p|max_tokens|n|system_prompt>=<value> assigns the value to that model's paramter
 :Ai!! to resend last message sent to last chat to new chat
-
-# TODO
+:Ai edit opens the file that is used for the user prompt
+:Ai edit user opens the file that is used for the user prompt
+:Ai edit system opens the file that is used for the system prompt
 
 - Soon you will need to investigate how to dynamically generate tests to
   account for every combination of every feature
@@ -128,3 +133,34 @@ providers/copilot/token.json
 providers/copilot/models.json
 providers/copilot/chat.data
 ```
+
+---
+
+all of the sub commands are stored in a structure to support sub sub commands
+and sub sub sub commands to ensure they are all able to be abbreviated and so
+that they can all be automatically filled out for the tab completion
+
+---
+
+write an awk script(s) that makes it super easy to quickly color bash columns
+in pipelines or something
+
+---
+
+Hitting enter while over a line in a codeblock runs it in the closests open
+terminal. If one is not open, open one to run it in.
+If you hit enter on the top of the codeblock (ie the ```<filetype>) the entire
+code block is ran.
+
+Asynchronous chat submissions
+
+Buffer updates with a loading animation of sorts (what kind? TBD)
+
+MCP and ACP support
+
+everytime a command is run in a shell with ai.nvim it opens a terminal buffer
+and runs the command. This could be in the background or take up a window. but
+this is the best way I want to interact with agents running long running
+commands so that I can view it. I also want a way to view more of the
+communication with tools and MCP stuff.
+
