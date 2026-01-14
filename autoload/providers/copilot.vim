@@ -51,7 +51,7 @@ function! s:curl_models() abort
         return g:copilot_curl_models_mock->trim()->json_decode()
     endi
 
-    let hostname = "api.business.githubcopilot.com"
+    let hostname = "api.githubcopilot.com"
     let url_path = "/models"
     let token = s:get_token()
 
@@ -165,7 +165,7 @@ function! providers#copilot#curl_chat(messages) abort
         throw "a:messages must be a list"
     endi
 
-    let hostname = "api.business.githubcopilot.com"
+    let hostname = "api.githubcopilot.com"
     let url_path = "/chat/completions"
     let temperature = 0.1
     let n = 1
