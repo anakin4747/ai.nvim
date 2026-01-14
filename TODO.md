@@ -164,3 +164,81 @@ this is the best way I want to interact with agents running long running
 commands so that I can view it. I also want a way to view more of the
 communication with tools and MCP stuff.
 
+---
+
+:Ai agent enable
+    enables agent mode opposed to the default chat mode that is fairly limited
+    since it does not have agentic capabilities
+:Ai agent disable
+    switches back to the default chat mode
+
+---
+
+Having the hit enter at codeblocks would be so sweet rn
+
+running the commands in :terminals so that they can always be watched and
+interacted with directly
+
+---
+
+support for highlighting commands from the :Ai buffer to run those in a
+:terminal buffer
+
+
+---
+
+tell ai to always use
+
+```
+sudo chown $(id -nu):$(id -ng) /srv/samba/share
+```
+
+instead of
+
+```
+sudo chown <youruser>:<youruser> /srv/samba/share
+```
+
+So that it is always runnable code
+
+---
+
+Or when requiring edits to a file don't do this:
+
+```bash
+# 5. Edit Samba config
+sudo nano /etc/samba/smb.conf
+
+# Add at the end:
+# [Share]
+#    path = /srv/samba/share
+#    browseable = yes
+#    read only = no
+#    guest ok = no
+#    valid users = <youruser>
+```
+
+Do this instead:
+
+```bash
+sudo cat >> /etc/samba/smb.conf << EOF
+[Share]
+   path = /srv/samba/share
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = $(id -nu)
+EOF
+```
+
+---
+
+Use sed or cat to perform file edits so that they can be more easily seen as
+they will be on display in the :terminal buffers. That is compared to using an
+mcp or some Ai tool for reading or writing, which is just harder to introspect
+into, why not keep it simple and just use sed and cat so that we can monitor it
+the way we always can.
+
+---
+
+ask AI to make grammarly but open source and as a language server
