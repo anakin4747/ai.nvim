@@ -1,0 +1,36 @@
+{
+  "agent_mode_auto_approval": true,
+  "annotations_enabled": true,
+  "azure_only": false,
+  "blackbird_clientside_indexing": false,
+  "chat_enabled": true,
+  "chat_jetbrains_enabled": true,
+  "code_quote_enabled": false,
+  "code_review_enabled": true,
+  "codesearch": true,
+  "copilotignore_enabled": false,
+  "endpoints": {
+    "api": "https://api.business.githubcopilot.com",
+    "origin-tracker": "https://origin-tracker.business.githubcopilot.com",
+    "proxy": "https://proxy.business.githubcopilot.com",
+    "telemetry": "https://telemetry.business.githubcopilot.com"
+  },
+  "expires_at": 1768169197,
+  "individual": false,
+  "limited_user_quotas": null,
+  "limited_user_reset_date": null,
+  "organization_list": [
+    "f02e326f800ee26f04df7961adbf7c0a"
+  ],
+  "prompt_8k": true,
+  "public_suggestions": "enabled",
+  "refresh_in": 1500,
+  "sku": "copilot_for_business_seat_quota",
+  "snippy_load_test_enabled": false,
+  "telemetry": "disabled",
+  "token": "tid=f02e326f800ee26f04df7961adbf7c0a;ol=f02e326f800ee26f04df7961adbf7c0a;exp=1768169197;sku=copilot_for_business_seat_quota;proxy-ep=proxy.business.githubcopilot.com;st=dotcom;ssc=1;chat=1;sn=1;malfil=1;editor_preview_features=1;agent_mode=1;agent_mode_auto_approval=1;mcp=1;ccr=1;8kp=1;ip=8.8.8.8;asn=AS1403:d3eb539a556352f3f47881d71fb0e5777b2f3e9a4251d283c18c67ce996774b7",
+  "tracking_id": "f02e326f800ee26f04df7961adbf7c0a",
+  "vsc_electron_fetcher_v2": false,
+  "xcode": true,
+  "xcode_chat": false
+}
