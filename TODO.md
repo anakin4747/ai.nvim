@@ -4,7 +4,8 @@
 :Ai chats <chat> selects that chat
 :Ai chats lists all chats
 :Ai chats <tab> allows you to select old conversations
-:Ai clean deletes all chats
+:Ai clean <chat> deletes that chat
+:Ai cleanall deletes all chats
 :Ai mrproper deletes ai.nvim dir
 :Ai explain changes the system prompt to a more verbose one
 :Ai -- <models|chats|...> treats the second argument as the prompt
@@ -14,10 +15,12 @@
 :Ai log obfuscate disable disables logging obfuscation
 :Ai <model> <temperature|top_p|max_tokens|n|system_prompt> prints the value of that model's paramter
 :Ai <model> <temperature|top_p|max_tokens|n|system_prompt>=<value> assigns the value to that model's paramter
-:Ai!! to resend last message sent to last chat to new chat
+:Ai!! to resend last message sent to last chat to new chat or just the case when you use ! wrong either used it when you didn't mean to or vica versa
 :Ai edit opens the file that is used for the user prompt
 :Ai edit user opens the file that is used for the user prompt
 :Ai edit system opens the file that is used for the system prompt
+:Ai diagnostics sends vim.diagnostic.get() to ai buffer
+:Ai grep to :grep through your chats
 
 - Soon you will need to investigate how to dynamically generate tests to
   account for every combination of every feature
@@ -242,3 +245,7 @@ the way we always can.
 ---
 
 ask AI to make grammarly but open source and as a language server
+
+---
+
+Properly handle the case of no internet connection
