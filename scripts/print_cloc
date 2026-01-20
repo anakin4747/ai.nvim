@@ -1,3 +1,5 @@
+#!/bin/bash
+
 which cloc &> /dev/null || (
     printf "\033[32mYou don't have cloc installed\033[0m\n"
     exit 1
@@ -5,7 +7,7 @@ which cloc &> /dev/null || (
 
 cloc . | \
     awk '/^-+$/ {p=1} p' | \
-    tr 'A-Z' 'a-z' | \
+    tr '[:upper:]' '[:lower:]' | \
     sed 's/vim script/vimscript /' | \
     sed 's/bourne again shell/bash              /' | \
     sed 's/bourne shell/bash        /' | \
