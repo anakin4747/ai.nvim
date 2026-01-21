@@ -1,5 +1,7 @@
 require("plenary.busted")
 
+local server = require("tests.test_server")
+
 local this_repo = vim.fn.expand('<sfile>:p:h')
 local default_mock_dir = this_repo .. "/tests/fixtures/ai.nvim"
 
@@ -37,10 +39,13 @@ local function teardown()
     vim.g.copilot_curl_token_mock = nil
     vim.g.copilot_curl_models_mock = nil
     vim.g.copilot_curl_chat_mock = nil
+
+    server:stop()
 end
 
 local function ai_describe(name, fn)
     describe(name, function()
+        before_each(server:start())
         after_each(teardown)
         fn()
     end)
