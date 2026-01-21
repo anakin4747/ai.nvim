@@ -28,3 +28,8 @@ RUN luarocks --lua-version=5.1 install mimetypes && \
     luarocks --lua-version=5.1 install luasocket && \
     luarocks --lua-version=5.1 install lzlib && \
     luarocks --lua-version=5.1 install pegasus
+
+COPY pegasus-patches /pegasus-patches
+
+RUN git -C /usr/share/lua/5.1/pegasus/ init 2> /dev/null && \
+    git -C /usr/share/lua/5.1/pegasus/ apply /pegasus-patches/*.patch
