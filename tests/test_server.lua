@@ -25,4 +25,9 @@ function Server:start(bad)
     end)
 end
 
+function Server:stop()
+    if self.pegasus == nil then return end
+    self.pegasus:stop()
+end
+
 return Server
