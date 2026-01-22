@@ -19,8 +19,13 @@
 :Ai edit opens the file that is used for the user prompt
 :Ai edit user opens the file that is used for the user prompt
 :Ai edit system opens the file that is used for the system prompt
-:Ai diagnostics sends vim.diagnostic.get() to ai buffer
+:Ai diagnostics sends vim.diagnostic.get() to ai buffer and also wraps it in fold markers and close only that fold to lightly hide it from the user
 :Ai grep to :grep through your chats
+:%Ai automatically provides watching of % so that we don't need to explicitly ask Ai to watch it and so that we don't need to keep sending it the same file with minor changes
+:%Ai also inserts a commented out name of the file at the top
+:%Ai for files larger than like 20 lines gets automatically folded so that they are easier to move around
+:Ai <filename> would be the way to pass a file different from % to the chat as well as enable watching automatically for that file
+:Ai do changes the system prompt or using ACP stuff to do agentic stuff like actualing going and editing files itself
 
 - Soon you will need to investigate how to dynamically generate tests to
   account for every combination of every feature
@@ -249,3 +254,26 @@ ask AI to make grammarly but open source and as a language server
 ---
 
 Properly handle the case of no internet connection
+
+---
+
+do a little :<line1>,<line2>normal == to left align indent text in the range
+you just passed
+
+---
+
+make chat buffers unlisted
+
+---
+
+file diffs for applying changes
+while hovering over a diff <cr> to accept diff and <C-c> to decline diff. Maybe
+<cr><cr> and <C-c><C-c> idk
+
+---
+
+big files getting insert in fold markers and folded automatically
+
+---
+
+handle the error condition properly when the chat is too large
