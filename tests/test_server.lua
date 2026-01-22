@@ -3,6 +3,23 @@ local uv = vim.loop
 local Server = {}
 Server.__index = Server
 
+-- taken from :h luv-file-system-operations
+local function readfile(path, callback)
+    vim.uv.fs_open(path, "r", 438, function(err, fd)
+        assert(not err, err)
+        vim.uv.fs_fstat(fd, function(err, stat)
+            assert(not err, err)
+            vim.uv.fs_read(fd, stat.size, 0, function(err, data)
+                assert(not err, err)
+                vim.uv.fs_close(fd, function(err)
+                    assert(not err, err)
+                    return callback(data)
+                end)
+            end)
+        end)
+    end)
+end
+
 function Server:new(opts)
     opts = opts or {}
     local port = opts.port or 8080
@@ -34,15 +51,18 @@ function Server:start(bad)
             end
 
             local path = chunk:match("GET%s+([^%s]+)%s+HTTP")
+            print("Received request for path:", path)
             path = path or "/"
             local responsepath = ("%s/tests/fixtures/endpoints/%s/%s")
                 :format(uv.cwd(), path, filename)
+            print("Serving file:", responsepath)
 
-            local ok, file = pcall(vim.fn.readfile, responsepath)
+            local ok, file = pcall(readfile, responsepath)
             local body, status
+            print("File read result:", ok, file)
             if not ok then
                 status = "404 Not Found"
-                body = "Not Found"
+                body = "Not Found\n"
             else
                 status = "200 OK"
                 body = table.concat(file, "\n")
@@ -53,6 +73,8 @@ function Server:start(bad)
                          "Content-Length: " .. #body .. "\r\n" ..
                          "Connection: close\r\n\r\n" ..
                          body
+
+            print("Sending response:", resp)
 
             client:write(resp, function()
                 client:shutdown()
