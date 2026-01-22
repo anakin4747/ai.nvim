@@ -50,9 +50,13 @@ function Server:start(bad)
                 return
             end
 
-            local path = chunk:match("GET%s+([^%s]+)%s+HTTP")
-            print("Received request for path:", path)
-            path = path or "/"
+            local path = chunk:match("%w+%s+/([^%s]+)%s+HTTP")
+            if path == nil then
+                print("no path found")
+                client:close()
+                return
+            end
+
             local responsepath = ("%s/tests/fixtures/endpoints/%s/%s")
                 :format(uv.cwd(), path, filename)
             print("Serving file:", responsepath)
