@@ -709,3 +709,45 @@ ai_describe(":Ai mes", function()
     end)
 end)
 
+local function get_local_token()
+    local data = vim.fn.json_decode(
+        vim.fn.readfile(
+            vim.fn.expand("~/.config/github-copilot/apps.json")
+        )
+    )
+    for _, v in pairs(data) do
+        return v.oauth_token
+    end
+    return nil
+end
+
+ai_describe("ai#curl", function()
+
+    describe("for copilot endpoint", function()
+
+        local token_headers = {
+            "authorization: Bearer " .. get_local_token(),
+            "accept: application/json",
+            "content-type: application/json",
+            "copilot-integration-id: vscode-chat",
+            "editor-version: neovim/0.11.0",
+        }
+
+        it("/copilot_internal/v2/token returns valid json online", function()
+
+            local expected = vim.fn['ai#curl'](
+                "api.github.com", "/copilot_internal/v2/token",
+                "GET", headers
+            )
+
+            vim.g.i_am_in_a_test = nil
+
+            local actual = vim.fn['ai#curl'](
+                "api.github.com", "/copilot_internal/v2/token",
+                "GET", headers
+            )
+
+            assert.are.same(expected, actual)
+        end)
+    end)
+end)
