@@ -277,3 +277,8 @@ big files getting insert in fold markers and folded automatically
 ---
 
 handle the error condition properly when the chat is too large
+
+---
+
+when files are being watched have that listed at the top of the AI's response
+so that we can see what files were watched during that response
