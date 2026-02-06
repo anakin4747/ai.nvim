@@ -3,21 +3,20 @@ local uv = vim.loop
 local Server = {}
 Server.__index = Server
 
--- taken from :h luv-file-system-operations
-local function readfile(path, callback)
-    vim.uv.fs_open(path, "r", 438, function(err, fd)
-        assert(not err, err)
-        vim.uv.fs_fstat(fd, function(err, stat)
-            assert(not err, err)
-            vim.uv.fs_read(fd, stat.size, 0, function(err, data)
-                assert(not err, err)
-                vim.uv.fs_close(fd, function(err)
-                    assert(not err, err)
-                    return callback(data)
-                end)
-            end)
-        end)
-    end)
+local function readfile_uv(path)
+    local fd = uv.fs_open(path, "r", 438)
+    if not fd then return nil end
+    local stat = uv.fs_fstat(fd)
+    if not stat then uv.fs_close(fd); return nil end
+    local data = uv.fs_read(fd, stat.size, 0)
+    uv.fs_close(fd)
+    if not data then return nil end
+    -- mimic vim.fn.readfile: return table of lines
+    local lines = {}
+    for line in data:gmatch("([^\n]*)\n?") do
+        table.insert(lines, line)
+    end
+    return lines
 end
 
 function Server:new(opts)
@@ -61,7 +60,7 @@ function Server:start(bad)
                 :format(uv.cwd(), path, filename)
             print("Serving file:", responsepath)
 
-            local ok, file = pcall(readfile, responsepath)
+            local ok, file = pcall(readfile_uv, responsepath)
             local body, status
             print("File read result:", ok, file)
             if not ok then
