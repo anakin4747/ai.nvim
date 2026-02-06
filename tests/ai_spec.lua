@@ -1,11 +1,5 @@
 require("plenary.busted")
 
-local Server = require("tests.test_server")
-
-local srv = Server({ port = 80 })
-
-srv:start(false)
-
 local this_repo = vim.fn.expand('<sfile>:p:h')
 local default_mock_dir = this_repo .. "/tests/fixtures/ai.nvim"
 
@@ -715,6 +709,3 @@ ai_describe(":Ai mes", function()
     end)
 end)
 
-vim.wait(30000)
-
-srv:stop()
