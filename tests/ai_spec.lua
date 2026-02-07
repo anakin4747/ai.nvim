@@ -761,38 +761,15 @@ local is_valid_token_json = jsonschema.generate_validator({
     }
 })
 
-local function get_local_token()
-    local data = vim.fn.json_decode(
-        vim.fn.readfile(
-            vim.fn.expand("~/.config/github-copilot/apps.json")
-        )
-    )
-    for _, v in pairs(data) do
-        return v.oauth_token
-    end
-    return nil
-end
-
 ai_describe("ai#curl", function()
 
     describe("for copilot endpoint", function()
-
-        local token_headers = {
-            "authorization: Bearer " .. get_local_token(),
-            "accept: application/json",
-            "content-type: application/json",
-            "copilot-integration-id: vscode-chat",
-            "editor-version: neovim/0.11.0",
-        }
 
         it("/copilot_internal/v2/token returns valid json online", function()
 
             vim.g.i_am_in_a_test = false
 
-            local response = vim.fn['ai#curl'](
-                "api.github.com", "/copilot_internal/v2/token",
-                "GET", token_headers
-            )
+            local response = vim.fn['providers#copilot#curl_remote_token']()
 
             local token
             assert.has_no.errors(function()
@@ -800,15 +777,11 @@ ai_describe("ai#curl", function()
             end)
 
             assert(is_valid_token_json(token))
-
         end)
 
         it("/copilot_internal/v2/token returns valid json offline", function()
 
-            local response = vim.fn['ai#curl'](
-                "api.github.com", "/copilot_internal/v2/token",
-                "GET", token_headers
-            )
+            local response = vim.fn['providers#copilot#curl_remote_token']()
 
             local token
             assert.has_no.errors(function()
