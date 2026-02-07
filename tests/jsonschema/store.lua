@@ -219,7 +219,7 @@ Copyright (c) 2017 Julien Desgats
 
 -- I gave up (for now) on doing a stripped down URI parser only for JSON schema
 -- needs
-local url = require 'net.url'
+local url = require 'tests.net.url'
 local schar = string.char
 
 -- the net.url is kinda weird when some uri parts are missing (sometimes it is
