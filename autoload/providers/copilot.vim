@@ -40,13 +40,13 @@ function! s:save_models() abort
     endi
 
     let models_json_path = $"{copilot_dir}/models.json"
-    return s:curl_models()
+    return providers#copilot#curl_models()
         \ ->json_encode()
         \ ->split("\n")
         \ ->writefile(models_json_path)
 endf
 
-function! s:curl_models() abort
+function! providers#copilot#curl_models() abort
     if exists("g:copilot_curl_models_mock")
         return g:copilot_curl_models_mock->trim()->json_decode()
     endi
@@ -97,7 +97,7 @@ function! providers#copilot#get_local_token() abort
     return apps_json[keys(apps_json)[0]]['oauth_token']
 endf
 
-function! s:curl_remote_token() abort
+function! providers#copilot#curl_remote_token() abort
     if exists("g:copilot_curl_token_mock")
         return g:copilot_curl_token_mock->trim()->json_decode()
     endi
@@ -111,7 +111,7 @@ function! s:curl_remote_token() abort
         \   $"accept: application/json",
         \]
 
-    return ai#curl(hostname, url_path, "GET", headers)->trim()->json_decode()
+    return ai#curl(hostname, url_path, "GET", headers)
 endf
 
 function! s:save_remote_token() abort
@@ -122,8 +122,7 @@ function! s:save_remote_token() abort
     endi
 
     let token_json_path = $"{copilot_dir}/token.json"
-    return s:curl_remote_token()
-        \ ->json_encode()
+    return providers#copilot#curl_remote_token()
         \ ->split("\n")
         \ ->writefile(token_json_path)
 endf
