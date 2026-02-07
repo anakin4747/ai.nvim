@@ -709,6 +709,58 @@ ai_describe(":Ai mes", function()
     end)
 end)
 
+local jsonschema = require('tests.jsonschema')
+
+local is_valid_token_json = jsonschema.generate_validator({
+    type = "object",
+    properties = {
+        agent_mode_auto_approval = { type = "boolean" },
+        annotations_enabled = { type = "boolean" },
+        azure_only = { type = "boolean" },
+        blackbird_clientside_indexing = { type = "boolean" },
+        chat_enabled = { type = "boolean" },
+        chat_jetbrains_enabled = { type = "boolean" },
+        code_quote_enabled = { type = "boolean" },
+        code_review_enabled = { type = "boolean" },
+        codesearch = { type = "boolean" },
+        copilotignore_enabled = { type = "boolean" },
+        endpoints = {
+            type = "object",
+            properties = {
+                api = { type = "string" },
+                ["origin-tracker"] = { type = "string" },
+                proxy = { type = "string" },
+                telemetry = { type = "string" }
+            },
+            required = { "api", "origin-tracker", "proxy", "telemetry" }
+        },
+        expires_at = { type = "number" },
+        individual = { type = "boolean" },
+        organization_list = {
+            type = "array",
+            items = { type = "string" }
+        },
+        prompt_8k = { type = "boolean" },
+        public_suggestions = { type = "string" },
+        refresh_in = { type = "number" },
+        sku = { type = "string" },
+        snippy_load_test_enabled = { type = "boolean" },
+        telemetry = { type = "string" },
+        token = { type = "string" },
+        tracking_id = { type = "string" },
+        vsc_electron_fetcher_v2 = { type = "boolean" },
+        xcode = { type = "boolean" },
+        xcode_chat = { type = "boolean" }
+    },
+    required = {
+        "agent_mode_auto_approval", "annotations_enabled", "azure_only", "blackbird_clientside_indexing", "chat_enabled",
+        "chat_jetbrains_enabled", "code_quote_enabled", "code_review_enabled", "codesearch", "copilotignore_enabled",
+        "endpoints", "expires_at", "individual", "organization_list", "prompt_8k", "public_suggestions", "refresh_in",
+        "sku", "snippy_load_test_enabled", "telemetry", "token", "tracking_id", "vsc_electron_fetcher_v2", "xcode",
+        "xcode_chat"
+    }
+})
+
 local function get_local_token()
     local data = vim.fn.json_decode(
         vim.fn.readfile(
@@ -735,19 +787,35 @@ ai_describe("ai#curl", function()
 
         it("/copilot_internal/v2/token returns valid json online", function()
 
-            local expected = vim.fn['ai#curl'](
+            vim.g.i_am_in_a_test = false
+
+            local response = vim.fn['ai#curl'](
                 "api.github.com", "/copilot_internal/v2/token",
-                "GET", headers
+                "GET", token_headers
             )
 
-            vim.g.i_am_in_a_test = nil
+            local token
+            assert.has_no.errors(function()
+                token = vim.fn.json_decode(response)
+            end)
 
-            local actual = vim.fn['ai#curl'](
+            assert(is_valid_token_json(token))
+
+        end)
+
+        it("/copilot_internal/v2/token returns valid json offline", function()
+
+            local response = vim.fn['ai#curl'](
                 "api.github.com", "/copilot_internal/v2/token",
-                "GET", headers
+                "GET", token_headers
             )
 
-            assert.are.same(expected, actual)
+            local token
+            assert.has_no.errors(function()
+                token = vim.fn.json_decode(response)
+            end)
+
+            assert(is_valid_token_json(token))
         end)
     end)
 end)

@@ -204,7 +204,7 @@ Copyright (c) 2017 Julien Desgats
    See the License for the specific language governing permissions and
    limitations under the License.
 --]]
-local store = require 'jsonschema.store'
+local store = require 'tests.jsonschema.store'
 local loadstring = loadstring or load
 local tostring = tostring
 local pairs = pairs
