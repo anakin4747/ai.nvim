@@ -16,9 +16,10 @@
 :Ai <model> <temperature|top_p|max_tokens|n|system_prompt> prints the value of that model's paramter
 :Ai <model> <temperature|top_p|max_tokens|n|system_prompt>=<value> assigns the value to that model's paramter
 :Ai!! to resend last message sent to last chat to new chat or just the case when you use ! wrong either used it when you didn't mean to or vica versa
-:Ai edit opens the file that is used for the user prompt
-:Ai edit user opens the file that is used for the user prompt
-:Ai edit system opens the file that is used for the system prompt
+:Ai prompt opens the file that is used for the user prompt
+:Ai prompt user opens the file that is used for the user prompt
+:Ai prompt system opens the file that is used for the system prompt
+:%Ai edit edits the changes to the file directly
 :Ai diagnostics sends vim.diagnostic.get() to ai buffer and also wraps it in fold markers and close only that fold to lightly hide it from the user
 :Ai grep to :grep through your chats
 :%Ai automatically provides watching of % so that we don't need to explicitly ask Ai to watch it and so that we don't need to keep sending it the same file with minor changes
