@@ -1,8 +1,8 @@
 
 .PHONY: cqfd
 cqfd:
-	cqfd init
-	cqfd
+	./scripts/cqfd/cqfd init
+	./scripts/cqfd/cqfd
 
 .PHONY: test tests
 test tests:
