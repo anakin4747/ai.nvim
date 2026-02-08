@@ -98,9 +98,6 @@ function! providers#copilot#get_local_token() abort
 endf
 
 function! providers#copilot#curl_remote_token() abort
-    if exists("g:copilot_curl_token_mock")
-        return g:copilot_curl_token_mock->trim()->json_decode()
-    endi
 
     let hostname = "api.github.com"
     let url_path = "/copilot_internal/v2/token"
