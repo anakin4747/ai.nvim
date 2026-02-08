@@ -143,11 +143,20 @@ endf
 function! ai#completion(arglead, cmdline, curpos) abort
     let arg_count = a:cmdline->split()->len()
 
-    if arg_count == 1
-        return providers#get_models()->join("\n") . "\n" . keys(g:ai_commands)->join("\n")
-    endi
+    if arg_count > 2 || (arg_count == 2 && empty(a:arglead))
+        return []
+    endif
 
-    return ""
+    let possible_completions = []
+    let possible_completions += providers#get_models()
+    let possible_completions += keys(g:ai_commands)
+
+    if !empty(a:arglead)
+        call filter(possible_completions,
+            \ {_, val -> stridx(val, a:arglead) == 0})
+    endif
+
+    return possible_completions
 endf
 
 function! s:make_curl_cmd(url, method, headers, body = "") abort
