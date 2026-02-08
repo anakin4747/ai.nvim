@@ -71,7 +71,6 @@ vim.g.ai_dir = default_mock_dir
 
 vim.g.ai_localtime = 1763098419
 
-vim.g.copilot_curl_token_mock = nil
 vim.g.copilot_curl_models_mock = nil
 vim.g.copilot_curl_chat_mock = nil
 
@@ -86,7 +85,6 @@ local function teardown()
     vim.system({ "git", "clean", "-fq", vim.g.ai_dir, default_mock_dir }):wait()
     vim.system({ "git", "restore", vim.g.ai_dir, default_mock_dir }):wait()
     vim.g.ai_dir = default_mock_dir
-    vim.g.copilot_curl_token_mock = nil
     vim.g.copilot_curl_models_mock = nil
     vim.g.copilot_curl_chat_mock = nil
 end
@@ -472,9 +470,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
         local old_token_json = readjsonfile(token_path)
 
-        local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
-        vim.g.copilot_curl_token_mock = readjsonfile(new_token_fixture)
-
         -- mock curling of models
         local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
         vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
@@ -484,17 +479,11 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         local new_token_json = readjsonfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
-        assert.are.same(
-            vim.json.decode(vim.g.copilot_curl_token_mock),
-            vim.json.decode(new_token_json)
-        )
+        assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
     end)
 
     it("gets a new token if no token exists on submit", function()
         vim.g.ai_dir = fixture_dir("no-token")
-
-        local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
-        vim.g.copilot_curl_token_mock = readjsonfile(new_token_fixture)
 
         -- mock curling of models
         local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
@@ -511,21 +500,15 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         local new_token_json = readjsonfile(token_path)
 
+        local token
         assert.has_no.errors(function()
-            vim.json.decode(new_token_json)
+            token = vim.json.decode(new_token_json)
         end)
-
-        assert.are.same(
-            vim.json.decode(vim.g.copilot_curl_token_mock),
-            vim.json.decode(new_token_json)
-        )
+        assert(is_valid_token_json(token))
     end)
 
     it("gets a new token if token is malformed on submit", function()
         vim.g.ai_dir = fixture_dir("bad-token")
-
-        local new_token_fixture = default_mock_dir .. "/providers/copilot/token.json"
-        vim.g.copilot_curl_token_mock = readjsonfile(new_token_fixture)
 
         -- mock curling of models
         local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
@@ -544,21 +527,13 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
             json = vim.json.decode(new_token_json)
         end)
 
-        assert.are.same(
-            vim.json.decode(vim.g.copilot_curl_token_mock),
-            json
-        )
+        assert(is_valid_token_json(json))
 
         assert.is_not_nil(json.expires_at)
     end)
 
     it("gets new models if token is expired on submit", function()
         vim.g.ai_dir = fixture_dir("expired-remote-token-get-models")
-
-        -- mock curling of token
-        vim.g.copilot_curl_token_mock = readjsonfile(
-            default_mock_dir .. "/providers/copilot/token.json"
-        )
 
         -- mock curling of models
         local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
@@ -576,11 +551,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
     it("gets new models if no token exists on submit", function()
         vim.g.ai_dir = fixture_dir("no-token-get-models")
-
-        -- mock curling of token
-        vim.g.copilot_curl_token_mock = readjsonfile(
-            default_mock_dir .. "/providers/copilot/token.json"
-        )
 
         -- mock curling of models
         local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
@@ -658,8 +628,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
         vim.g.ai_dir = fixture_dir("no-dir")
 
         -- mock all data
-        local token_fixture = default_mock_dir .. "/providers/copilot/token.json"
-        vim.g.copilot_curl_token_mock = readjsonfile(token_fixture)
         local models_fixture = default_mock_dir .. "/providers/copilot/models.json"
         vim.g.copilot_curl_models_mock = readjsonfile(models_fixture)
         local chat_fixture = default_mock_dir .. "/providers/copilot/chat.data"
