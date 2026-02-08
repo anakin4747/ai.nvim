@@ -41,15 +41,11 @@ function! s:save_models() abort
 
     let models_json_path = $"{copilot_dir}/models.json"
     return providers#copilot#curl_models()
-        \ ->json_encode()
         \ ->split("\n")
         \ ->writefile(models_json_path)
 endf
 
 function! providers#copilot#curl_models() abort
-    if exists("g:copilot_curl_models_mock")
-        return g:copilot_curl_models_mock->trim()->json_decode()
-    endi
 
     let hostname = "api.githubcopilot.com"
     let url_path = "/models"
@@ -63,7 +59,7 @@ function! providers#copilot#curl_models() abort
         \   $"editor-version: neovim/0.11.0",
         \]
 
-    return ai#curl(hostname, url_path, "GET", headers)->trim()->json_decode()
+    return ai#curl(hostname, url_path, "GET", headers)
 endf
 
 function! s:get_token(localtime = g:ai_localtime) abort
