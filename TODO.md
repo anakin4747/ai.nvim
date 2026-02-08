@@ -106,6 +106,7 @@
 
 - being markdown smart, like if I pass a range of a codeblock of lua code in a
   markdown file, pass lua instead of markdown as the filetype of the codeblock
+  use :Inspect to figure this out easier
 
 - if triple backticks appear in the message, escape them
 
