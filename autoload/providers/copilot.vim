@@ -173,7 +173,6 @@ function! providers#copilot#curl_chat(messages) abort
     let max_tokens = 16384
     let stream = v:true
     let top_p = 1
-    let model = 'gpt-4.1'
 
     let body = json_encode(#{
         \   temperature: temperature,
@@ -182,7 +181,7 @@ function! providers#copilot#curl_chat(messages) abort
         \   max_tokens: max_tokens,
         \   stream: stream,
         \   top_p: top_p,
-        \   model: model
+        \   model: g:ai_model
         \})
     let content_length = len(body)
 
