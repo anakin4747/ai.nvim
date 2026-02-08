@@ -179,16 +179,26 @@ endf
 
 function! ai#curl(hostname, url_path, method, headers, body = "") abort
     if exists("g:i_am_in_a_test")
-        let response = $"tests/fixtures/endpoints/{a:url_path}/good.json"
-            \ ->readfile()
-            \ ->join("\n")
-    else
-        let url = $"https://{a:hostname}{a:url_path}"
-        let cmd = s:make_curl_cmd(url, a:method, a:headers, a:body)
-        call ai#log("curl request", cmd->join(), "sh")
-        let response = system(cmd)
-        call ai#log("curl response", response, "json")
+        if !exists("g:ai_test_endpoints")
+            return $"tests/fixtures/endpoints/{a:url_path}/good.json"
+                \ ->readfile()
+                \ ->join("\n")
+        endi
+
+        let mock_file = g:ai_test_endpoints->get(a:url_path, "")
+
+        if mock_file != ""
+            return $"tests/fixtures/endpoints/{a:url_path}/{mock_file}"
+                \ ->readfile()
+                \ ->join("\n")
+        endi
     endi
+
+    let url = $"https://{a:hostname}{a:url_path}"
+    let cmd = s:make_curl_cmd(url, a:method, a:headers, a:body)
+    call ai#log("curl request", cmd->join(), "sh")
+    let response = system(cmd)
+    call ai#log("curl response", response, "json")
 
     return response
 endf
