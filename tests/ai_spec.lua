@@ -194,6 +194,8 @@ local function teardown()
     vim.system({ "git", "clean", "-fq", vim.g.ai_dir, default_mock_dir }):wait()
     vim.system({ "git", "restore", vim.g.ai_dir, default_mock_dir }):wait()
     vim.g.ai_dir = default_mock_dir
+
+    vim.g.ai_test_endpoints = nil
 end
 
 local function ai_describe(name, fn)
@@ -903,5 +905,18 @@ ai_describe("ai#curl", function()
                 end
             end
         end)
+    end)
+end)
+
+ai_describe("vim.g.ai_test_endpoints", function()
+
+    it("can be used to mock endpoints", function()
+
+        vim.g.ai_test_endpoints = {
+            ['/chat/completions'] = 'expired.json'
+        }
+        local response = vim.fn['providers#copilot#curl_chat']({'messages'})
+
+        assert.are_match('unauthorized: token expired', response)
     end)
 end)
