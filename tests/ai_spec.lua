@@ -145,11 +145,43 @@ local is_valid_models_json = jsonschema.generate_validator({
     required = { "data", "object" }
 })
 
+local is_valid_chat_json = jsonschema.generate_validator({
+  type = "object",
+  required = { "choices", "created", "id", "model", "system_fingerprint" },
+  properties = {
+    choices = {
+      type = "array",
+      items = {
+        type = "object",
+        required = { "index", "delta" },
+        properties = {
+          index = { type = "integer" },
+          delta = {
+            type = "object",
+            required = { "content" },
+            properties = {
+                content = {
+                    anyOf = {
+                        { type = "string" },
+                        { lua_type = "userdata" }
+                    }
+                },
+                role = { type = "string" }
+            }
+          }
+        }
+      }
+    },
+    created = { type = "integer" },
+    id = { type = "string" },
+    model = { type = "string" },
+    system_fingerprint = { type = "string" }
+  }
+})
+
 vim.g.ai_dir = default_mock_dir
 
 vim.g.ai_localtime = 1763098419
-
-vim.g.copilot_curl_chat_mock = nil
 
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -162,7 +194,6 @@ local function teardown()
     vim.system({ "git", "clean", "-fq", vim.g.ai_dir, default_mock_dir }):wait()
     vim.system({ "git", "restore", vim.g.ai_dir, default_mock_dir }):wait()
     vim.g.ai_dir = default_mock_dir
-    vim.g.copilot_curl_chat_mock = nil
 end
 
 local function ai_describe(name, fn)
@@ -649,11 +680,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
     it("populates the chat with a response", function()
 
-        -- mock chat data
-        local chat_data = default_mock_dir .. "/providers/copilot/chat.data"
-        vim.g.copilot_curl_chat_mock = readjsonfile(chat_data)
-
-        vim.cmd('Ai gpt-4.1 write me a hello world in lua')
+        vim.cmd('Ai gpt-4.1 write me a hello world in rust')
         vim.fn['providers#submit_chat']()
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -661,25 +688,33 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
         assert.are.same({
             '# ME',
             '',
-            'write me a hello world in lua',
+            'write me a hello world in rust',
             '',
             '# AI.NVIM gpt-4.1',
             '',
-            '```lua',
-            'print("Hello, world!")',
+            'Certainly! Here is a simple "Hello, world!" program in Rust:',
+            '',
+            '```rust',
+            'fn main() {',
+            '    println!("Hello, world!");',
+            '}',
             '```',
             '',
-            '# ME',
+            'To run this:',
             '',
+            '1. Save it as `main.rs`.',
+            '2. Compile it with `rustc main.rs`.',
+            '3. Run the output with `./main` (on Linux/macOS) or `main.exe` (on Windows).',
+            '',
+            'Let me know if you need more help!',
+            '',
+            '# ME',
+            ''
         }, lines)
     end)
 
     it("creates ai.nvim dir itself", function()
         vim.g.ai_dir = fixture_dir("no-dir")
-
-        -- mock all data
-        local chat_fixture = default_mock_dir .. "/providers/copilot/chat.data"
-        vim.g.copilot_curl_chat_mock = readjsonfile(chat_fixture)
 
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
         assert(vim.fn.filereadable(token_path) == 0)
@@ -831,6 +866,42 @@ ai_describe("ai#curl", function()
             end)
 
             assert(is_valid_models_json(models))
+        end)
+
+        it("/chat/completions returns valid json online", function()
+
+            vim.g.i_am_in_a_test = false
+
+            local response = vim.fn['providers#copilot#curl_chat']({'messages'})
+
+            for line in response:gmatch("[^\r\n]+") do
+                local json = line:gsub("^data:%s*", "")
+                if json ~= "[DONE]" and json ~= "" then
+                    local chat
+                    assert.has_no.errors(function()
+                        chat = vim.fn.json_decode(json)
+                    end)
+
+                    assert(is_valid_chat_json(chat))
+                end
+            end
+        end)
+
+        it("/chat/completion returns valid json offline", function()
+
+            local response = vim.fn['providers#copilot#curl_chat']({'messages'})
+
+            for line in response:gmatch("[^\r\n]+") do
+                local json = line:gsub("^data:%s*", "")
+                if json ~= "[DONE]" and json ~= "" then
+                    local chat
+                    assert.has_no.errors(function()
+                        chat = vim.fn.json_decode(json)
+                    end)
+
+                    assert(is_valid_chat_json(chat))
+                end
+            end
         end)
     end)
 end)
