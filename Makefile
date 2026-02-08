@@ -1,6 +1,7 @@
 
 .PHONY: cqfd
 cqfd:
+	git submodule update --init
 	./scripts/cqfd/cqfd init
 	./scripts/cqfd/cqfd
 
