@@ -41,17 +41,6 @@
 
 - need to add test for VISUAL mode compatibility not just VISUAL_LINE mode
 
-- do more fuzzing of function arguments and add more error handling when
-  everything is more settled down and features are more firm
-
-- three tabs max of indentation in vimscript
-
-- add a test that gets a token if a chat submission returns an error saying
-  that the token is expired
-  ```
-  unauthorized: token expired
-  ```
-
 - make it so that the ai always wraps text outside of code blocks boxes at
   &textwidth
 
@@ -70,17 +59,8 @@
 
 - investigate ACP
 
-- have a way to easily generate test fixtures from the data you send and
-  recieve to the chatbot
-
 - improve tab completion for :Ai <tab> since it doesn't complete if you already
   begin typing an option like :Ai g<tab> does not complete anything
-
-- just mock the server by having it serve the types of data that could be
-  recieved. this way the entire stack gets tested not just portions
-    - now you will be able to mock all the different things each endpoint can
-      return
-    - ooh and now that can be used to facilitate fuzzing
 
 - lookup table of the system prompt. Like `:Ai explain` could use a system
   prompt that explains how they should explain. or the default system prompt
@@ -88,18 +68,11 @@
   codeblock already has a filetype after ``` then don't specify it in a
   comment
 
-- add logging and a mechanism to save files for collecting test data (watch out
-  to disable such instrusive behaviour by default)
-
 - vimscript test suite will print the results so that it can be interpreted as
   :help since the test output is literally the documentation.
 - vimscript test suite will work for both vim and neovim
 
 - standardize how you are referencing the chat buffer and bufnr
-
-- a way to repaste what you pasted in an old buffer with :'<,'>Ai to a new
-  buffer instead after realising you forgot the !
-  :Ai!!
 
 - if what you have selected is already wrapped in a codeblock don't send the
   triple backticks to the chat
@@ -110,39 +83,9 @@
 
 - if triple backticks appear in the message, escape them
 
-- a way to assert that a test should not hit the network
-
 - need debouncing on submit_chat()
 
 - :Ai log puts you at the bottom of the log
-
-get tokens -> "https://api.github.com/copilot_internal/v2/token"
-save as json to providers/copilot/token.json
-
-get models -> "https://api.business.githubcopilot.com/models"
-save as json to providers/copilot/models.json
-
-post chat json -> "https://api.business.githubcopilot.com/chat/completions"
-will be saved as data/json to providers/copilot/chat.data
-
-so have the docker container reroute api.github.com and
-api.business.githubcopilot.com to localhost
-
-So now a test fixture will have
-
-The webserver will mock these end points are return the values
-
-```inputs
-copilot_internal/v2/token
-models
-chat/completions
-```
-
-```outputs
-providers/copilot/token.json
-providers/copilot/models.json
-providers/copilot/chat.data
-```
 
 ---
 
@@ -152,15 +95,12 @@ that they can all be automatically filled out for the tab completion
 
 ---
 
-write an awk script(s) that makes it super easy to quickly color bash columns
-in pipelines or something
-
----
-
 Hitting enter while over a line in a codeblock runs it in the closests open
 terminal. If one is not open, open one to run it in.
 If you hit enter on the top of the codeblock (ie the ```<filetype>) the entire
 code block is ran.
+
+---
 
 Asynchronous chat submissions
 
@@ -284,3 +224,21 @@ handle the error condition properly when the chat is too large
 
 when files are being watched have that listed at the top of the AI's response
 so that we can see what files were watched during that response
+
+---
+
+# to support async sending
+
+Currently the application blocks on sending chat data
+
+On sending chat data
+
+Worst case:
+    - curl token
+    - curl models
+    - curl chat data
+
+best case:
+    - token exists
+    - models exists
+    - curl chat data
