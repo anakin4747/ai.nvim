@@ -6,7 +6,6 @@ name='ai_nvim'
 command="make tests"
 docker_run_args=" \
     -v $HOME/.config/github-copilot/apps.json:$HOME/.config/github-copilot/apps.json \
-    -p 80:80 \
 "
 
 # vi: ft=ini
