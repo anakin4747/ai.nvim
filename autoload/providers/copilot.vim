@@ -149,9 +149,6 @@ function! s:get_chat_data() abort
 endf
 
 function! providers#copilot#curl_chat(messages) abort
-    if exists("g:copilot_curl_chat_mock")
-        return g:copilot_curl_chat_mock
-    endi
 
     if type(a:messages) != v:t_list
         throw "a:messages must be a list"
