@@ -2,6 +2,10 @@
 function! providers#copilot#submit_chat() abort
     call s:get_token()
     let response = s:get_chat_data()
+    if response == ""
+        call s:get_new_token()
+        let response = s:get_chat_data()
+    endi
 
     let lines = ['', $"# AI.NVIM {g:ai_model}", '']
 
@@ -66,7 +70,7 @@ function! s:get_token(localtime = g:ai_localtime) abort
     let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
 
     if !filereadable(token_json_path)
-        call s:save_remote_token()
+        call s:get_new_token()
         call s:save_models()
         return s:get_token(a:localtime)
     endi
@@ -74,7 +78,7 @@ function! s:get_token(localtime = g:ai_localtime) abort
     let token_json = token_json_path->readfile()->join("\n")->json_decode()
 
     if !exists("token_json.expires_at")
-        call s:save_remote_token()
+        call s:get_new_token()
         return s:get_token(a:localtime)
     endi
 
@@ -82,7 +86,7 @@ function! s:get_token(localtime = g:ai_localtime) abort
         return token_json.token
     endi
 
-    call s:save_remote_token()
+    call s:get_new_token()
     call s:save_models()
     return s:get_token(a:localtime)
 endf
@@ -107,7 +111,7 @@ function! providers#copilot#curl_remote_token() abort
     return ai#curl(hostname, url_path, "GET", headers)
 endf
 
-function! s:save_remote_token() abort
+function! s:get_new_token() abort
     let copilot_dir = $"{ai#nvim_get_dir()}/providers/copilot"
 
     if !filereadable(copilot_dir)
@@ -122,6 +126,10 @@ endf
 
 function! s:get_chat_data() abort
     let response = getline(0, '$')->providers#copilot#curl_chat()
+
+    if response->match('unauthorized: token expired') != -1
+        return ""
+    endi
 
     let data = ""
 
