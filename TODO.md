@@ -1,6 +1,13 @@
 
 # TODO
 
+## Highest Priority TODOs
+
+- Asynchronous chat submission
+- ACP integration
+- MCP integration
+- skills integration
+
 :Ai chats <chat> selects that chat
 :Ai chats lists all chats
 :Ai chats <tab> allows you to select old conversations
@@ -99,6 +106,11 @@ Hitting enter while over a line in a codeblock runs it in the closests open
 terminal. If one is not open, open one to run it in.
 If you hit enter on the top of the codeblock (ie the ```<filetype>) the entire
 code block is ran.
+
+When this is use the terminals contents are automatically included in the
+context from this point on
+
+and that terminal also gets listed as a watched buffer
 
 ---
 
@@ -242,3 +254,59 @@ best case:
     - token exists
     - models exists
     - curl chat data
+
+---
+
+Fix your symlinks in your test fixtures to use relative paths instead of the
+hardcoded absolute path used on your machine
+
+---
+
+how to assert in tests that ai.nvim sends the correct parameters
+
+---
+
+handle this test case
+---START---
+2026-02-08 18:28:56
+message: 'curl request'
+stacktrace:
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/providers.vim:31:providers#submit_chat()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/providers/copilot.vim:7:providers#copilot#submit_chat()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/providers/copilot.vim:128:ýR64_get_chat_data()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/providers/copilot.vim:199:providers#copilot#curl_chat()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/ai.vim:208:ai#curl()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/ai.vim:234:ai#log()
+
+```sh
+curl --request POST --url https://api.githubcopilot.com/chat/completions
+--silent --header authorization: --header accept: application/json --header
+content-type: application/json --header copilot-integration-id: vscode-chat
+--header editor-version: neovim/0.11.0 --header content-length: 614 --data
+{"messages": [{"role": "system", "content": "I am sending you a markdown of our
+chat conversation. Use the previous interactions as context but focus on
+answering the most recent questions which will be at the bottom of the chat.
+Never print emojis. I will ask you for code. Only respond with the code in
+markdown codeblocks. If I want more details I will ask you to clarify. Always
+limit the width of your output to 80 characters when reasonable."}, {"role":
+"user", "content": "# ME\n\nwhat model are you?"}], "temperature": 0.1,
+"model": "gpt-5.1-codex", "max_tokens": 16384, "stream": true, "top_p": 1, "n":
+1}
+```
+----END----
+
+
+
+---START---
+2026-02-08 18:28:57
+message: 'curl response'
+stacktrace:
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/providers.vim:31:providers#submit_chat()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/providers/copilot.vim:7:providers#copilot#submit_chat()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/providers/copilot.vim:128:ýR64_get_chat_data()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/providers/copilot.vim:199:providers#copilot#curl_chat()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/ai.vim:212:ai#curl()
+  /home/kin/src/nvim.cfg/pack/ai.nvim/start/ai.nvim/autoload/ai.vim:234:ai#log()
+
+```json
+{"error":{"message":"model gpt-5.1-codex is not accessible via the /chat/completions endpoint","code":"unsupported_api_for_model"}}
