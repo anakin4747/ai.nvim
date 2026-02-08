@@ -9,7 +9,7 @@ let g:ai_commands = {
     \}
 
 command!
-    \ -complete=custom,ai#completion
+    \ -complete=customlist,ai#completion
     \ -nargs=*
     \ -range
     \ -bang

@@ -325,7 +325,7 @@ ai_describe(":Ai <tab>", function()
     it("completes the first argument with models", function()
         local completion = vim.fn['ai#completion']("", "Ai ", "")
 
-        assert(vim.tbl_contains(vim.split(completion, "\n"), "gemini-2.5-pro"))
+        assert(vim.tbl_contains(completion, "gemini-2.5-pro"))
     end)
 end)
 
@@ -333,6 +333,7 @@ ai_describe(":Ai g<tab>", function()
 
     it("completes with models that start with g", function()
         local expected = {
+            'gemini-2.5-pro',
             'gpt-4.1',
             'gpt-4o',
             'gpt-5',
@@ -340,7 +341,7 @@ ai_describe(":Ai g<tab>", function()
             'gpt-5-mini',
         }
 
-        local actual = vim.fn['ai#completion']("", "Ai g", "")
+        local actual = vim.fn['ai#completion']("g", "Ai g", "")
 
         assert.are.same(expected, actual)
     end)
@@ -384,7 +385,7 @@ ai_describe(":Ai <model>", function()
     it("<tab> does not complete after first argument", function()
         local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
 
-        assert.same("", completion)
+        assert.same({}, completion)
     end)
 end)
 
