@@ -177,7 +177,7 @@ function! s:make_curl_cmd(url, method, headers, body = "") abort
     return cmd
 endf
 
-function! ai#curl(hostname, url_path, method, headers, body = "") abort
+function! ai#curl(hostname, url_path, method, headers, body = "", callback = "") abort
     if exists("g:i_am_in_a_test")
         if !exists("g:ai_test_endpoints")
             return $"tests/fixtures/endpoints/{a:url_path}/good.json"
@@ -197,7 +197,9 @@ function! ai#curl(hostname, url_path, method, headers, body = "") abort
     let url = $"https://{a:hostname}{a:url_path}"
     let cmd = s:make_curl_cmd(url, a:method, a:headers, a:body)
     call ai#log("curl request", cmd->join(), "sh")
-    let response = system(cmd)
+    if a:callback == ""
+        let response = system(cmd)
+    endif
     call ai#log("curl response", response, "json")
 
     return response
