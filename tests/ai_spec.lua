@@ -67,11 +67,88 @@ local is_valid_token_json = jsonschema.generate_validator({
     }
 })
 
+local is_valid_models_json = jsonschema.generate_validator({
+    type = "object",
+    properties = {
+        data = {
+            type = "array",
+            items = {
+                type = "object",
+                properties = {
+                    id = { type = "string" },
+                    capabilities = {
+                        type = "object",
+                        properties = {
+                            supports = {
+                                type = "object",
+                                additionalProperties = {
+                                    anyOf = {
+                                        { type = "boolean" },
+                                        { type = "number" }
+                                    }
+                                }
+                            },
+                            limits = {
+                                type = "object",
+                                properties = {
+                                    vision = {
+                                        type = "object",
+                                        properties = {
+                                            supported_media_types = {
+                                                type = "array",
+                                                items = { type = "string" }
+                                            },
+                                            max_prompt_image_size = { type = "number" },
+                                            max_prompt_images = { type = "number" }
+                                        },
+                                        required = { "supported_media_types", "max_prompt_image_size", "max_prompt_images" }
+                                    },
+                                    max_prompt_tokens = { type = "number" },
+                                    max_context_window_tokens = { type = "number" },
+                                    max_output_tokens = { type = "number" },
+                                    max_inputs = { type = "number" }
+                                },
+                                additionalProperties = true
+                            },
+                            type = { type = "string" },
+                            tokenizer = { type = "string" },
+                            family = { type = "string" },
+                            object = { type = "string" }
+                        },
+                        required = { "supports", "type", "tokenizer", "family", "object" }
+                    },
+                    model_picker_enabled = { type = "boolean" },
+                    name = { type = "string" },
+                    policy = {
+                        type = "object",
+                        properties = {
+                            state = { type = "string" },
+                            terms = { type = "string" }
+                        },
+                        required = { "state", "terms" }
+                    },
+                    vendor = { type = "string" },
+                    object = { type = "string" },
+                    version = { type = "string" },
+                    preview = { type = "boolean" },
+                    model_picker_category = { type = "string" },
+                    supported_endpoints = {
+                        type = "array",
+                        items = { type = "string" }
+                    }
+                },
+                required = { "id", "capabilities", "model_picker_enabled", "name", "vendor", "object", "version", "preview" }
+            }
+        },
+        object = { type = "string" }
+    },
+    required = { "data", "object" }
+})
+
 vim.g.ai_dir = default_mock_dir
 
 vim.g.ai_localtime = 1763098419
 
-vim.g.copilot_curl_models_mock = nil
 vim.g.copilot_curl_chat_mock = nil
 
 local function teardown()
@@ -85,7 +162,6 @@ local function teardown()
     vim.system({ "git", "clean", "-fq", vim.g.ai_dir, default_mock_dir }):wait()
     vim.system({ "git", "restore", vim.g.ai_dir, default_mock_dir }):wait()
     vim.g.ai_dir = default_mock_dir
-    vim.g.copilot_curl_models_mock = nil
     vim.g.copilot_curl_chat_mock = nil
 end
 
@@ -470,10 +546,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
         local old_token_json = readjsonfile(token_path)
 
-        -- mock curling of models
-        local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
-        vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
-
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
 
@@ -484,10 +556,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
     it("gets a new token if no token exists on submit", function()
         vim.g.ai_dir = fixture_dir("no-token")
-
-        -- mock curling of models
-        local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
-        vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
 
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
 
@@ -510,10 +578,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
     it("gets a new token if token is malformed on submit", function()
         vim.g.ai_dir = fixture_dir("bad-token")
 
-        -- mock curling of models
-        local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
-        vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
-
         local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
 
         vim.cmd('Ai gpt-4.1 wow')
@@ -535,10 +599,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
     it("gets new models if token is expired on submit", function()
         vim.g.ai_dir = fixture_dir("expired-remote-token-get-models")
 
-        -- mock curling of models
-        local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
-        vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
-
         local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
         local old_models_mtime = vim.uv.fs_stat(models_path).mtime
 
@@ -551,10 +611,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
     it("gets new models if no token exists on submit", function()
         vim.g.ai_dir = fixture_dir("no-token-get-models")
-
-        -- mock curling of models
-        local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
-        vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
 
         local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
         local old_models_mtime = vim.uv.fs_stat(models_path).mtime
@@ -572,10 +628,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
     it("gets new models if no models exist on submit", function()
         vim.g.ai_dir = fixture_dir("no-models")
 
-        -- mock curling of models
-        local new_models_fixture = default_mock_dir .. "/providers/copilot/models.json"
-        vim.g.copilot_curl_models_mock = readjsonfile(new_models_fixture)
-
         -- ensure models.json does not exist
         local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
         assert(vim.fn.filereadable(models_path) == 0)
@@ -587,14 +639,12 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         local new_models_json = readjsonfile(models_path)
 
+        local models
         assert.has_no.errors(function()
-            vim.json.decode(new_models_json)
+            models = vim.json.decode(new_models_json)
         end)
 
-        assert.are.same(
-            vim.json.decode(vim.g.copilot_curl_models_mock),
-            vim.json.decode(new_models_json)
-        )
+        assert(is_valid_models_json(models))
     end)
 
     it("populates the chat with a response", function()
@@ -628,8 +678,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
         vim.g.ai_dir = fixture_dir("no-dir")
 
         -- mock all data
-        local models_fixture = default_mock_dir .. "/providers/copilot/models.json"
-        vim.g.copilot_curl_models_mock = readjsonfile(models_fixture)
         local chat_fixture = default_mock_dir .. "/providers/copilot/chat.data"
         vim.g.copilot_curl_chat_mock = readjsonfile(chat_fixture)
 
@@ -757,6 +805,32 @@ ai_describe("ai#curl", function()
             end)
 
             assert(is_valid_token_json(token))
+        end)
+
+        it("/models returns valid json online", function()
+
+            vim.g.i_am_in_a_test = false
+
+            local response = vim.fn['providers#copilot#curl_models']()
+
+            local models
+            assert.has_no.errors(function()
+                models = vim.fn.json_decode(response)
+            end)
+
+            assert(is_valid_models_json(models))
+        end)
+
+        it("/models returns valid json offline", function()
+
+            local response = vim.fn['providers#copilot#curl_models']()
+
+            local models
+            assert.has_no.errors(function()
+                models = vim.fn.json_decode(response)
+            end)
+
+            assert(is_valid_models_json(models))
         end)
     end)
 end)
