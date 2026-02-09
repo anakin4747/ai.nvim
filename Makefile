@@ -8,4 +8,4 @@ cqfd:
 .PHONY: test tests
 test tests:
 	-./scripts/run_tests
-	./scripts/print_cloc
+	@./scripts/print_cloc
