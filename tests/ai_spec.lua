@@ -339,6 +339,7 @@ ai_describe(":Ai g<tab>", function()
             'gpt-5',
             'gpt-5-codex',
             'gpt-5-mini',
+            'grep',
         }
 
         local actual = vim.fn['ai#completion']("g", "Ai g", "")
@@ -958,5 +959,21 @@ ai_describe(":Ai chats", function()
             local fname = vim.fn.bufname(item.bufnr)
             assert(vim.fn.match(fname, pattern))
         end
+    end)
+end)
+
+ai_describe(":Ai grep", function()
+
+    it("<pattern> searches through all chats for <pattern>", function()
+        vim.cmd('Ai abc-xyz')
+        vim.cmd('silent Ai! grep abc-xyz')
+        local qflist = vim.fn.getqflist()
+        assert(#qflist == 1)
+
+        local qf_item = qflist[1]
+        local bufnr = qf_item.bufnr
+        local lnum = qf_item.lnum
+        local line = vim.api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
+        assert(string.find(line, "abc-xyz", 1, true))
     end)
 end)

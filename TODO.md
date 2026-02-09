@@ -27,7 +27,7 @@
 :Ai prompt system opens the file that is used for the system prompt
 :%Ai edit edits the changes to the file directly
 :Ai diagnostics sends vim.diagnostic.get() to ai buffer and also wraps it in fold markers and close only that fold to lightly hide it from the user
-:Ai grep to :grep through your chats
+:Ai grep with no pattern is an error but not treated as one currently
 :%Ai automatically provides watching of % so that we don't need to explicitly ask Ai to watch it and so that we don't need to keep sending it the same file with minor changes
 :%Ai also inserts a commented out name of the file at the top
 :%Ai for files larger than like 20 lines gets automatically folded so that they are easier to move around

@@ -7,7 +7,7 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
     let cmd = s:cmd_or_abbrev(first_word)
     if cmd != ""
-        call call(g:ai_commands[cmd]['func'], [])
+        call call(g:ai_commands[cmd]['func'], [prompt])
         if g:ai_commands[cmd]->get('exit', v:false)
             return
         endi
@@ -253,7 +253,7 @@ function! ai#log(msg, data, datatype = "") abort
     call writefile(log_msg, log_path, 'a')
 endf
 
-function! ai#handle_chats() abort
+function! ai#handle_chats(...) abort
     let dir = $"{ai#nvim_get_dir()}/chats/"
     let chats = systemlist($"ls -1t {dir}")
 
@@ -266,11 +266,16 @@ function! ai#handle_chats() abort
     copen
 endf
 
-function! ai#handle_log() abort
+function! ai#handle_grep(...) abort
+    let pattern = a:000->get(0)->split()->get(1)
+    execute $"vimgrep /{pattern}/ {ai#nvim_get_dir()}/chats/*"
+endf
+
+function! ai#handle_log(...) abort
     execute $"edit {ai#nvim_get_dir()}/log.md"
 endf
 
-function! ai#handle_messages() abort
+function! ai#handle_messages(...) abort
     redir => msg
     silent! messages
     redir END
