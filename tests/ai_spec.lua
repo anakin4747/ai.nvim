@@ -240,6 +240,23 @@ ai_describe(":Ai", function()
         local actual = vim.api.nvim_win_get_cursor(0)[1]
         assert.are.same(expected, actual)
     end)
+
+    it("gets a new token if /chat/completions complains about expired token", function()
+
+        vim.g.ai_test_endpoints = {
+            ['/chat/completions'] = 'expired.json'
+        }
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        local old_token_json = readjsonfile(token_path)
+
+        vim.cmd('Ai gpt-4.1 wow')
+        vim.fn['providers#submit_chat']()
+
+        local new_token_json = readjsonfile(token_path)
+        assert.are.not_same(old_token_json, new_token_json)
+        assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
+    end)
 end)
 
 ai_describe(":Ai!", function()
@@ -925,22 +942,6 @@ end)
 
 ai_describe(":Ai", function()
 
-    it("gets a new token if /chat/completions complains about expired token", function()
-
-        vim.g.ai_test_endpoints = {
-            ['/chat/completions'] = 'expired.json'
-        }
-
-        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-        local old_token_json = readjsonfile(token_path)
-
-        vim.cmd('Ai gpt-4.1 wow')
-        vim.fn['providers#submit_chat']()
-
-        local new_token_json = readjsonfile(token_path)
-        assert.are.not_same(old_token_json, new_token_json)
-        assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
-    end)
 end)
 
 ai_describe(":Ai chats", function()
