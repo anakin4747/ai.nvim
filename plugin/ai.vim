@@ -2,7 +2,7 @@
 let g:ai_model = "gpt-4.1"
 let g:ai_localtime = localtime()
 "let g:ai_dir = ""
-"
+
 let g:ai_commands = {
     \ 'chats': {'func': function('ai#handle_chats'), 'exit': v:true},
     \ 'log': {'func': function('ai#handle_log'), 'exit': v:true},
