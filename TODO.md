@@ -33,6 +33,7 @@
 :%Ai for files larger than like 20 lines gets automatically folded so that they are easier to move around
 :Ai <filename> would be the way to pass a file different from % to the chat as well as enable watching automatically for that file
 :Ai do changes the system prompt or using ACP stuff to do agentic stuff like actualing going and editing files itself
+:'<,'>Ai vert provides support for vertical and a range since :vert and :'<,'> are mutally exclusive
 
 - Soon you will need to investigate how to dynamically generate tests to
   account for every combination of every feature
@@ -309,3 +310,9 @@ stacktrace:
 
 ```json
 {"error":{"message":"model gpt-5.1-codex is not accessible via the /chat/completions endpoint","code":"unsupported_api_for_model"}}
+```
+
+---
+
+Handle the case where you are unauthenticated
+
