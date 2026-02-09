@@ -267,7 +267,13 @@ function! ai#handle_chats(...) abort
 endf
 
 function! ai#handle_grep(...) abort
-    let pattern = a:000->get(0)->split()->get(1)
+    let pattern = a:000->get(0)->split()->get(1, "")
+    if pattern == ""
+        echohl ErrorMsg
+        echomsg ':Ai grep requires a search pattern'
+        echohl None
+        return
+    endi
     execute $"vimgrep /{pattern}/ {ai#nvim_get_dir()}/chats/*"
 endf
 
