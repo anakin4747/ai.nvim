@@ -83,7 +83,7 @@ function! ai#nvim_get_dir() abort
     return g:ai_dir
 endf
 
-function! ai#get_last_chat_path(chats_dir = ai#get_chats_dir()) abort
+function! ai#get_last_chat_path(chats_dir = $"{ai#nvim_get_dir()}/chats") abort
     let last_chat = system($"ls -1t {a:chats_dir} | head -n1")->trim()
     if v:shell_error != 0 || last_chat == ""
         return ""
@@ -251,6 +251,19 @@ function! ai#log(msg, data, datatype = "") abort
     endi
 
     call writefile(log_msg, log_path, 'a')
+endf
+
+function! ai#handle_chats() abort
+    let dir = $"{ai#nvim_get_dir()}/chats/"
+    let chats = systemlist($"ls -1t {dir}")
+
+    let items = []
+    for fname in chats
+        call add(items, #{filename: dir . fname})
+    endfo
+
+    call setqflist(items, 'r')
+    copen
 endf
 
 function! ai#handle_log() abort

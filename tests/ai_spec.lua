@@ -941,3 +941,22 @@ ai_describe(":Ai", function()
         assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
     end)
 end)
+
+ai_describe(":Ai chats", function()
+
+    it("lists all chats in a quickfix list", function()
+
+        vim.cmd('Ai! chats')
+
+        local qflist = vim.fn.getqflist()
+
+        assert(#qflist > 0)
+
+        local pattern = '.*/ai-chat.*\\.md'
+
+        for _, item in ipairs(qflist) do
+            local fname = vim.fn.bufname(item.bufnr)
+            assert(vim.fn.match(fname, pattern))
+        end
+    end)
+end)
