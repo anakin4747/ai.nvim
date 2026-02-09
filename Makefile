@@ -3,7 +3,7 @@
 cqfd:
 	git submodule update --init
 	./scripts/cqfd/cqfd init
-	./scripts/cqfd/cqfd
+	./scripts/cqfd/cqfd run make tests
 
 .PHONY: test tests
 test tests:
