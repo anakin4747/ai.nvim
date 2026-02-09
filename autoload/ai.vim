@@ -148,8 +148,8 @@ function! ai#completion(arglead, cmdline, curpos) abort
     endif
 
     let possible_completions = []
-    let possible_completions += providers#get_models()
     let possible_completions += keys(g:ai_commands)
+    let possible_completions += providers#get_models()
 
     if !empty(a:arglead)
         call filter(possible_completions,
