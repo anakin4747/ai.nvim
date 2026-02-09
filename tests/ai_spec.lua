@@ -333,13 +333,13 @@ ai_describe(":Ai g<tab>", function()
 
     it("completes with models that start with g", function()
         local expected = {
+            'grep',
             'gemini-2.5-pro',
             'gpt-4.1',
             'gpt-4o',
             'gpt-5',
             'gpt-5-codex',
             'gpt-5-mini',
-            'grep',
         }
 
         local actual = vim.fn['ai#completion']("g", "Ai g", "")
