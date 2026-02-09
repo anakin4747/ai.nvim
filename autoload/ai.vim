@@ -97,7 +97,7 @@ function! s:last_chat_exists(chats_dir) abort
 endf
 
 function! s:new_chat_path(chats_dir) abort
-    return $"{a:chats_dir}/ai-chat-{localtime()}.md"
+    return $"{a:chats_dir}/ai-chat-{strftime("%b-%d-%Y-%T")->tolower()}.md"
 endf
 
 function! s:open_chat(chat_path, mods = "") abort
@@ -122,7 +122,7 @@ function! s:get_open_chat_winnr() abort
             continue
         endi
 
-        if bufname(bufnr) =~# 'ai.nvim/chats/ai-chat-\d\+\.md'
+        if bufname(bufnr) =~# 'ai.nvim/chats/ai-chat-.*.md'
             return win
         endif
     endfo
