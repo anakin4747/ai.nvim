@@ -257,6 +257,36 @@ ai_describe(":Ai", function()
         assert.are.not_same(old_token_json, new_token_json)
         assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
     end)
+
+    it("supports streaming", function()
+
+        vim.g.ai_test_endpoints = {
+            ['/chat/completions'] = {
+                'fragment1.json',
+                'fragment2.json',
+                'fragment3.json',
+                'fragment4.json',
+            }
+        }
+
+        vim.cmd('Ai! gpt-4.1 hello world')
+        vim.fn['providers#submit_chat']()
+
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            '# ME',
+            '',
+            '```',
+            'hello world',
+            '```',
+            '# AI.NVIM gpt-4.1',
+            '',
+            '```',
+            'hello world',
+            '```'
+        }, actual)
+    end)
 end)
 
 ai_describe(":Ai!", function()
