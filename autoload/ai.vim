@@ -159,7 +159,7 @@ function! ai#completion(arglead, cmdline, curpos) abort
     return possible_completions
 endf
 
-function! s:make_curl_cmd(url, method, headers, body = "") abort
+function! ai#build_curl_cmd(url, method, headers, body = "") abort
     let cmd = [
         \   "curl",
         \       "--request", a:method,
@@ -184,34 +184,6 @@ function! s:make_curl_cmd(url, method, headers, body = "") abort
     endi
 
     return cmd
-endf
-
-function! ai#curl(hostname, url_path, method, headers, body = "", callback = "") abort
-    if exists("g:i_am_in_a_test")
-        if !exists("g:ai_test_endpoints")
-            return $"tests/fixtures/endpoints/{a:url_path}/good.json"
-                \ ->readfile()
-                \ ->join("\n")
-        endi
-
-        let mock_file = g:ai_test_endpoints->get(a:url_path, "")
-
-        if mock_file != ""
-            return $"tests/fixtures/endpoints/{a:url_path}/{mock_file}"
-                \ ->readfile()
-                \ ->join("\n")
-        endi
-    endi
-
-    let url = $"https://{a:hostname}{a:url_path}"
-    let cmd = s:make_curl_cmd(url, a:method, a:headers, a:body)
-    call ai#log("curl request", cmd->join(), "sh")
-    if a:callback == ""
-        let response = system(cmd)
-    endif
-    call ai#log("curl response", response, "json")
-
-    return response
 endf
 
 function! ai#log(msg, data, datatype = "") abort
@@ -251,6 +223,81 @@ function! ai#log(msg, data, datatype = "") abort
     endi
 
     call writefile(log_msg, log_path, 'a')
+endf
+
+function! ai#enqueue_job(job) abort
+    if len(g:ai_job_queue) >= 3
+        throw "no more than 3 jobs are needed at a time"
+    endi
+    if a:job->get('on_stdout')->type() != v:t_func
+        return v:false
+    endi
+    if a:job->get('cmd')->type() != v:t_list
+        return v:false
+    endi
+    call add(g:ai_job_queue, a:job)
+    return v:true
+endf
+
+function! ai#wait_for_jobs() abort
+    while g:ai_job_running
+        sleep 10m
+    endw
+endf
+
+function! s:run_next_job(_, __, ___) abort
+    let g:ai_job_running = v:false
+    call ai#run_job_queue()
+endf
+
+function! s:mock_jobstart(cmd, opts) abort
+    let url = a:cmd[index(a:cmd, "--url") + 1]
+    let url_path = substitute(url, 'https://.*\.com\(/.*\)', '\1', '')
+
+    let fixture_path = ""
+
+    if !exists("g:ai_test_endpoints")
+        let fixture_path = $"tests/fixtures/endpoints/{url_path}/good.json"
+    else
+        let mock_file = g:ai_test_endpoints->get(url_path, "")
+        if mock_file != ""
+            let fixture_path = $"tests/fixtures/endpoints/{url_path}/{mock_file}"
+        endi
+    endi
+
+    call jobstart(['cat', fixture_path], a:opts)
+endf
+
+function! ai#run_job_queue() abort
+    if g:ai_job_running
+        return
+    endi
+
+    if len(g:ai_job_queue) == 0
+        return
+    endif
+
+    let g:ai_job_running = v:true
+    let job = remove(g:ai_job_queue, 0)
+
+    let job_runner = 'jobstart'
+
+    if exists("g:i_am_in_a_test")
+        let job_runner = 's:mock_jobstart'
+    endi
+
+    let job_runner_args = [job.cmd]
+    let job_opts = {
+        \   'on_exit': function('s:run_next_job'),
+        \   'on_stdout': job.on_stdout,
+        \ }
+    if exists("job.stdout_buffered")
+        call extend(job_opts, #{stdout_buffered: job.stdout_buffered})
+    endi
+
+    let job_runner_args += [job_opts]
+
+    call call(job_runner, job_runner_args)
 endf
 
 function! ai#handle_chats(...) abort
