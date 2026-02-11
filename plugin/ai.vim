@@ -25,5 +25,5 @@ augroup AiNvimKeyMaps
     autocmd!
     autocmd
         \ BufEnter ai-chat-*.md
-        \ nnoremap <buffer> <CR> :call providers#submit_chat()<CR>
+        \ nnoremap <buffer> <CR> :silent call providers#submit_chat()<CR>
 augroup END
