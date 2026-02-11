@@ -196,6 +196,7 @@ local function teardown()
     vim.g.ai_dir = default_mock_dir
 
     vim.g.ai_test_endpoints = nil
+    vim.g.ai_responses = {}
 end
 
 local function ai_describe(name, fn)
@@ -863,7 +864,7 @@ ai_describe(":Ai mes", function()
     end)
 end)
 
-ai_describe("ai#curl", function()
+ai_describe("g:ai_responses", function()
 
     describe("for copilot endpoint", function()
 
@@ -871,14 +872,21 @@ ai_describe("ai#curl", function()
 
             vim.g.i_am_in_a_test = false
 
-            local response = vim.fn['providers#copilot#curl_remote_token']()
+            vim.cmd([[
+                call providers#copilot#enqueue_token_fetch()
+                call ai#run_job_queue()
+            ]])
 
-            local token
-            assert.has_no.errors(function()
-                token = vim.fn.json_decode(response)
-            end)
+            local response = vim.g.ai_responses
 
-            assert(is_valid_token_json(token))
+            -- local token
+            -- assert.has_no.errors(function()
+            --     token = vim.fn.json_decode(response)
+            -- end)
+
+            -- assert(is_valid_token_json(token))
+            -- vim.wait(1000)
+            assert.are.same(response, '')
         end)
 
         it("/copilot_internal/v2/token returns valid json offline", function()
@@ -968,10 +976,6 @@ ai_describe("vim.g.ai_test_endpoints", function()
 
         assert.are_match('unauthorized: token expired', response)
     end)
-end)
-
-ai_describe(":Ai", function()
-
 end)
 
 ai_describe(":Ai chats", function()

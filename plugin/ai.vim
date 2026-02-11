@@ -1,6 +1,9 @@
 
 let g:ai_model = "gpt-4.1"
 let g:ai_localtime = localtime()
+let g:ai_job_queue = []
+let g:ai_job_running = v:false
+let g:ai_responses = []
 "let g:ai_dir = ""
 
 let g:ai_commands = {
