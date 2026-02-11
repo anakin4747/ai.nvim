@@ -6,6 +6,14 @@ function! providers#copilot#submit_chat() abort
 
     if s:token_needed()
         call providers#copilot#enqueue_token_fetch()
+        call ai#run_job_queue()
+        call ai#wait_for_jobs()
+    endi
+
+    if s:models_needed()
+        call providers#copilot#enqueue_token_fetch()
+        call ai#run_job_queue()
+        call ai#wait_for_jobs()
         call providers#copilot#enqueue_models_fetch()
     endi
 
@@ -23,21 +31,49 @@ function! providers#copilot#enqueue_token_fetch() abort
 endf
 
 function! s:token_needed(localtime = g:ai_localtime) abort
-    let token_json_path = $"{ai#nvim_get_dir()}/providers/copilot/token.json"
+    let copilot_path = $"{ai#nvim_get_dir()}/providers/copilot/"
+    let token_json_path = $"{copilot_path}/token.json"
 
-    if !filereadable(token_json_path)
+    if !isdirectory(copilot_path) || !filereadable(token_json_path)
+        echo "Token file not found"
         return v:true
     endi
 
-    let token_json = token_json_path->readfile()->join("\n")->json_decode()
+    let token = {}
 
-    if !exists("token_json.expires_at")
+    try
+        let token = json_decode(readfile(token_json_path))
+    catch
+        echo "Token file exists but is not valid JSON"
+        return v:true
+    endt
+
+    if !exists("token.expires_at")
+        echo "Token missing expires_at"
         return v:true
     endi
 
-    if token_json.expires_at < a:localtime
+    if token.expires_at < a:localtime
+        echo "Token expired"
         return v:true
     endi
+
+    return v:false
+endf
+
+function! s:models_needed()
+    let copilot_path = $"{ai#nvim_get_dir()}/providers/copilot/"
+    let models_json_path = $"{copilot_path}/models.json"
+
+    if !isdirectory(copilot_path) || !filereadable(models_json_path)
+        return v:true
+    endi
+
+    try
+        call json_decode(readfile(models_json_path))
+    catch
+        return v:true
+    endt
 
     return v:false
 endf
@@ -148,8 +184,10 @@ function! s:build_submit_chat_curl_cmd(messages) abort
         \   model: g:ai_model
         \})
 
+    let token = s:get_token()
+
     let headers = [
-        \   $"authorization: Bearer {s:get_token()}",
+        \   $"authorization: Bearer {token}",
         \   $"accept: application/json",
         \   $"content-type: application/json",
         \   $"copilot-integration-id: vscode-chat",
@@ -207,23 +245,6 @@ function! s:handle_chat_response(_, response, __) abort
     let lines += ['', '# ME', '']
 
     call appendbufline(bufnr(), "$", lines)
-endf
-
-function! s:models_needed()
-    let copilot_path = $"{ai#nvim_get_dir()}/providers/copilot/"
-    let models_json_path = $"{copilot_path}/models.json"
-
-    if !isdirectory(copilot_path) || !filereadable(models_json_path)
-        return v:true
-    endi
-
-    try
-        call json_decode(readfile(models_json_path))
-    catch
-        return v:true
-    endt
-
-    return v:false
 endf
 
 function! providers#copilot#get_models() abort

@@ -255,6 +255,10 @@ ai_describe(":Ai", function()
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local response = vim.g.ai_responses
+        assert.are.same('', responses)
 
         local new_token_json = readjsonfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
