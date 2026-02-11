@@ -197,6 +197,8 @@ local function teardown()
 
     vim.g.ai_test_endpoints = nil
     vim.g.ai_responses = {}
+
+    vim.fn['ai#wait_for_jobs']()
 end
 
 local function ai_describe(name, fn)
@@ -646,6 +648,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         assert(vim.fn.filereadable(token_path) == 1)
 
@@ -765,20 +768,19 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
         }, lines)
     end)
 
+    -- TODO: move to more accurate describe block
     it("creates ai.nvim dir itself", function()
         vim.g.ai_dir = fixture_dir("no-dir")
 
-        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-        assert(vim.fn.filereadable(token_path) == 0)
+        assert(vim.fn.isdirectory(vim.g.ai_dir) == 0)
 
-        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
-        assert(vim.fn.filereadable(models_path) == 0)
+        vim.cmd([[
+            call providers#copilot#enqueue_token_fetch()
+            call ai#run_job_queue()
+            call ai#wait_for_jobs()
+        ]])
 
-        vim.cmd('Ai gpt-4.1 write me a hello world in lua')
-        vim.fn['providers#submit_chat']()
-
-        assert(vim.fn.filereadable(token_path) == 1)
-        assert(vim.fn.filereadable(models_path) == 1)
+        assert(vim.fn.isdirectory(vim.g.ai_dir) == 1)
     end)
 end)
 
@@ -875,23 +877,28 @@ ai_describe("g:ai_responses", function()
             vim.cmd([[
                 call providers#copilot#enqueue_token_fetch()
                 call ai#run_job_queue()
+                call ai#wait_for_jobs()
             ]])
 
             local response = vim.g.ai_responses
 
-            -- local token
-            -- assert.has_no.errors(function()
-            --     token = vim.fn.json_decode(response)
-            -- end)
+            local token
+            assert.has_no.errors(function()
+                token = vim.fn.json_decode(response)
+            end)
 
-            -- assert(is_valid_token_json(token))
-            -- vim.wait(1000)
-            assert.are.same(response, '')
+            assert(is_valid_token_json(token))
         end)
 
         it("/copilot_internal/v2/token returns valid json offline", function()
 
-            local response = vim.fn['providers#copilot#curl_remote_token']()
+            vim.cmd([[
+                call providers#copilot#enqueue_token_fetch()
+                call ai#run_job_queue()
+                call ai#wait_for_jobs()
+            ]])
+
+            local response = vim.g.ai_responses
 
             local token
             assert.has_no.errors(function()
@@ -905,7 +912,13 @@ ai_describe("g:ai_responses", function()
 
             vim.g.i_am_in_a_test = false
 
-            local response = vim.fn['providers#copilot#curl_models']()
+            vim.cmd([[
+                call providers#copilot#enqueue_models_fetch()
+                call ai#run_job_queue()
+                call ai#wait_for_jobs()
+            ]])
+
+            local response = vim.g.ai_responses
 
             local models
             assert.has_no.errors(function()
@@ -917,7 +930,13 @@ ai_describe("g:ai_responses", function()
 
         it("/models returns valid json offline", function()
 
-            local response = vim.fn['providers#copilot#curl_models']()
+            vim.cmd([[
+                call providers#copilot#enqueue_models_fetch()
+                call ai#run_job_queue()
+                call ai#wait_for_jobs()
+            ]])
+
+            local response = vim.g.ai_responses
 
             local models
             assert.has_no.errors(function()
