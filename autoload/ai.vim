@@ -250,15 +250,14 @@ function! s:run_next_job(_, __, ___) abort
     call ai#run_job_queue()
 endf
 
+" TODO: move this to test code
 function! s:mock_jobstart(cmd, opts) abort
     let url = a:cmd[index(a:cmd, "--url") + 1]
     let url_path = substitute(url, 'https://.*\.com\(/.*\)', '\1', '')
 
-    let fixture_path = ""
+    let fixture_path = $"tests/fixtures/endpoints/{url_path}/good.json"
 
-    if !exists("g:ai_test_endpoints")
-        let fixture_path = $"tests/fixtures/endpoints/{url_path}/good.json"
-    else
+    if exists("g:ai_test_endpoints")
         let mock_file = g:ai_test_endpoints->get(url_path, "")
         if mock_file != ""
             let fixture_path = $"tests/fixtures/endpoints/{url_path}/{mock_file}"
