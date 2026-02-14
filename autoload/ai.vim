@@ -252,19 +252,36 @@ endf
 
 " TODO: move this to test code
 function! s:mock_jobstart(cmd, opts) abort
+
     let url = a:cmd[index(a:cmd, "--url") + 1]
     let url_path = substitute(url, 'https://.*\.com\(/.*\)', '\1', '')
 
-    let fixture_path = $"tests/fixtures/endpoints/{url_path}/good.json"
+    let fixture_paths = [$"tests/fixtures/endpoints/{url_path}/good.json"]
 
     if exists("g:ai_test_endpoints")
         let mock_file = g:ai_test_endpoints->get(url_path, "")
-        if mock_file != ""
-            let fixture_path = $"tests/fixtures/endpoints/{url_path}/{mock_file}"
+
+        if type(mock_file) == v:t_list
+            let fixture_paths = []
+            for path in mock_file
+                let fixture_paths += [$"tests/fixtures/endpoints/{url_path}/{path}"]
+            endfo
         endi
+
+        call ai#log($"url: '{url}' url_path: '{url_path}' mock_file: '{mock_file}' mock_file type: '{type(mock_file)}' url_path: '{url_path}' ai_test_endpoints: '{g:ai_test_endpoints}'")
+
+        if type(mock_file) == v:t_string && mock_file != ""
+            let fixture_paths = [$"tests/fixtures/endpoints/{url_path}/{mock_file}"]
+        endi
+
+        call ai#log($"here")
     endi
 
-    call jobstart(['cat', fixture_path], a:opts)
+    let job = ['cat'] + fixture_paths
+
+    call ai#log($"job: '{job}'")
+
+    call jobstart(job, a:opts)
 endf
 
 function! ai#run_job_queue() abort
