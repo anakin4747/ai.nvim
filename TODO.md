@@ -239,24 +239,6 @@ so that we can see what files were watched during that response
 
 ---
 
-# to support async sending
-
-Currently the application blocks on sending chat data
-
-On sending chat data
-
-Worst case:
-    - curl token
-    - curl models
-    - curl chat data
-
-best case:
-    - token exists
-    - models exists
-    - curl chat data
-
----
-
 Fix your symlinks in your test fixtures to use relative paths instead of the
 hardcoded absolute path used on your machine
 
@@ -316,3 +298,88 @@ stacktrace:
 
 Handle the case where you are unauthenticated
 
+---
+
+# to support async sending
+
+Currently the application blocks on sending chat data
+
+On sending chat data
+
+Worst case:
+    - curl token
+    - curl models
+    - curl chat data
+
+best case:
+    - token exists
+    - models exists
+    - curl chat data
+
+So for the worst case:
+    When curling the token is finished we need to curl the models
+    when curling the models is finished we need to post the chat data
+    Every line of data back from the chat we update the buffer with the new word
+
+Pseudo code
+```lua
+curl_token(function()
+    save_token()
+    if no models then
+        curl_models(function()
+            save_models()
+        end)
+    end
+    curl_chat(function()
+        print(one word)
+    end)
+end)
+```
+
+synchronous tasks:
+- save token
+- save models
+- parse chat response
+
+asynchronous tasks:
+- get token
+- get models
+- submit chat
+
+---
+
+On chat submission:
+
+```lua
+function submit_chat()
+    if bad token then
+        add_to_task_queue(curl_token)
+    end
+
+    if bad model then
+        add_to_task_queue(curl_models)
+    end
+
+    add_to_task_queue(curl_chat)
+
+    run_task_queue()
+end
+```
+
+```vim
+
+
+
+
+
+```
+
+---
+
+make tests log everything and clear the logs upon successfully passing the test
+
+---
+
+Once tests are passing go back and ensure the tests are done from as far
+external as possible, the tests shouldn't care about the internal queuing
+structure
