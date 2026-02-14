@@ -273,25 +273,38 @@ ai_describe(":Ai", function()
                 'fragment2.json',
                 'fragment3.json',
                 'fragment4.json',
+                'fragment5.json',
             }
         }
 
-        vim.cmd('Ai! gpt-4.1 hello world')
+        vim.cmd('Ai! write me fibanoci in rust')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
         assert.are.same({
             '# ME',
             '',
-            '```',
-            'hello world',
-            '```',
+            'write me fibanoci in rust',
+            '',
             '# AI.NVIM gpt-4.1',
             '',
+            '```rust',
+            'fn fibonacci(n: u32) -> u32 {',
+            '    match n {',
+            '        0 => 0,',
+            '        1 => 1,',
+            '        _ => fibonacci(n - 1) fibonacci(n - 2),',
+            '    }',
+            '}',
+            '',
+            'fn main() {',
+            '    for i in 0.. {',
+            '        println!("{}", fibonacci(i));',
+            '    }',
+            '}',
             '```',
-            'hello world',
-            '```'
         }, actual)
     end)
 end)
