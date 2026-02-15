@@ -160,14 +160,7 @@ function! s:build_submit_chat_curl_cmd(messages) abort
 
     let url = "https://api.githubcopilot.com/chat/completions"
 
-    let system_prompt =<< trim END
-        I am sending you a markdown of our chat conversation. Use the previous
-        interactions as context but focus on answering the most recent
-        questions which will be at the bottom of the chat. Never print emojis.
-        I will ask you for code. Only respond with the code in markdown
-        codeblocks. If I want more details I will ask you to clarify. Always
-        limit the width of your output to 80 characters when reasonable.
-    END
+    let system_prompt = "I am sending you a markdown of our chat conversation. Use the previous interactions as context but focus on answering the most recent questions which will be at the bottom of the chat. Never print emojis. I will ask you for code. Only respond with the code in markdown codeblocks. If I want more details I will ask you to clarify. Always limit the width of your output to 80 characters when reasonable."
 
     let messages = [
         \   { 'role': 'system', 'content': system_prompt },
@@ -195,7 +188,7 @@ function! s:build_submit_chat_curl_cmd(messages) abort
         \   $"content-length: {len(body)}",
         \]
 
-    return ai#build_curl_cmd(url, "GET", headers)
+    return ai#build_curl_cmd(url, "POST", headers, body)
 endf
 
 function! providers#copilot#enqueue_chat_submission() abort
@@ -205,25 +198,61 @@ function! providers#copilot#enqueue_chat_submission() abort
         \ })
 endf
 
+let s:chat_state = "stopped"
+let s:incomplete_response = ""
+
 function! s:handle_chat_response(_, response, __) abort
     let g:ai_responses += a:response
 
-    if a:response[0]->match('unauthorized: token expired') != -1
+    let header = ['', $"# AI.NVIM {g:ai_model}", '', '']
+
+    if s:chat_state == "stopped"
+        echo "writing header"
+        call appendbufline(bufnr(), "$", header)
+        echo "switched to processing"
+        let s:chat_state = "processing"
+    endi
+
+    let response = a:response
+    "echo $"response: '{response}'\n\n"
+    "
+
+    if response[0]->match('unauthorized: token expired') != -1
+        echo "unauthorized"
         call providers#copilot#enqueue_token_fetch()
-        call providers#copilot#enqueue_chat_submission()
         return
     endi
 
     let data = ""
 
-    for line in a:response
-        if line !~ '^data: ' || line =~ 'DONE'
+    for line_nr in range(len(response))
+
+        if response[line_nr] == 'data: [DONE]'
+            let s:chat_state = "stopped"
+            echo "stopped"
+            call appendbufline(bufnr(), "$", ['', '# ME', ''])
+            return
+        endi
+
+        if s:incomplete_response != ""
+            echo "previous response was incomplete"
+            echo $"s:incomplete_response: '{s:incomplete_response}'"
+            echo $"response[line_nr]: '{response[line_nr]}'"
+            let response[line_nr] = s:incomplete_response . response[line_nr]
+            let s:incomplete_response = ""
+        endi
+
+        " [-1] wasn't working to get the final character in the line
+        let length = len(response[line_nr]) - 1
+        if response[line_nr][length] != '}'
+            let s:incomplete_response = response[line_nr]
             continue
         endi
 
-        let json = line
+        let json = response[line_nr]
             \ ->substitute('^data: ', '', '')
-            \ ->json_decode()
+
+        let json = json_decode(json)
 
         if empty(json.choices)
            continue
@@ -233,18 +262,17 @@ function! s:handle_chat_response(_, response, __) abort
             continue
         endi
 
-        let data .= json.choices[0].delta.content
+        let content = json.choices[0].delta.content
+        let last_line = getbufline(bufnr(), "$")[0]
+
+        if content =~ "\n"
+            let parts = split(content, "\n", 1)
+            call setbufline(bufnr(), "$", last_line . parts[0])
+            call appendbufline(bufnr(), "$", parts[1:])
+        else
+            call setbufline(bufnr(), "$", last_line . content)
+        endif
     endfo
-
-    let lines = ['', $"# AI.NVIM {g:ai_model}", '']
-
-    for line in data
-        let lines += [line]
-    endfo
-
-    let lines += ['', '# ME', '']
-
-    call appendbufline(bufnr(), "$", lines)
 endf
 
 function! providers#copilot#get_models() abort
