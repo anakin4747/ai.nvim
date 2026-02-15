@@ -331,7 +331,8 @@ function! ai#handle_grep(...) abort
         echohl None
         return
     endi
-    execute $"vimgrep /{pattern}/ {ai#nvim_get_dir()}/chats/*"
+    execute $"vimgrep /{pattern}/j {ai#nvim_get_dir()}/chats/*"
+    copen
 endf
 
 function! ai#handle_log(...) abort
