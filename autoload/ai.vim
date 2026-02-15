@@ -189,6 +189,8 @@ endf
 function! ai#log(msg, data, datatype = "") abort
     let loggin = v:true
 
+    let data = a:data
+
     if !loggin
         return
     endi
@@ -212,8 +214,12 @@ function! ai#log(msg, data, datatype = "") abort
         let log_msg += [$"  {filepath}:{lnum}:{Func}"]
     endfo
 
-    if a:data != ""
-        let log_msg += ["", $"```{a:datatype}", a:data, "```"]
+    if type(data) == v:t_list
+        let data = data->join("\n")
+    endi
+
+    if data != ""
+        let log_msg += ["", $"```{a:datatype}", data, "```"]
     endi
 
     let log_msg += ["----END----", ""]
