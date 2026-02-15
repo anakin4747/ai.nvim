@@ -1,7 +1,7 @@
 
 function! providers#copilot#submit_chat() abort
     if g:ai_job_running
-        return
+        throw "previous submit is still running"
     endi
 
     if s:token_needed() || s:models_needed()
