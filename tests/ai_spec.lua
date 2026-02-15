@@ -639,6 +639,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         local new_token_json = readjsonfile(token_path)
         assert.are.same(old_token_json, new_token_json)
@@ -651,6 +652,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         local new_token_json = readjsonfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
@@ -686,6 +688,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         local new_token_json = readjsonfile(token_path)
 
@@ -708,6 +711,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         local new_models_mtime = vim.uv.fs_stat(models_path).mtime
         assert.are.not_same(old_models_mtime, new_models_mtime)
@@ -724,6 +728,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         local new_models_mtime = vim.uv.fs_stat(models_path).mtime
         assert.are.not_same(old_models_mtime, new_models_mtime)
@@ -738,6 +743,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         vim.cmd('Ai gpt-4.1 wow')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         assert(vim.fn.filereadable(models_path) == 1)
 
