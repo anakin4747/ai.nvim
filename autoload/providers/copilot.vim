@@ -35,7 +35,6 @@ function! s:token_needed(localtime = g:ai_localtime) abort
     let token_json_path = $"{copilot_path}/token.json"
 
     if !isdirectory(copilot_path) || !filereadable(token_json_path)
-        echo "Token file not found"
         return v:true
     endi
 
@@ -44,17 +43,14 @@ function! s:token_needed(localtime = g:ai_localtime) abort
     try
         let token = json_decode(readfile(token_json_path))
     catch
-        echo "Token file exists but is not valid JSON"
         return v:true
     endt
 
     if !exists("token.expires_at")
-        echo "Token missing expires_at"
         return v:true
     endi
 
     if token.expires_at < a:localtime
-        echo "Token expired"
         return v:true
     endi
 
@@ -235,9 +231,6 @@ function! s:handle_chat_response(_, response, __) abort
         endi
 
         if s:incomplete_response != ""
-            echo "previous response was incomplete"
-            echo $"s:incomplete_response: '{s:incomplete_response}'"
-            echo $"response[line_nr]: '{response[line_nr]}'"
             let response[line_nr] = s:incomplete_response . response[line_nr]
             let s:incomplete_response = ""
         endi
