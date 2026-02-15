@@ -188,33 +188,25 @@ function! s:build_submit_chat_curl_cmd(messages) abort
 endf
 
 function! providers#copilot#enqueue_chat_submission() abort
+
+    let header = ['', $"# AI.NVIM {g:ai_model}", '', '']
+
+    call appendbufline(bufnr(), "$", header)
+
     return ai#enqueue_job(#{
         \ cmd: s:build_submit_chat_curl_cmd(getline(0, '$')),
         \ on_stdout: function('s:handle_chat_response'),
         \ })
 endf
 
-let s:chat_state = "stopped"
 let s:incomplete_response = ""
 
 function! s:handle_chat_response(_, response, __) abort
     let g:ai_responses += a:response
 
-    let header = ['', $"# AI.NVIM {g:ai_model}", '', '']
-
-    if s:chat_state == "stopped"
-        echo "writing header"
-        call appendbufline(bufnr(), "$", header)
-        echo "switched to processing"
-        let s:chat_state = "processing"
-    endi
-
     let response = a:response
-    "echo $"response: '{response}'\n\n"
-    "
 
     if response[0]->match('unauthorized: token expired') != -1
-        echo "unauthorized"
         call providers#copilot#enqueue_token_fetch()
         return
     endi
@@ -224,8 +216,6 @@ function! s:handle_chat_response(_, response, __) abort
     for line_nr in range(len(response))
 
         if response[line_nr] == 'data: [DONE]'
-            let s:chat_state = "stopped"
-            echo "stopped"
             call appendbufline(bufnr(), "$", ['', '# ME', ''])
             return
         endi
