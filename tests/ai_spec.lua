@@ -649,6 +649,15 @@ ai_describe("providers#copilot#submit_chat()", function()
     end)
 end)
 
+ai_describe("providers#copilot#get_local_token()", function()
+
+    it("successfully gets oauth_token from apps.json", function()
+        local expected = "^ghu_[[:alnum:]]\\{36}$"
+        local actual = vim.fn['providers#copilot#get_local_token']()
+        assert(vim.fn.match(actual, expected) ~= -1)
+    end)
+end)
+
 ai_describe(":Ai gpt-4.1 <prompt>", function()
 
     it("gets cached token if token is not expired on submit", function()
@@ -825,15 +834,6 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
         ]])
 
         assert(vim.fn.isdirectory(vim.g.ai_dir) == 1)
-    end)
-end)
-
-ai_describe("providers#copilot#get_local_token()", function()
-
-    it("successfully gets oauth_token from apps.json", function()
-        local expected = "^ghu_[[:alnum:]]\\{36}$"
-        local actual = vim.fn['providers#copilot#get_local_token']()
-        assert(vim.fn.match(actual, expected) ~= -1)
     end)
 end)
 
