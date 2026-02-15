@@ -154,10 +154,20 @@ function! s:build_submit_chat_curl_cmd(messages) abort
 
     let url = "https://api.githubcopilot.com/chat/completions"
 
-    let system_prompt = "I am sending you a markdown of our chat conversation. Use the previous interactions as context but focus on answering the most recent questions which will be at the bottom of the chat. Never print emojis. I will ask you for code. Only respond with the code in markdown codeblocks. If I want more details I will ask you to clarify. Always limit the width of your output to 80 characters when reasonable."
+    let system_prompt =<< trim END
+        I am sending you a markdown file of our chat conversation.
+        Use the previous interactions as context but focus on answering the
+        most recent questions which will be at the bottom of the chat.
+        Never print emojis.
+        Always limit the width of your output to 80 characters when reasonable.
+        Always use guard clauses in your code to avoid excessive nesting when
+        possible.
+        When you provide recommended code changes always provide them as diffs
+        in markdown codeblocks.
+    END
 
     let messages = [
-        \   { 'role': 'system', 'content': system_prompt },
+        \   { 'role': 'system', 'content': system_prompt->join("\n") },
         \   { 'role': 'user', 'content': a:messages->join("\n") }
         \]
 
