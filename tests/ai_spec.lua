@@ -274,6 +274,47 @@ ai_describe(":Ai", function()
             '',
         }, actual)
     end)
+
+    it("only writes responses to the last chat on submission", function()
+
+        vim.cmd('Ai! write me a hello world in rust')
+        vim.cmd.enew()
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        assert.are.same({''}, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+
+        vim.cmd('Ai')
+
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            '# ME',
+            '',
+            'write me a hello world in rust',
+            '',
+            '# AI.NVIM gpt-4.1',
+            '',
+            'Certainly! Here is a simple "Hello, world!" program in Rust:',
+            '',
+            '```rust',
+            'fn main() {',
+            '    println!("Hello, world!");',
+            '}',
+            '```',
+            '',
+            'To run this:',
+            '',
+            '1. Save it as `main.rs`.',
+            '2. Compile it with `rustc main.rs`.',
+            '3. Run the output with `./main` (on Linux/macOS) or `main.exe` (on Windows).',
+            '',
+            'Let me know if you need more help!',
+            '',
+            '# ME',
+            ''
+        }, actual)
+    end)
 end)
 
 ai_describe(":Ai!", function()
