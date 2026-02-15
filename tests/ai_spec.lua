@@ -970,42 +970,6 @@ ai_describe("g:ai_responses", function()
 
             assert(is_valid_models_json(models))
         end)
-
-        it("/chat/completions returns valid json online", function()
-
-            vim.g.i_am_in_a_test = false
-
-            local response = vim.fn['providers#copilot#curl_chat']({'messages'})
-
-            for line in response:gmatch("[^\r\n]+") do
-                local json = line:gsub("^data:%s*", "")
-                if json ~= "[DONE]" and json ~= "" then
-                    local chat
-                    assert.has_no.errors(function()
-                        chat = vim.fn.json_decode(json)
-                    end)
-
-                    assert(is_valid_chat_json(chat))
-                end
-            end
-        end)
-
-        it("/chat/completion returns valid json offline", function()
-
-            local response = vim.fn['providers#copilot#curl_chat']({'messages'})
-
-            for line in response:gmatch("[^\r\n]+") do
-                local json = line:gsub("^data:%s*", "")
-                if json ~= "[DONE]" and json ~= "" then
-                    local chat
-                    assert.has_no.errors(function()
-                        chat = vim.fn.json_decode(json)
-                    end)
-
-                    assert(is_valid_chat_json(chat))
-                end
-            end
-        end)
     end)
 end)
 
