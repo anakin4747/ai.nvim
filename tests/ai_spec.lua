@@ -637,6 +637,18 @@ ai_describe("providers#get_models()", function()
     end)
 end)
 
+ai_describe("providers#copilot#submit_chat()", function()
+
+    it("debounces chat submission by throwing an error", function()
+        vim.cmd('Ai! wow')
+        vim.fn['providers#copilot#submit_chat']()
+        assert.has.errors(function()
+            vim.fn['providers#copilot#submit_chat']()
+        end)
+        vim.fn['ai#wait_for_jobs']()
+    end)
+end)
+
 ai_describe(":Ai gpt-4.1 <prompt>", function()
 
     it("gets cached token if token is not expired on submit", function()
