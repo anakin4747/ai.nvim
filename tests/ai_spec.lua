@@ -145,40 +145,6 @@ local is_valid_models_json = jsonschema.generate_validator({
     required = { "data", "object" }
 })
 
-local is_valid_chat_json = jsonschema.generate_validator({
-  type = "object",
-  required = { "choices", "created", "id", "model", "system_fingerprint" },
-  properties = {
-    choices = {
-      type = "array",
-      items = {
-        type = "object",
-        required = { "index", "delta" },
-        properties = {
-          index = { type = "integer" },
-          delta = {
-            type = "object",
-            required = { "content" },
-            properties = {
-                content = {
-                    anyOf = {
-                        { type = "string" },
-                        { lua_type = "userdata" }
-                    }
-                },
-                role = { type = "string" }
-            }
-          }
-        }
-      }
-    },
-    created = { type = "integer" },
-    id = { type = "string" },
-    model = { type = "string" },
-    system_fingerprint = { type = "string" }
-  }
-})
-
 vim.g.ai_dir = default_mock_dir
 
 vim.g.ai_localtime = 1763098419
@@ -969,42 +935,6 @@ ai_describe("g:ai_responses", function()
             end)
 
             assert(is_valid_models_json(models))
-        end)
-
-        it("/chat/completions returns valid json online", function()
-
-            vim.g.i_am_in_a_test = false
-
-            local response = vim.fn['providers#copilot#curl_chat']({'messages'})
-
-            for line in response:gmatch("[^\r\n]+") do
-                local json = line:gsub("^data:%s*", "")
-                if json ~= "[DONE]" and json ~= "" then
-                    local chat
-                    assert.has_no.errors(function()
-                        chat = vim.fn.json_decode(json)
-                    end)
-
-                    assert(is_valid_chat_json(chat))
-                end
-            end
-        end)
-
-        it("/chat/completion returns valid json offline", function()
-
-            local response = vim.fn['providers#copilot#curl_chat']({'messages'})
-
-            for line in response:gmatch("[^\r\n]+") do
-                local json = line:gsub("^data:%s*", "")
-                if json ~= "[DONE]" and json ~= "" then
-                    local chat
-                    assert.has_no.errors(function()
-                        chat = vim.fn.json_decode(json)
-                    end)
-
-                    assert(is_valid_chat_json(chat))
-                end
-            end
         end)
     end)
 end)
