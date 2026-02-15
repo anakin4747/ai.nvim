@@ -88,6 +88,8 @@ endf
 function! s:handle_token_response(_, response, __) abort
     let g:ai_responses += a:response
 
+    call ai#log('token response', a:response, 'json')
+
     let copilot_dir = $"{ai#nvim_get_dir()}/providers/copilot"
 
     if !filereadable(copilot_dir)
@@ -132,6 +134,8 @@ endf
 
 function! s:handle_models_response(_, response, __) abort
     let g:ai_responses += a:response
+
+    call ai#log('model response', a:response, 'json')
 
     let copilot_dir = $"{ai#nvim_get_dir()}/providers/copilot"
 
@@ -198,6 +202,8 @@ let s:incomplete_response = ""
 
 function! s:handle_chat_response(_, response, __) abort
     let g:ai_responses += a:response
+
+    call ai#log('chat response', a:response, 'json')
 
     let response = a:response
 
