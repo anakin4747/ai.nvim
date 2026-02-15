@@ -268,18 +268,12 @@ function! s:mock_jobstart(cmd, opts) abort
             endfo
         endi
 
-        call ai#log($"url: '{url}' url_path: '{url_path}' mock_file: '{mock_file}' mock_file type: '{type(mock_file)}' url_path: '{url_path}' ai_test_endpoints: '{g:ai_test_endpoints}'")
-
         if type(mock_file) == v:t_string && mock_file != ""
             let fixture_paths = [$"tests/fixtures/endpoints/{url_path}/{mock_file}"]
         endi
-
-        call ai#log($"here")
     endi
 
     let job = ['cat'] + fixture_paths
-
-    call ai#log($"job: '{job}'")
 
     call jobstart(job, a:opts)
 endf
