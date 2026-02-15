@@ -219,17 +219,14 @@ function! s:handle_chat_response(_, response, __) abort
             let s:incomplete_response = ""
         endi
 
-        " [-1] wasn't working to get the final character in the line
-        let length = len(response[line_nr]) - 1
-        if response[line_nr][length] != '}'
+        try
+            let json = response[line_nr]
+                \ ->substitute('^data: ', '', '')
+                \ ->json_decode()
+        catch
             let s:incomplete_response = response[line_nr]
             continue
-        endi
-
-        let json = response[line_nr]
-            \ ->substitute('^data: ', '', '')
-
-        let json = json_decode(json)
+        endt
 
         if empty(json.choices)
            continue
