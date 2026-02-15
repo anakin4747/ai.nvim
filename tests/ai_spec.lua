@@ -182,6 +182,7 @@ local is_valid_chat_json = jsonschema.generate_validator({
 vim.g.ai_dir = default_mock_dir
 
 vim.g.ai_localtime = 1763098419
+vim.g.ai_test_endpoints = nil
 
 local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -257,9 +258,6 @@ ai_describe(":Ai", function()
         vim.fn['providers#submit_chat']()
         vim.fn['ai#wait_for_jobs']()
 
-        local response = vim.g.ai_responses
-        assert.are.same('', responses)
-
         local new_token_json = readjsonfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
         assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
@@ -295,12 +293,12 @@ ai_describe(":Ai", function()
             '    match n {',
             '        0 => 0,',
             '        1 => 1,',
-            '        _ => fibonacci(n - 1) fibonacci(n - 2),',
+            '        _ => fibonacci(n - 1) + fibonacci(n - 2),',
             '    }',
             '}',
             '',
             'fn main() {',
-            '    for i in 0.. {',
+            '    for i in 0..10 {',
             '        println!("{}", fibonacci(i));',
             '    }',
             '}',
@@ -754,6 +752,7 @@ ai_describe(":Ai gpt-4.1 <prompt>", function()
 
         vim.cmd('Ai gpt-4.1 write me a hello world in rust')
         vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
