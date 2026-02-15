@@ -164,6 +164,14 @@ function! s:build_submit_chat_curl_cmd(messages) abort
         possible.
         When you provide recommended code changes always provide them as diffs
         in markdown codeblocks.
+
+        Only every provide commands which can be ran immediately without
+        modification.
+        For example, use `sudo chown $(id -nu):$(id -ng) /srv/samba/share`
+        instead of `sudo chown <youruser>:<youruser> /srv/samba/share`
+
+        When recommending simple file edits provide a `cat` or `sed` command to
+        make the modifications instead of telling me to use vim or nano.
     END
 
     let messages = [
