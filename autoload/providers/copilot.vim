@@ -245,6 +245,10 @@ function! s:handle_chat_response(_, response, __) abort
             continue
         endt
 
+        if !has_key(json, 'choices')
+           continue
+        endi
+
         if empty(json.choices)
            continue
         endi
