@@ -7,5 +7,5 @@ cqfd:
 
 .PHONY: test tests
 test tests:
-	-./scripts/run_tests
+	-./scripts/run_tests | grep -v '^test-message-payload$$'
 	@./scripts/print_cloc
