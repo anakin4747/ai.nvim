@@ -132,52 +132,6 @@ support for highlighting commands from the :Ai buffer to run those in a
 
 ---
 
-tell ai to always use
-
-```
-sudo chown $(id -nu):$(id -ng) /srv/samba/share
-```
-
-instead of
-
-```
-sudo chown <youruser>:<youruser> /srv/samba/share
-```
-
-So that it is always runnable code
-
----
-
-Or when requiring edits to a file don't do this:
-
-```bash
-# 5. Edit Samba config
-sudo nano /etc/samba/smb.conf
-
-# Add at the end:
-# [Share]
-#    path = /srv/samba/share
-#    browseable = yes
-#    read only = no
-#    guest ok = no
-#    valid users = <youruser>
-```
-
-Do this instead:
-
-```bash
-sudo cat >> /etc/samba/smb.conf << EOF
-[Share]
-   path = /srv/samba/share
-   browseable = yes
-   read only = no
-   guest ok = no
-   valid users = $(id -nu)
-EOF
-```
-
----
-
 Use sed or cat to perform file edits so that they can be more easily seen as
 they will be on display in the :terminal buffers. That is compared to using an
 mcp or some Ai tool for reading or writing, which is just harder to introspect
