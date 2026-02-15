@@ -946,7 +946,14 @@ ai_describe("vim.g.ai_test_endpoints", function()
         vim.g.ai_test_endpoints = {
             ['/chat/completions'] = 'expired.json'
         }
-        local response = vim.fn['providers#copilot#curl_chat']({'messages'})
+
+        vim.cmd([[
+            call providers#copilot#enqueue_chat_submission()
+            call ai#run_job_queue()
+            call ai#wait_for_jobs()
+        ]])
+
+        local response = vim.g.ai_responses[1]
 
         assert.are_match('unauthorized: token expired', response)
     end)
