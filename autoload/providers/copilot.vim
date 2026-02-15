@@ -185,7 +185,8 @@ function! providers#copilot#enqueue_chat_submission() abort
 
     let header = ['', $"# AI.NVIM {g:ai_model}", '', '']
 
-    call appendbufline(bufnr(), "$", header)
+    let s:chat_bufnr = bufnr(ai#get_last_chat_path())
+    call appendbufline(s:chat_bufnr, "$", header)
 
     return ai#enqueue_job(#{
         \ cmd: s:build_submit_chat_curl_cmd(getline(0, '$')),
@@ -210,7 +211,7 @@ function! s:handle_chat_response(_, response, __) abort
     for line_nr in range(len(response))
 
         if response[line_nr] == 'data: [DONE]'
-            call appendbufline(bufnr(), "$", ['', '# ME', ''])
+            call appendbufline(s:chat_bufnr, "$", ['', '# ME', ''])
             return
         endi
 
@@ -237,14 +238,14 @@ function! s:handle_chat_response(_, response, __) abort
         endi
 
         let content = json.choices[0].delta.content
-        let last_line = getbufline(bufnr(), "$")[0]
+        let last_line = getbufline(s:chat_bufnr, "$")[0]
 
         if content =~ "\n"
             let parts = split(content, "\n", 1)
-            call setbufline(bufnr(), "$", last_line . parts[0])
-            call appendbufline(bufnr(), "$", parts[1:])
+            call setbufline(s:chat_bufnr, "$", last_line . parts[0])
+            call appendbufline(s:chat_bufnr, "$", parts[1:])
         else
-            call setbufline(bufnr(), "$", last_line . content)
+            call setbufline(s:chat_bufnr, "$", last_line . content)
         endif
     endfo
 endf
