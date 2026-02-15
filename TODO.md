@@ -3,7 +3,6 @@
 
 ## Highest Priority TODOs
 
-- Asynchronous chat submission
 - ACP integration
 - MCP integration
 - skills integration
@@ -51,12 +50,6 @@
 - make it so that the ai always wraps text outside of code blocks boxes at
   &textwidth
 
-- add functionality to support livestreaming of contents or atleast
-  non-blocking maybe
-
-- add a test to ensure the cursor gets moved to the bottom of the chat after
-  getting chat response
-
 - maybe support `:Ai explain` to change the system prompt to asking for an
   explanation instead of only for codeblocks like it is hardcoded to now
 
@@ -65,9 +58,6 @@
 - image support in the future
 
 - investigate ACP
-
-- improve tab completion for :Ai <tab> since it doesn't complete if you already
-  begin typing an option like :Ai g<tab> does not complete anything
 
 - lookup table of the system prompt. Like `:Ai explain` could use a system
   prompt that explains how they should explain. or the default system prompt
@@ -78,8 +68,6 @@
 - vimscript test suite will print the results so that it can be interpreted as
   :help since the test output is literally the documentation.
 - vimscript test suite will work for both vim and neovim
-
-- standardize how you are referencing the chat buffer and bufnr
 
 - if what you have selected is already wrapped in a codeblock don't send the
   triple backticks to the chat
@@ -114,10 +102,6 @@ and that terminal also gets listed as a watched buffer
 
 ---
 
-Asynchronous chat submissions
-
-Buffer updates with a loading animation of sorts (what kind? TBD)
-
 MCP and ACP support
 
 everytime a command is run in a shell with ai.nvim it opens a terminal buffer
@@ -145,7 +129,6 @@ interacted with directly
 
 support for highlighting commands from the :Ai buffer to run those in a
 :terminal buffer
-
 
 ---
 
@@ -239,11 +222,6 @@ so that we can see what files were watched during that response
 
 ---
 
-Fix your symlinks in your test fixtures to use relative paths instead of the
-hardcoded absolute path used on your machine
-
----
-
 how to assert in tests that ai.nvim sends the correct parameters
 
 ---
@@ -297,82 +275,6 @@ stacktrace:
 ---
 
 Handle the case where you are unauthenticated
-
----
-
-# to support async sending
-
-Currently the application blocks on sending chat data
-
-On sending chat data
-
-Worst case:
-    - curl token
-    - curl models
-    - curl chat data
-
-best case:
-    - token exists
-    - models exists
-    - curl chat data
-
-So for the worst case:
-    When curling the token is finished we need to curl the models
-    when curling the models is finished we need to post the chat data
-    Every line of data back from the chat we update the buffer with the new word
-
-Pseudo code
-```lua
-curl_token(function()
-    save_token()
-    if no models then
-        curl_models(function()
-            save_models()
-        end)
-    end
-    curl_chat(function()
-        print(one word)
-    end)
-end)
-```
-
-synchronous tasks:
-- save token
-- save models
-- parse chat response
-
-asynchronous tasks:
-- get token
-- get models
-- submit chat
-
----
-
-On chat submission:
-
-```lua
-function submit_chat()
-    if bad token then
-        add_to_task_queue(curl_token)
-    end
-
-    if bad model then
-        add_to_task_queue(curl_models)
-    end
-
-    add_to_task_queue(curl_chat)
-
-    run_task_queue()
-end
-```
-
-```vim
-
-
-
-
-
-```
 
 ---
 
