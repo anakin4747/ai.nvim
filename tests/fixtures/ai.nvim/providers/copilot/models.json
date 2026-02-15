@@ -1,1 +1,733 @@
-{"data": [{"id": "gpt-4.1", "capabilities": {"supports": {"tool_calls": true, "vision": true, "structured_outputs": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/gif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 128000, "max_context_window_tokens": 128000, "max_output_tokens": 16384}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4.1", "object": "model_capabilities"}, "model_picker_enabled": true, "name": "GPT-4.1", "policy": {"state": "enabled", "terms": "Enable access to the latest GPT-4.1 model from OpenAI. [Learn more about how GitHub Copilot serves GPT-4.1](https://docs.github.com/en/copilot/using-github-copilot/ai-models/choosing-the-right-ai-model-for-your-task#gpt-41)."}, "vendor": "Azure OpenAI", "object": "model", "version": "gpt-4.1-2025-04-14", "preview": false, "model_picker_category": "versatile"}, {"id": "gpt-5-mini", "capabilities": {"supports": {"tool_calls": true, "vision": true, "structured_outputs": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/gif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 128000, "max_context_window_tokens": 264000, "max_output_tokens": 64000}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-5-mini", "object": "model_capabilities"}, "model_picker_enabled": true, "name": "GPT-5 mini", "policy": {"state": "enabled", "terms": "Enable access to the latest GPT-5 mini model from OpenAI. [Learn more about how GitHub Copilot serves GPT-5 mini](https://gh.io/copilot-openai)."}, "vendor": "Azure OpenAI", "object": "model", "version": "gpt-5-mini", "preview": false, "model_picker_category": "lightweight"}, {"id": "gpt-5", "capabilities": {"supports": {"tool_calls": true, "vision": true, "structured_outputs": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/gif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 128000, "max_context_window_tokens": 400000, "max_output_tokens": 128000}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-5", "object": "model_capabilities"}, "model_picker_enabled": true, "name": "GPT-5", "supported_endpoints": ["/chat/completions", "/responses"], "policy": {"state": "enabled", "terms": "Enable access to the latest GPT-5 model from OpenAI. [Learn more about how GitHub Copilot serves GPT-5](https://gh.io/copilot-openai)."}, "vendor": "Azure OpenAI", "object": "model", "version": "gpt-5", "preview": false, "model_picker_category": "versatile"}, {"id": "gpt-3.5-turbo", "capabilities": {"supports": {"tool_calls": true, "streaming": true}, "limits": {"max_prompt_tokens": 12288, "max_context_window_tokens": 16384, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "cl100k_base", "family": "gpt-3.5-turbo", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT 3.5 Turbo", "vendor": "Azure OpenAI", "version": "gpt-3.5-turbo-0613", "preview": false, "object": "model"}, {"id": "gpt-3.5-turbo-0613", "capabilities": {"supports": {"tool_calls": true, "streaming": true}, "limits": {"max_prompt_tokens": 12288, "max_context_window_tokens": 16384, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "cl100k_base", "family": "gpt-3.5-turbo", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT 3.5 Turbo", "vendor": "Azure OpenAI", "version": "gpt-3.5-turbo-0613", "preview": false, "object": "model"}, {"id": "gpt-4o-mini", "capabilities": {"supports": {"tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"max_prompt_tokens": 12288, "max_context_window_tokens": 128000, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4o-mini", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT-4o mini", "vendor": "Azure OpenAI", "version": "gpt-4o-mini-2024-07-18", "preview": false, "object": "model"}, {"id": "gpt-4o-mini-2024-07-18", "capabilities": {"supports": {"tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"max_prompt_tokens": 12288, "max_context_window_tokens": 128000, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4o-mini", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT-4o mini", "vendor": "Azure OpenAI", "version": "gpt-4o-mini-2024-07-18", "preview": false, "object": "model"}, {"id": "gpt-4", "capabilities": {"supports": {"tool_calls": true, "streaming": true}, "limits": {"max_prompt_tokens": 32768, "max_context_window_tokens": 32768, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "cl100k_base", "family": "gpt-4", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT 4", "vendor": "Azure OpenAI", "version": "gpt-4-0613", "preview": false, "object": "model"}, {"id": "gpt-4-0613", "capabilities": {"supports": {"tool_calls": true, "streaming": true}, "limits": {"max_prompt_tokens": 32768, "max_context_window_tokens": 32768, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "cl100k_base", "family": "gpt-4", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT 4", "vendor": "Azure OpenAI", "version": "gpt-4-0613", "preview": false, "object": "model"}, {"id": "gpt-4-0125-preview", "capabilities": {"supports": {"tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"max_prompt_tokens": 64000, "max_context_window_tokens": 128000, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "cl100k_base", "family": "gpt-4-turbo", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT 4 Turbo", "vendor": "Azure OpenAI", "version": "gpt-4-0125-preview", "preview": false, "object": "model"}, {"id": "gpt-4o", "capabilities": {"supports": {"vision": true, "tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/gif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 64000, "max_context_window_tokens": 128000, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4o", "object": "model_capabilities"}, "model_picker_enabled": true, "name": "GPT-4o", "vendor": "Azure OpenAI", "object": "model", "version": "gpt-4o-2024-11-20", "preview": false, "model_picker_category": "versatile"}, {"id": "gpt-4o-2024-11-20", "capabilities": {"supports": {"vision": true, "tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/gif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 64000, "max_context_window_tokens": 128000, "max_output_tokens": 16384}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4o", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT-4o", "vendor": "Azure OpenAI", "version": "gpt-4o-2024-11-20", "preview": false, "object": "model"}, {"id": "gpt-4o-2024-05-13", "capabilities": {"supports": {"vision": true, "tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/gif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 64000, "max_context_window_tokens": 128000, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4o", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT-4o", "vendor": "Azure OpenAI", "version": "gpt-4o-2024-05-13", "preview": false, "object": "model"}, {"id": "gpt-4-o-preview", "capabilities": {"supports": {"tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"max_prompt_tokens": 64000, "max_context_window_tokens": 128000, "max_output_tokens": 4096}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4o", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT-4o", "vendor": "Azure OpenAI", "version": "gpt-4o-2024-05-13", "preview": false, "object": "model"}, {"id": "gpt-4o-2024-08-06", "capabilities": {"supports": {"tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"max_prompt_tokens": 64000, "max_context_window_tokens": 128000, "max_output_tokens": 16384}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4o", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT-4o", "vendor": "Azure OpenAI", "version": "gpt-4o-2024-08-06", "preview": false, "object": "model"}, {"id": "gpt-5-codex", "capabilities": {"supports": {"tool_calls": true, "vision": true, "structured_outputs": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/gif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 128000, "max_context_window_tokens": 400000, "max_output_tokens": 128000}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-5-codex", "object": "model_capabilities"}, "model_picker_enabled": true, "name": "GPT-5-Codex (Preview)", "supported_endpoints": ["/responses"], "policy": {"state": "enabled", "terms": "Enable access to the latest GPT-5-Codex model from OpenAI. [Learn more about how GitHub Copilot serves GPT-5-Codex](https://gh.io/copilot-openai)."}, "vendor": "OpenAI", "object": "model", "version": "gpt-5-codex", "preview": true, "model_picker_category": "powerful"}, {"id": "text-embedding-ada-002", "capabilities": {"supports": {}, "limits": {"max_inputs": 512}, "type": "embeddings", "tokenizer": "cl100k_base", "family": "text-embedding-ada-002", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "Embedding V2 Ada", "vendor": "Azure OpenAI", "version": "text-embedding-3-small", "preview": false, "object": "model"}, {"id": "text-embedding-3-small", "capabilities": {"supports": {"dimensions": true}, "limits": {"max_inputs": 512}, "type": "embeddings", "tokenizer": "cl100k_base", "family": "text-embedding-3-small", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "Embedding V3 small", "vendor": "Azure OpenAI", "version": "text-embedding-3-small", "preview": false, "object": "model"}, {"id": "text-embedding-3-small-inference", "capabilities": {"supports": {"dimensions": true}, "type": "embeddings", "tokenizer": "cl100k_base", "family": "text-embedding-3-small", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "Embedding V3 small (Inference)", "vendor": "Azure OpenAI", "version": "text-embedding-3-small", "preview": false, "object": "model"}, {"id": "claude-sonnet-4.5", "capabilities": {"supports": {"vision": true, "tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp"], "max_prompt_image_size": 3145728, "max_prompt_images": 5}, "max_prompt_tokens": 128000, "max_context_window_tokens": 144000, "max_output_tokens": 16000}, "type": "chat", "tokenizer": "o200k_base", "family": "claude-sonnet-4.5", "object": "model_capabilities"}, "model_picker_enabled": true, "name": "Claude Sonnet 4.5", "policy": {"state": "enabled", "terms": "Enable access to the latest Claude Sonnet 4.5 model from Anthropic. [Learn more about how GitHub Copilot serves Claude Sonnet 4.5](https://docs.github.com/en/copilot/using-github-copilot/ai-models/using-claude-sonnet-in-github-copilot)."}, "vendor": "Anthropic", "object": "model", "version": "claude-sonnet-4.5", "preview": false, "model_picker_category": "versatile"}, {"id": "claude-haiku-4.5", "capabilities": {"supports": {"vision": true, "tool_calls": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp"], "max_prompt_image_size": 3145728, "max_prompt_images": 5}, "max_prompt_tokens": 128000, "max_context_window_tokens": 144000, "max_output_tokens": 16000}, "type": "chat", "tokenizer": "o200k_base", "family": "claude-haiku-4.5", "object": "model_capabilities"}, "model_picker_enabled": true, "name": "Claude Haiku 4.5", "policy": {"state": "enabled", "terms": "Enable access to the latest Claude Haiku 4.5 model from Anthropic. [Learn more about how GitHub Copilot serves Claude Haiku 4.5](https://gh.io/copilot-anthropic)."}, "vendor": "Anthropic", "object": "model", "version": "claude-haiku-4.5", "preview": false, "model_picker_category": "versatile"}, {"id": "gemini-2.5-pro", "capabilities": {"supports": {"vision": true, "tool_calls": true, "streaming": true, "parallel_tool_calls": true, "min_thinking_budget": 128, "max_thinking_budget": 32768}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 128000, "max_context_window_tokens": 128000, "max_output_tokens": 64000}, "type": "chat", "tokenizer": "o200k_base", "family": "gemini-2.5-pro", "object": "model_capabilities"}, "model_picker_enabled": true, "name": "Gemini 2.5 Pro", "policy": {"state": "enabled", "terms": "Enable access to the latest Gemini 2.5 Pro model from Google. [Learn more about how GitHub Copilot serves Gemini 2.5 Pro](https://docs.github.com/en/copilot/using-github-copilot/ai-models/choosing-the-right-ai-model-for-your-task#gemini-25-pro)."}, "vendor": "Google", "object": "model", "version": "gemini-2.5-pro", "preview": false, "model_picker_category": "powerful"}, {"id": "gpt-4.1-2025-04-14", "capabilities": {"supports": {"tool_calls": true, "vision": true, "structured_outputs": true, "streaming": true, "parallel_tool_calls": true}, "limits": {"vision": {"supported_media_types": ["image/jpeg", "image/png", "image/webp", "image/gif"], "max_prompt_image_size": 3145728, "max_prompt_images": 1}, "max_prompt_tokens": 128000, "max_context_window_tokens": 128000, "max_output_tokens": 16384}, "type": "chat", "tokenizer": "o200k_base", "family": "gpt-4.1", "object": "model_capabilities"}, "model_picker_enabled": false, "name": "GPT-4.1", "policy": {"state": "enabled", "terms": "Enable access to the latest GPT-4.1 model from OpenAI. [Learn more about how GitHub Copilot serves GPT-4.1](https://docs.github.com/en/copilot/using-github-copilot/ai-models/choosing-the-right-ai-model-for-your-task#gpt-41)."}, "vendor": "Azure OpenAI", "version": "gpt-4.1-2025-04-14", "preview": false, "object": "model"}], "object": "list"}
+{
+  "data": [
+    {
+      "id": "gpt-4.1",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "vision": true,
+          "structured_outputs": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 128000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 16384
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4.1",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": true,
+      "name": "GPT-4.1",
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest GPT-4.1 model from OpenAI. [Learn more about how GitHub Copilot serves GPT-4.1](https://docs.github.com/en/copilot/using-github-copilot/ai-models/choosing-the-right-ai-model-for-your-task#gpt-41)."
+      },
+      "vendor": "Azure OpenAI",
+      "object": "model",
+      "version": "gpt-4.1-2025-04-14",
+      "preview": false,
+      "model_picker_category": "versatile"
+    },
+    {
+      "id": "gpt-5-mini",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "vision": true,
+          "structured_outputs": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 128000,
+          "max_context_window_tokens": 264000,
+          "max_output_tokens": 64000
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-5-mini",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": true,
+      "name": "GPT-5 mini",
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest GPT-5 mini model from OpenAI. [Learn more about how GitHub Copilot serves GPT-5 mini](https://gh.io/copilot-openai)."
+      },
+      "vendor": "Azure OpenAI",
+      "object": "model",
+      "version": "gpt-5-mini",
+      "preview": false,
+      "model_picker_category": "lightweight"
+    },
+    {
+      "id": "gpt-5",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "vision": true,
+          "structured_outputs": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 128000,
+          "max_context_window_tokens": 400000,
+          "max_output_tokens": 128000
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-5",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": true,
+      "name": "GPT-5",
+      "supported_endpoints": [
+        "/chat/completions",
+        "/responses"
+      ],
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest GPT-5 model from OpenAI. [Learn more about how GitHub Copilot serves GPT-5](https://gh.io/copilot-openai)."
+      },
+      "vendor": "Azure OpenAI",
+      "object": "model",
+      "version": "gpt-5",
+      "preview": false,
+      "model_picker_category": "versatile"
+    },
+    {
+      "id": "gpt-3.5-turbo",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true
+        },
+        "limits": {
+          "max_prompt_tokens": 12288,
+          "max_context_window_tokens": 16384,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "cl100k_base",
+        "family": "gpt-3.5-turbo",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT 3.5 Turbo",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-3.5-turbo-0613",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-3.5-turbo-0613",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true
+        },
+        "limits": {
+          "max_prompt_tokens": 12288,
+          "max_context_window_tokens": 16384,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "cl100k_base",
+        "family": "gpt-3.5-turbo",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT 3.5 Turbo",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-3.5-turbo-0613",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4o-mini",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "max_prompt_tokens": 12288,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4o-mini",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT-4o mini",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4o-mini-2024-07-18",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4o-mini-2024-07-18",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "max_prompt_tokens": 12288,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4o-mini",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT-4o mini",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4o-mini-2024-07-18",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true
+        },
+        "limits": {
+          "max_prompt_tokens": 32768,
+          "max_context_window_tokens": 32768,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "cl100k_base",
+        "family": "gpt-4",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT 4",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4-0613",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4-0613",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true
+        },
+        "limits": {
+          "max_prompt_tokens": 32768,
+          "max_context_window_tokens": 32768,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "cl100k_base",
+        "family": "gpt-4",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT 4",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4-0613",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4-0125-preview",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "max_prompt_tokens": 64000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "cl100k_base",
+        "family": "gpt-4-turbo",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT 4 Turbo",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4-0125-preview",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4o",
+      "capabilities": {
+        "supports": {
+          "vision": true,
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 64000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4o",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": true,
+      "name": "GPT-4o",
+      "vendor": "Azure OpenAI",
+      "object": "model",
+      "version": "gpt-4o-2024-11-20",
+      "preview": false,
+      "model_picker_category": "versatile"
+    },
+    {
+      "id": "gpt-4o-2024-11-20",
+      "capabilities": {
+        "supports": {
+          "vision": true,
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 64000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 16384
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4o",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT-4o",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4o-2024-11-20",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4o-2024-05-13",
+      "capabilities": {
+        "supports": {
+          "vision": true,
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 64000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4o",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT-4o",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4o-2024-05-13",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4-o-preview",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "max_prompt_tokens": 64000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 4096
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4o",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT-4o",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4o-2024-05-13",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-4o-2024-08-06",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "max_prompt_tokens": 64000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 16384
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4o",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT-4o",
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4o-2024-08-06",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "gpt-5-codex",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "vision": true,
+          "structured_outputs": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 128000,
+          "max_context_window_tokens": 400000,
+          "max_output_tokens": 128000
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-5-codex",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": true,
+      "name": "GPT-5-Codex (Preview)",
+      "supported_endpoints": [
+        "/responses"
+      ],
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest GPT-5-Codex model from OpenAI. [Learn more about how GitHub Copilot serves GPT-5-Codex](https://gh.io/copilot-openai)."
+      },
+      "vendor": "OpenAI",
+      "object": "model",
+      "version": "gpt-5-codex",
+      "preview": true,
+      "model_picker_category": "powerful"
+    },
+    {
+      "id": "text-embedding-ada-002",
+      "capabilities": {
+        "supports": {},
+        "limits": {
+          "max_inputs": 512
+        },
+        "type": "embeddings",
+        "tokenizer": "cl100k_base",
+        "family": "text-embedding-ada-002",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "Embedding V2 Ada",
+      "vendor": "Azure OpenAI",
+      "version": "text-embedding-3-small",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "text-embedding-3-small",
+      "capabilities": {
+        "supports": {
+          "dimensions": true
+        },
+        "limits": {
+          "max_inputs": 512
+        },
+        "type": "embeddings",
+        "tokenizer": "cl100k_base",
+        "family": "text-embedding-3-small",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "Embedding V3 small",
+      "vendor": "Azure OpenAI",
+      "version": "text-embedding-3-small",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "text-embedding-3-small-inference",
+      "capabilities": {
+        "supports": {
+          "dimensions": true
+        },
+        "type": "embeddings",
+        "tokenizer": "cl100k_base",
+        "family": "text-embedding-3-small",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "Embedding V3 small (Inference)",
+      "vendor": "Azure OpenAI",
+      "version": "text-embedding-3-small",
+      "preview": false,
+      "object": "model"
+    },
+    {
+      "id": "claude-sonnet-4.5",
+      "capabilities": {
+        "supports": {
+          "vision": true,
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 5
+          },
+          "max_prompt_tokens": 128000,
+          "max_context_window_tokens": 144000,
+          "max_output_tokens": 16000
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "claude-sonnet-4.5",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": true,
+      "name": "Claude Sonnet 4.5",
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest Claude Sonnet 4.5 model from Anthropic. [Learn more about how GitHub Copilot serves Claude Sonnet 4.5](https://docs.github.com/en/copilot/using-github-copilot/ai-models/using-claude-sonnet-in-github-copilot)."
+      },
+      "vendor": "Anthropic",
+      "object": "model",
+      "version": "claude-sonnet-4.5",
+      "preview": false,
+      "model_picker_category": "versatile"
+    },
+    {
+      "id": "claude-haiku-4.5",
+      "capabilities": {
+        "supports": {
+          "vision": true,
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 5
+          },
+          "max_prompt_tokens": 128000,
+          "max_context_window_tokens": 144000,
+          "max_output_tokens": 16000
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "claude-haiku-4.5",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": true,
+      "name": "Claude Haiku 4.5",
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest Claude Haiku 4.5 model from Anthropic. [Learn more about how GitHub Copilot serves Claude Haiku 4.5](https://gh.io/copilot-anthropic)."
+      },
+      "vendor": "Anthropic",
+      "object": "model",
+      "version": "claude-haiku-4.5",
+      "preview": false,
+      "model_picker_category": "versatile"
+    },
+    {
+      "id": "gemini-2.5-pro",
+      "capabilities": {
+        "supports": {
+          "vision": true,
+          "tool_calls": true,
+          "streaming": true,
+          "parallel_tool_calls": true,
+          "min_thinking_budget": 128,
+          "max_thinking_budget": 32768
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/heic",
+              "image/heif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 128000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 64000
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gemini-2.5-pro",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": true,
+      "name": "Gemini 2.5 Pro",
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest Gemini 2.5 Pro model from Google. [Learn more about how GitHub Copilot serves Gemini 2.5 Pro](https://docs.github.com/en/copilot/using-github-copilot/ai-models/choosing-the-right-ai-model-for-your-task#gemini-25-pro)."
+      },
+      "vendor": "Google",
+      "object": "model",
+      "version": "gemini-2.5-pro",
+      "preview": false,
+      "model_picker_category": "powerful"
+    },
+    {
+      "id": "gpt-4.1-2025-04-14",
+      "capabilities": {
+        "supports": {
+          "tool_calls": true,
+          "vision": true,
+          "structured_outputs": true,
+          "streaming": true,
+          "parallel_tool_calls": true
+        },
+        "limits": {
+          "vision": {
+            "supported_media_types": [
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+              "image/gif"
+            ],
+            "max_prompt_image_size": 3145728,
+            "max_prompt_images": 1
+          },
+          "max_prompt_tokens": 128000,
+          "max_context_window_tokens": 128000,
+          "max_output_tokens": 16384
+        },
+        "type": "chat",
+        "tokenizer": "o200k_base",
+        "family": "gpt-4.1",
+        "object": "model_capabilities"
+      },
+      "model_picker_enabled": false,
+      "name": "GPT-4.1",
+      "policy": {
+        "state": "enabled",
+        "terms": "Enable access to the latest GPT-4.1 model from OpenAI. [Learn more about how GitHub Copilot serves GPT-4.1](https://docs.github.com/en/copilot/using-github-copilot/ai-models/choosing-the-right-ai-model-for-your-task#gpt-41)."
+      },
+      "vendor": "Azure OpenAI",
+      "version": "gpt-4.1-2025-04-14",
+      "preview": false,
+      "object": "model"
+    }
+  ],
+  "object": "list"
+}
