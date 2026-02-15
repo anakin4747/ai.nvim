@@ -4,13 +4,7 @@ function! providers#copilot#submit_chat() abort
         return
     endi
 
-    if s:token_needed()
-        call providers#copilot#enqueue_token_fetch()
-        call ai#run_job_queue()
-        call ai#wait_for_jobs()
-    endi
-
-    if s:models_needed()
+    if s:token_needed() || s:models_needed()
         call providers#copilot#enqueue_token_fetch()
         call ai#run_job_queue()
         call ai#wait_for_jobs()
