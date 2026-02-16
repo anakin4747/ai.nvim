@@ -18,6 +18,7 @@
 :Ai log disable disables logging to log.md
 :Ai log obfuscate enable enables logging obfuscation
 :Ai log obfuscate disable disables logging obfuscation
+:Ai log puts you at the bottom of the log
 :Ai <model> <temperature|top_p|max_tokens|n|system_prompt> prints the value of that model's paramter
 :Ai <model> <temperature|top_p|max_tokens|n|system_prompt>=<value> assigns the value to that model's paramter
 :Ai!! to resend last message sent to last chat to new chat or just the case when you use ! wrong either used it when you didn't mean to or vica versa
@@ -26,13 +27,15 @@
 :Ai prompt system opens the file that is used for the system prompt
 :%Ai edit edits the changes to the file directly
 :Ai diagnostics sends vim.diagnostic.get() to ai buffer and also wraps it in fold markers and close only that fold to lightly hide it from the user
-:Ai grep with no pattern is an error but not treated as one currently
+:Ai grep sorts results by most recent
 :%Ai automatically provides watching of % so that we don't need to explicitly ask Ai to watch it and so that we don't need to keep sending it the same file with minor changes
 :%Ai also inserts a commented out name of the file at the top
 :%Ai for files larger than like 20 lines gets automatically folded so that they are easier to move around
 :Ai <filename> would be the way to pass a file different from % to the chat as well as enable watching automatically for that file
 :Ai do changes the system prompt or using ACP stuff to do agentic stuff like actualing going and editing files itself
 :'<,'>Ai vert provides support for vertical and a range since :vert and :'<,'> are mutally exclusive
+g== for running current codeblocks in a :terminal
+:'<,'>g= runs the highlighted codeblocks in a :terminal
 
 - Soon you will need to investigate how to dynamically generate tests to
   account for every combination of every feature
@@ -78,9 +81,6 @@
 
 - if triple backticks appear in the message, escape them
 
-- need debouncing on submit_chat()
-
-- :Ai log puts you at the bottom of the log
 
 ---
 
@@ -239,3 +239,10 @@ make tests log everything and clear the logs upon successfully passing the test
 Once tests are passing go back and ensure the tests are done from as far
 external as possible, the tests shouldn't care about the internal queuing
 structure
+
+---
+
+Once the chat responds the chat should be written to
+
+---
+
