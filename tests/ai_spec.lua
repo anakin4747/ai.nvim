@@ -165,6 +165,8 @@ local function teardown()
     vim.g.ai_test_endpoints = nil
     vim.g.ai_responses = {}
 
+    vim.g.ai_model = 'gpt-4.1'
+
     vim.fn['ai#wait_for_jobs']()
 end
 
@@ -361,41 +363,209 @@ ai_describe(":Ai!", function()
     end)
 end)
 
-ai_describe(":Ai <prompt>", function()
+ai_describe(":Ai[!] [prompt]", function()
 
     it("accepts a prompt as an argument", function()
         assert.has_no.errors(function()
             vim.cmd('Ai make me toast')
         end)
-    end)
-
-    it("passes <prompt> to the buffer", function()
-        vim.cmd('Ai make me toast')
-
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-        assert(vim.tbl_contains(lines, "make me toast"))
-    end)
-end)
-
-ai_describe(":Ai! <prompt>", function()
-
-    it("accepts a prompt as an argument", function()
         assert.has_no.errors(function()
             vim.cmd('Ai! make me toast')
         end)
     end)
 
-    it("passes <prompt> to the buffer", function()
-        vim.cmd('Ai! make me toast')
+    it("passes [prompt] to the buffer", function()
+        vim.cmd('Ai make me toast')
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
         assert(vim.tbl_contains(lines, "make me toast"))
+
+        vim.cmd('Ai! make me toast')
+
+        lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "make me toast"))
+    end)
+
+    it("gets cached token if token is not expired on submit", function()
+        vim.g.ai_dir = fixture_dir("non-expired-remote-token")
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        local old_token_json = readjsonfile(token_path)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_token_json = readjsonfile(token_path)
+        assert.are.same(old_token_json, new_token_json)
+    end)
+
+    it("gets a new token if token is expired on submit", function()
+        vim.g.ai_dir = fixture_dir("expired-remote-token")
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        local old_token_json = readjsonfile(token_path)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_token_json = readjsonfile(token_path)
+        assert.are.not_same(old_token_json, new_token_json)
+        assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
+    end)
+
+    it("gets a new token if no token exists on submit", function()
+        vim.g.ai_dir = fixture_dir("no-token")
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+
+        assert(vim.fn.filereadable(token_path) == 0)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        assert(vim.fn.filereadable(token_path) == 1)
+
+        local new_token_json = readjsonfile(token_path)
+
+        local token
+        assert.has_no.errors(function()
+            token = vim.json.decode(new_token_json)
+        end)
+        assert(is_valid_token_json(token))
+    end)
+
+    it("gets a new token if token is malformed on submit", function()
+        vim.g.ai_dir = fixture_dir("bad-token")
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_token_json = readjsonfile(token_path)
+
+        local json
+
+        assert.has_no.errors(function()
+            json = vim.json.decode(new_token_json)
+        end)
+
+        assert(is_valid_token_json(json))
+
+        assert.is_not_nil(json.expires_at)
+    end)
+
+    it("gets new models if token is expired on submit", function()
+        vim.g.ai_dir = fixture_dir("expired-remote-token-get-models")
+
+        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
+        local old_models_mtime = vim.uv.fs_stat(models_path).mtime
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_models_mtime = vim.uv.fs_stat(models_path).mtime
+        assert.are.not_same(old_models_mtime, new_models_mtime)
+    end)
+
+    it("gets new models if no token exists on submit", function()
+        vim.g.ai_dir = fixture_dir("no-token-get-models")
+
+        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
+        local old_models_mtime = vim.uv.fs_stat(models_path).mtime
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        assert(vim.fn.filereadable(token_path) == 0)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_models_mtime = vim.uv.fs_stat(models_path).mtime
+        assert.are.not_same(old_models_mtime, new_models_mtime)
+    end)
+
+    it("gets new models if no models exist on submit", function()
+        vim.g.ai_dir = fixture_dir("no-models")
+
+        -- ensure models.json does not exist
+        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
+        assert(vim.fn.filereadable(models_path) == 0)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        assert(vim.fn.filereadable(models_path) == 1)
+
+        local new_models_json = readjsonfile(models_path)
+
+        local models
+        assert.has_no.errors(function()
+            models = vim.json.decode(new_models_json)
+        end)
+
+        assert(is_valid_models_json(models))
+    end)
+
+    it("populates the chat with a response", function()
+
+        vim.cmd('Ai write me a hello world in rust')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            '# ME',
+            '',
+            'write me a hello world in rust',
+            '',
+            '# AI.NVIM gpt-4.1',
+            '',
+            'Certainly! Here is a simple "Hello, world!" program in Rust:',
+            '',
+            '```rust',
+            'fn main() {',
+            '    println!("Hello, world!");',
+            '}',
+            '```',
+            '',
+            'To run this:',
+            '',
+            '1. Save it as `main.rs`.',
+            '2. Compile it with `rustc main.rs`.',
+            '3. Run the output with `./main` (on Linux/macOS) or `main.exe` (on Windows).',
+            '',
+            'Let me know if you need more help!',
+            '',
+            '# ME',
+            ''
+        }, lines)
+    end)
+
+    -- TODO: move to more accurate describe block
+    it("creates ai.nvim dir itself", function()
+        vim.g.ai_dir = fixture_dir("no-dir")
+
+        assert(vim.fn.isdirectory(vim.g.ai_dir) == 0)
+
+        vim.cmd([[
+            call providers#copilot#enqueue_token_fetch()
+            call ai#run_job_queue()
+            call ai#wait_for_jobs()
+        ]])
+
+        assert(vim.fn.isdirectory(vim.g.ai_dir) == 1)
     end)
 end)
 
-ai_describe(":Ai <tab>", function()
+ai_describe(":Ai <Tab>", function()
 
     it("completes the first argument with models", function()
         local completion = vim.fn['ai#completion']("", "Ai ", "")
@@ -404,7 +574,7 @@ ai_describe(":Ai <tab>", function()
     end)
 end)
 
-ai_describe(":Ai g<tab>", function()
+ai_describe(":Ai g<Tab>", function()
 
     it("completes with models that start with g", function()
         local expected = {
@@ -423,9 +593,9 @@ ai_describe(":Ai g<tab>", function()
     end)
 end)
 
-ai_describe(":Ai <model>", function()
+ai_describe(":Ai [model]", function()
 
-    it("sets the model to <model>", function()
+    it("sets the model to [model]", function()
 
         vim.cmd('Ai claude-haiku-4.5')
 
@@ -443,8 +613,8 @@ ai_describe(":Ai <model>", function()
         assert.are.same(expected_win, actual_win)
     end)
 
-    ai_describe("<prompt>", function()
-        it("does not pass <model> to the chat", function()
+    ai_describe("[prompt]", function()
+        it("does not pass [model] to the chat", function()
 
             vim.cmd('Ai claude-haiku-4.5 sample chat')
 
@@ -458,14 +628,14 @@ ai_describe(":Ai <model>", function()
         end)
     end)
 
-    it("<tab> does not complete after first argument", function()
+    it("<Tab> does not complete after first argument", function()
         local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
 
         assert.same({}, completion)
     end)
 end)
 
-ai_describe(":'<,'>Ai", function()
+ai_describe(":[range]Ai", function()
 
     it("accepts a range without error", function()
         vim.api.nvim_buf_set_lines(0, 0, -1, false, { "a", "b", "c", "d" })
@@ -491,7 +661,7 @@ ai_describe(":'<,'>Ai", function()
         assert(vim.tbl_contains(lines, "C-Murder"))
     end)
 
-    it("<prompt> passes the selected range and <prompt> to the buffer", function()
+    it("[prompt] passes the selected range and [prompt] to the buffer", function()
         vim.api.nvim_buf_set_lines(0, 0, -1, false, {
             "De La Soul",
             "Wu-Tang",
@@ -655,185 +825,6 @@ ai_describe("providers#copilot#get_local_token()", function()
         local expected = "^ghu_[[:alnum:]]\\{36}$"
         local actual = vim.fn['providers#copilot#get_local_token']()
         assert(vim.fn.match(actual, expected) ~= -1)
-    end)
-end)
-
-ai_describe(":Ai gpt-4.1 <prompt>", function()
-
-    it("gets cached token if token is not expired on submit", function()
-        vim.g.ai_dir = fixture_dir("non-expired-remote-token")
-        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-        local old_token_json = readjsonfile(token_path)
-
-        vim.cmd('Ai gpt-4.1 wow')
-        vim.fn['providers#submit_chat']()
-        vim.fn['ai#wait_for_jobs']()
-
-        local new_token_json = readjsonfile(token_path)
-        assert.are.same(old_token_json, new_token_json)
-    end)
-
-    it("gets a new token if token is expired on submit", function()
-        vim.g.ai_dir = fixture_dir("expired-remote-token")
-        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-        local old_token_json = readjsonfile(token_path)
-
-        vim.cmd('Ai gpt-4.1 wow')
-        vim.fn['providers#submit_chat']()
-        vim.fn['ai#wait_for_jobs']()
-
-        local new_token_json = readjsonfile(token_path)
-        assert.are.not_same(old_token_json, new_token_json)
-        assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
-    end)
-
-    it("gets a new token if no token exists on submit", function()
-        vim.g.ai_dir = fixture_dir("no-token")
-
-        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-
-        assert(vim.fn.filereadable(token_path) == 0)
-
-        vim.cmd('Ai gpt-4.1 wow')
-        vim.fn['providers#submit_chat']()
-        vim.fn['ai#wait_for_jobs']()
-
-        assert(vim.fn.filereadable(token_path) == 1)
-
-        local new_token_json = readjsonfile(token_path)
-
-        local token
-        assert.has_no.errors(function()
-            token = vim.json.decode(new_token_json)
-        end)
-        assert(is_valid_token_json(token))
-    end)
-
-    it("gets a new token if token is malformed on submit", function()
-        vim.g.ai_dir = fixture_dir("bad-token")
-
-        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-
-        vim.cmd('Ai gpt-4.1 wow')
-        vim.fn['providers#submit_chat']()
-        vim.fn['ai#wait_for_jobs']()
-
-        local new_token_json = readjsonfile(token_path)
-
-        local json
-
-        assert.has_no.errors(function()
-            json = vim.json.decode(new_token_json)
-        end)
-
-        assert(is_valid_token_json(json))
-
-        assert.is_not_nil(json.expires_at)
-    end)
-
-    it("gets new models if token is expired on submit", function()
-        vim.g.ai_dir = fixture_dir("expired-remote-token-get-models")
-
-        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
-        local old_models_mtime = vim.uv.fs_stat(models_path).mtime
-
-        vim.cmd('Ai gpt-4.1 wow')
-        vim.fn['providers#submit_chat']()
-        vim.fn['ai#wait_for_jobs']()
-
-        local new_models_mtime = vim.uv.fs_stat(models_path).mtime
-        assert.are.not_same(old_models_mtime, new_models_mtime)
-    end)
-
-    it("gets new models if no token exists on submit", function()
-        vim.g.ai_dir = fixture_dir("no-token-get-models")
-
-        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
-        local old_models_mtime = vim.uv.fs_stat(models_path).mtime
-
-        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
-        assert(vim.fn.filereadable(token_path) == 0)
-
-        vim.cmd('Ai gpt-4.1 wow')
-        vim.fn['providers#submit_chat']()
-        vim.fn['ai#wait_for_jobs']()
-
-        local new_models_mtime = vim.uv.fs_stat(models_path).mtime
-        assert.are.not_same(old_models_mtime, new_models_mtime)
-    end)
-
-    it("gets new models if no models exist on submit", function()
-        vim.g.ai_dir = fixture_dir("no-models")
-
-        -- ensure models.json does not exist
-        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
-        assert(vim.fn.filereadable(models_path) == 0)
-
-        vim.cmd('Ai gpt-4.1 wow')
-        vim.fn['providers#submit_chat']()
-        vim.fn['ai#wait_for_jobs']()
-
-        assert(vim.fn.filereadable(models_path) == 1)
-
-        local new_models_json = readjsonfile(models_path)
-
-        local models
-        assert.has_no.errors(function()
-            models = vim.json.decode(new_models_json)
-        end)
-
-        assert(is_valid_models_json(models))
-    end)
-
-    it("populates the chat with a response", function()
-
-        vim.cmd('Ai gpt-4.1 write me a hello world in rust')
-        vim.fn['providers#submit_chat']()
-        vim.fn['ai#wait_for_jobs']()
-
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-        assert.are.same({
-            '# ME',
-            '',
-            'write me a hello world in rust',
-            '',
-            '# AI.NVIM gpt-4.1',
-            '',
-            'Certainly! Here is a simple "Hello, world!" program in Rust:',
-            '',
-            '```rust',
-            'fn main() {',
-            '    println!("Hello, world!");',
-            '}',
-            '```',
-            '',
-            'To run this:',
-            '',
-            '1. Save it as `main.rs`.',
-            '2. Compile it with `rustc main.rs`.',
-            '3. Run the output with `./main` (on Linux/macOS) or `main.exe` (on Windows).',
-            '',
-            'Let me know if you need more help!',
-            '',
-            '# ME',
-            ''
-        }, lines)
-    end)
-
-    -- TODO: move to more accurate describe block
-    it("creates ai.nvim dir itself", function()
-        vim.g.ai_dir = fixture_dir("no-dir")
-
-        assert(vim.fn.isdirectory(vim.g.ai_dir) == 0)
-
-        vim.cmd([[
-            call providers#copilot#enqueue_token_fetch()
-            call ai#run_job_queue()
-            call ai#wait_for_jobs()
-        ]])
-
-        assert(vim.fn.isdirectory(vim.g.ai_dir) == 1)
     end)
 end)
 
