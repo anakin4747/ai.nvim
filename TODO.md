@@ -36,6 +36,7 @@
 :'<,'>Ai vert provides support for vertical and a range since :vert and :'<,'> are mutally exclusive
 g== for running current codeblocks in a :terminal
 :'<,'>g= runs the highlighted codeblocks in a :terminal
+responses respect '&textwidth' outside of codeblocks
 
 - Soon you will need to investigate how to dynamically generate tests to
   account for every combination of every feature
@@ -46,12 +47,7 @@ g== for running current codeblocks in a :terminal
   model vs no model
   ```
 
-- standardize variable naming based on type maybe
-
 - need to add test for VISUAL mode compatibility not just VISUAL_LINE mode
-
-- make it so that the ai always wraps text outside of code blocks boxes at
-  &textwidth
 
 - maybe support `:Ai explain` to change the system prompt to asking for an
   explanation instead of only for codeblocks like it is hardcoded to now
