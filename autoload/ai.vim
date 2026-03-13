@@ -141,10 +141,30 @@ function! s:check_prompt_for_model(prompt) abort
 endf
 
 function! ai#completion(arglead, cmdline, curpos) abort
-    let arg_count = a:cmdline->split()->len()
+    let args = a:cmdline->split()
+    let arg_count = len(args)
 
-    if arg_count > 2 || (arg_count == 2 && empty(a:arglead))
-        return []
+    " Subcommand completion
+    if arg_count >= 2
+        let subcommand = args[1]
+        
+        " Completion for :Ai chats <Tab>
+        if subcommand ==# 'chats' && (arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead))
+            let dir = $"{ai#nvim_get_dir()}/chats/"
+            if isdirectory(dir)
+                let chats = systemlist($"ls -1t {dir}")
+                if !empty(a:arglead)
+                    call filter(chats, {_, val -> stridx(val, a:arglead) == 0})
+                endif
+                return chats
+            endif
+            return []
+        endif
+        
+        " Block completion for other cases after the first argument
+        if arg_count > 2 || (arg_count == 2 && empty(a:arglead))
+            return []
+        endif
     endif
 
     let possible_completions = []
