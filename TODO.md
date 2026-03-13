@@ -1,24 +1,25 @@
 
 # TODO
 
-:Ai cleanall deletes all chats
-:Ai mrproper deletes ai.nvim dir
+
+Ai TODOs:
+```
+:Ai <model> <temperature|top_p|max_tokens|n> prints the value of that model's paramter
+:Ai <model> <temperature|top_p|max_tokens|n>=<value> assigns the value to that model's paramter
+- with input validation
+- add a test that ensures it throws an error with improper input for what the
+  api endpoint is expecting.
+```
+
 :Ai explain changes the system prompt to a more verbose one
-:Ai -- <models|chats|...> treats the second argument as the prompt
-:Ai log enable enables logging to log.md
-:Ai log disable disables logging to log.md
+:Ai!! to resend last message sent to last chat to new chat or just the case when you use ! wrong either used it when you didn't mean to or vica versa
 :Ai log obfuscate enable enables logging obfuscation
 :Ai log obfuscate disable disables logging obfuscation
-:Ai log puts you at the bottom of the log
-:Ai <model> <temperature|top_p|max_tokens|n|system_prompt> prints the value of that model's paramter
-:Ai <model> <temperature|top_p|max_tokens|n|system_prompt>=<value> assigns the value to that model's paramter
-:Ai!! to resend last message sent to last chat to new chat or just the case when you use ! wrong either used it when you didn't mean to or vica versa
 :Ai prompt opens the file that is used for the user prompt
 :Ai prompt user opens the file that is used for the user prompt
 :Ai prompt system opens the file that is used for the system prompt
 :%Ai edit edits the changes to the file directly
 :Ai diagnostics sends vim.diagnostic.get() to ai buffer and also wraps it in fold markers and close only that fold to lightly hide it from the user
-:Ai grep sorts results by most recent
 :%Ai automatically provides watching of % so that we don't need to explicitly ask Ai to watch it and so that we don't need to keep sending it the same file with minor changes
 :%Ai also inserts a commented out name of the file at the top
 :%Ai for files larger than like 20 lines gets automatically folded so that they are easier to move around
