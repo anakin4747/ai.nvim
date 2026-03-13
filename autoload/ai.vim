@@ -338,6 +338,13 @@ endf
 
 function! ai#handle_chats(...) abort
     let dir = $"{ai#nvim_get_dir()}/chats/"
+
+    let chat_arg = a:000->get(0)->split()->get(1, "")
+    if chat_arg != ""
+        execute $"edit {dir}{chat_arg}"
+        return
+    endif
+
     let chats = systemlist($"ls -1t {dir}")
 
     let items = []
