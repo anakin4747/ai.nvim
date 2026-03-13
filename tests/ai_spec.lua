@@ -1114,3 +1114,30 @@ ai_describe(":Ai mrproper", function()
         assert(vim.fn.isdirectory(dir) == 0)
     end)
 end)
+
+ai_describe(":Ai -- [prompt]", function()
+
+    it("treats the rest as a prompt even when it matches a subcommand", function()
+        vim.cmd('Ai -- chats')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "chats",
+        }, lines)
+    end)
+
+    it("treats the rest as a prompt even when it matches a model", function()
+        vim.cmd('Ai -- gpt-4.1')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "gpt-4.1",
+        }, lines)
+    end)
+end)
