@@ -8,7 +8,6 @@
 - skills integration
 
 :Ai chats <chat> selects that chat
-:Ai chats <tab> allows you to select old conversations
 :Ai clean <chat> deletes that chat
 :Ai cleanall deletes all chats
 :Ai mrproper deletes ai.nvim dir
