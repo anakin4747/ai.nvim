@@ -148,8 +148,8 @@ function! ai#completion(arglead, cmdline, curpos) abort
     if arg_count >= 2
         let subcommand = args[1]
         
-        " Completion for :Ai chats <Tab>
-        if subcommand ==# 'chats' && (arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead))
+        " Completion for :Ai chats <Tab> and :Ai clean <Tab>
+        if (subcommand ==# 'chats' || subcommand ==# 'clean') && (arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead))
             let dir = $"{ai#nvim_get_dir()}/chats/"
             if isdirectory(dir)
                 let chats = systemlist($"ls -1t {dir}")
@@ -354,6 +354,14 @@ function! ai#handle_chats(...) abort
 
     call setqflist(items, 'r')
     copen
+endf
+
+function! ai#handle_clean(...) abort
+    let dir = $"{ai#nvim_get_dir()}/chats/"
+    let chat_arg = a:000->get(0)->split()->get(1, "")
+    if chat_arg != ""
+        call delete(dir . chat_arg)
+    endif
 endf
 
 function! ai#handle_grep(...) abort

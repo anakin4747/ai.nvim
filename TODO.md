@@ -1,8 +1,6 @@
 
 # TODO
 
-:Ai chats <chat> selects that chat
-:Ai clean <chat> deletes that chat
 :Ai cleanall deletes all chats
 :Ai mrproper deletes ai.nvim dir
 :Ai explain changes the system prompt to a more verbose one
