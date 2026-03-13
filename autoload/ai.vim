@@ -386,7 +386,10 @@ function! ai#handle_grep(...) abort
         echohl None
         return
     endi
-    execute $"vimgrep /{pattern}/j {ai#nvim_get_dir()}/chats/*"
+    let files = systemlist($"ls -1t {ai#nvim_get_dir()}/chats/")
+    let dir = $"{ai#nvim_get_dir()}/chats/"
+    let paths = map(files, {_, f -> dir . f})
+    execute $"vimgrep /{pattern}/j {join(paths)}"
     copen
 endf
 
