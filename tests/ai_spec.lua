@@ -1039,6 +1039,22 @@ ai_describe(":Ai chats <Tab>", function()
     end)
 end)
 
+ai_describe(":Ai cleanall", function()
+
+    it("deletes all chats", function()
+        vim.cmd('Ai! one')
+        vim.cmd('Ai! two')
+        vim.cmd('Ai! three')
+
+        local chats_dir = vim.g.ai_dir .. "/chats"
+        assert(#vim.fn.glob(chats_dir .. "/*.md", false, true) > 0)
+
+        vim.cmd('Ai cleanall')
+
+        assert(#vim.fn.glob(chats_dir .. "/*.md", false, true) == 0)
+    end)
+end)
+
 ai_describe(":Ai grep", function()
 
     it("<pattern> searches through all chats for <pattern>", function()
