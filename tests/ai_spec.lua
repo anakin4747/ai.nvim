@@ -163,9 +163,11 @@ local function teardown()
     vim.g.ai_dir = default_mock_dir
 
     vim.g.ai_test_endpoints = nil
+    vim.g.ai_test_endpoint_sequences = nil
     vim.g.ai_responses = {}
 
     vim.g.ai_model = 'gpt-4.1'
+    vim.g.ai_model_params = vim.empty_dict()
 
     vim.fn['ai#wait_for_jobs']()
 end
@@ -229,6 +231,49 @@ ai_describe(":Ai", function()
         local new_token_json = readjsonfile(token_path)
         assert.are.not_same(old_token_json, new_token_json)
         assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
+    end)
+
+    it("retries chat submission after fetching a new token if /chat/completions complains about expired token", function()
+
+        -- First call to /chat/completions returns expired, second returns good.
+        -- This requires the mock to support sequential responses per endpoint.
+        vim.g.ai_test_endpoint_sequences = {
+            ['/chat/completions'] = { 'expired.json', 'good.json' }
+        }
+
+        vim.cmd('Ai write me a hello world in rust')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        -- The full response should be present, proving the retry succeeded
+        assert.are.same({
+            '# ME',
+            '',
+            'write me a hello world in rust',
+            '',
+            '# AI.NVIM gpt-4.1',
+            '',
+            'Certainly! Here is a simple "Hello, world!" program in Rust:',
+            '',
+            '```rust',
+            'fn main() {',
+            '    println!("Hello, world!");',
+            '}',
+            '```',
+            '',
+            'To run this:',
+            '',
+            '1. Save it as `main.rs`.',
+            '2. Compile it with `rustc main.rs`.',
+            '3. Run the output with `./main` (on Linux/macOS) or `main.exe` (on Windows).',
+            '',
+            'Let me know if you need more help!',
+            '',
+            '# ME',
+            ''
+        }, lines)
     end)
 
     it("supports streaming", function()
