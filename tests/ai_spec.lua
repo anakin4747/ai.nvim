@@ -1054,3 +1054,28 @@ ai_describe(":Ai grep", function()
         assert(string.find(line, "abc-xyz", 1, true))
     end)
 end)
+
+ai_describe(":Ai clean", function()
+
+    it("<chat> deletes that chat", function()
+        vim.cmd('Ai! dummy')
+        local chat_path = vim.api.nvim_buf_get_name(0)
+        local chat_name = vim.fn.fnamemodify(chat_path, ":t")
+
+        assert(vim.fn.filereadable(chat_path) == 1)
+
+        vim.cmd('Ai clean ' .. chat_name)
+
+        assert(vim.fn.filereadable(chat_path) == 0)
+    end)
+
+    it("<Tab> completes with chat filenames", function()
+        vim.cmd('Ai! dummy')
+        local chat_path = vim.api.nvim_buf_get_name(0)
+        local chat_name = vim.fn.fnamemodify(chat_path, ":t")
+
+        local completion = vim.fn['ai#completion']("", "Ai clean ", "")
+
+        assert(vim.tbl_contains(completion, chat_name))
+    end)
+end)
