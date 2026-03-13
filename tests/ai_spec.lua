@@ -1086,6 +1086,26 @@ ai_describe(":Ai grep", function()
         local line = vim.api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
         assert(string.find(line, "abc-xyz", 1, true))
     end)
+
+    it("sorts results by most recent chat first", function()
+        vim.cmd('Ai unique-grep-term')
+        local first_chat = vim.api.nvim_buf_get_name(0)
+
+        vim.wait(1000)
+
+        vim.cmd('Ai! unique-grep-term')
+        local second_chat = vim.api.nvim_buf_get_name(0)
+
+        vim.cmd('silent Ai! grep unique-grep-term')
+        local qflist = vim.fn.getqflist()
+        assert(#qflist == 2)
+
+        local first_result = vim.fn.bufname(qflist[1].bufnr)
+        local second_result = vim.fn.bufname(qflist[2].bufnr)
+
+        assert.equal(second_chat, first_result)
+        assert.equal(first_chat, second_result)
+    end)
 end)
 
 ai_describe(":Ai clean", function()
