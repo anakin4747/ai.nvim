@@ -834,6 +834,13 @@ ai_describe(":Ai log", function()
         vim.cmd('Ai log')
         assert.are_match("log.md", vim.api.nvim_buf_get_name(0))
     end)
+
+    it("puts the cursor at the bottom of the log", function()
+        vim.cmd('Ai log')
+        local expected = vim.api.nvim_buf_line_count(0)
+        local actual = vim.api.nvim_win_get_cursor(0)[1]
+        assert.are.same(expected, actual)
+    end)
 end)
 
 ai_describe(":Ai l", function()
