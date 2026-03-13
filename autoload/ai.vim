@@ -371,6 +371,10 @@ function! ai#handle_cleanall(...) abort
     endfo
 endf
 
+function! ai#handle_mrproper(...) abort
+    call delete(ai#nvim_get_dir(), "rf")
+endf
+
 function! ai#handle_grep(...) abort
     let pattern = a:000->get(0)->split()->get(1, "")
     if pattern == ""

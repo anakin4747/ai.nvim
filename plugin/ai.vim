@@ -13,6 +13,7 @@ let g:ai_commands = {
     \ 'grep': {'func': function('ai#handle_grep'), 'exit': v:true},
     \ 'log': {'func': function('ai#handle_log'), 'exit': v:true},
     \ 'messages': {'func': function('ai#handle_messages'), 'exit': v:true},
+    \ 'mrproper': {'func': function('ai#handle_mrproper'), 'exit': v:true},
     \}
 
 command!
