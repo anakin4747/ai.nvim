@@ -1100,8 +1100,8 @@ ai_describe(":Ai grep", function()
         local qflist = vim.fn.getqflist()
         assert(#qflist == 2)
 
-        local first_result = vim.fn.bufname(qflist[1].bufnr)
-        local second_result = vim.fn.bufname(qflist[2].bufnr)
+        local first_result = vim.fn.fnamemodify(vim.fn.bufname(qflist[1].bufnr), ":p")
+        local second_result = vim.fn.fnamemodify(vim.fn.bufname(qflist[2].bufnr), ":p")
 
         assert.equal(second_chat, first_result)
         assert.equal(first_chat, second_result)
