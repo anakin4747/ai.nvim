@@ -1,12 +1,6 @@
 
 # TODO
 
-## Highest Priority TODOs
-
-- ACP integration
-- MCP integration
-- skills integration
-
 :Ai chats <chat> selects that chat
 :Ai clean <chat> deletes that chat
 :Ai cleanall deletes all chats
@@ -36,6 +30,12 @@
 g== for running current codeblocks in a :terminal
 :'<,'>g= runs the highlighted codeblocks in a :terminal
 responses respect '&textwidth' outside of codeblocks
+
+## Highest Priority TODOs
+
+- ACP integration
+- MCP integration
+- skills integration
 
 AGENTS.md file gets listed picked up the same way you will do file watching so
 that it can be easily deleted.
