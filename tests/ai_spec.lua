@@ -1171,3 +1171,113 @@ ai_describe(":Ai -- [prompt]", function()
         }, lines)
     end)
 end)
+
+ai_describe(":Ai <model> <param>", function()
+
+    it("prints the value of temperature", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai gpt-4.1 temperature')
+
+        vim.notify = orig
+        assert(#output > 0)
+        assert(string.find(output[1], "temperature", 1, true))
+    end)
+
+    it("prints the value of top_p", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai gpt-4.1 top_p')
+
+        vim.notify = orig
+        assert(#output > 0)
+        assert(string.find(output[1], "top_p", 1, true))
+    end)
+
+    it("prints the value of max_tokens", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai gpt-4.1 max_tokens')
+
+        vim.notify = orig
+        assert(#output > 0)
+        assert(string.find(output[1], "max_tokens", 1, true))
+    end)
+
+    it("prints the value of n", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai gpt-4.1 n')
+
+        vim.notify = orig
+        assert(#output > 0)
+        assert(string.find(output[1], "n", 1, true))
+    end)
+
+    it("errors on invalid param", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 invalid_param')
+        end)
+    end)
+end)
+
+ai_describe(":Ai <model> <param>=<value>", function()
+
+    it("sets temperature", function()
+        vim.cmd('Ai gpt-4.1 temperature=0.5')
+        assert.equal(0.5, vim.fn['ai#get_model_param']('gpt-4.1', 'temperature'))
+    end)
+
+    it("sets top_p", function()
+        vim.cmd('Ai gpt-4.1 top_p=0.9')
+        assert.equal(0.9, vim.fn['ai#get_model_param']('gpt-4.1', 'top_p'))
+    end)
+
+    it("sets max_tokens", function()
+        vim.cmd('Ai gpt-4.1 max_tokens=4096')
+        assert.equal(4096, vim.fn['ai#get_model_param']('gpt-4.1', 'max_tokens'))
+    end)
+
+    it("sets n", function()
+        vim.cmd('Ai gpt-4.1 n=2')
+        assert.equal(2, vim.fn['ai#get_model_param']('gpt-4.1', 'n'))
+    end)
+
+    it("errors on invalid param", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 invalid_param=1')
+        end)
+    end)
+
+    it("errors on invalid value for temperature (out of range)", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 temperature=5')
+        end)
+    end)
+
+    it("errors on invalid value for top_p (out of range)", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 top_p=2')
+        end)
+    end)
+
+    it("errors on invalid value for max_tokens (non-integer)", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 max_tokens=1.5')
+        end)
+    end)
+
+    it("errors on invalid value for n (non-integer)", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 n=1.5')
+        end)
+    end)
+end)
