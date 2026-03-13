@@ -26,6 +26,21 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
             if prompt == ""
                 return
             endi
+
+            " :Ai <model> <param> or :Ai <model> <param>=<value>
+            let second_word = split(prompt)->get(0, "")
+            let eq_idx = stridx(second_word, '=')
+            if eq_idx > 0
+                " Looks like a param assignment — validate the param name
+                let param = second_word[:eq_idx - 1]
+                let val_str = second_word[eq_idx + 1:]
+                call s:set_model_param(model_passed, param, val_str)
+                return
+            elseif !empty(second_word) && index(keys(g:ai_model_param_defaults), second_word) != -1 && split(prompt)->len() == 1
+                let val = ai#get_model_param(model_passed, second_word)
+                execute $"lua vim.notify('{second_word} = {val}')"
+                return
+            endi
         endi
     endi
 
@@ -79,6 +94,73 @@ function! s:cmd_or_abbrev(abbrev)
 
     return ""
 endf
+
+function! ai#get_model_param(model, param) abort
+    let valid_params = keys(g:ai_model_param_defaults)
+    if index(valid_params, a:param) == -1
+        throw $"ai.nvim: invalid model param '{a:param}'. Valid: {join(valid_params, ', ')}"
+    endi
+
+    return get(get(g:ai_model_params, a:model, {}), a:param,
+        \ g:ai_model_param_defaults[a:param])
+endf
+
+function! s:validate_model_param(param, value) abort
+    if a:param ==# 'temperature'
+        if type(a:value) != v:t_float && type(a:value) != v:t_number
+            throw "ai.nvim: temperature must be a number"
+        endi
+        if a:value < 0 || a:value > 2
+            throw "ai.nvim: temperature must be between 0 and 2"
+        endi
+    elseif a:param ==# 'top_p'
+        if type(a:value) != v:t_float && type(a:value) != v:t_number
+            throw "ai.nvim: top_p must be a number"
+        endi
+        if a:value < 0 || a:value > 1
+            throw "ai.nvim: top_p must be between 0 and 1"
+        endi
+    elseif a:param ==# 'max_tokens'
+        if type(a:value) == v:t_float
+            throw "ai.nvim: max_tokens must be an integer"
+        endi
+        if type(a:value) != v:t_number
+            throw "ai.nvim: max_tokens must be an integer"
+        endi
+    elseif a:param ==# 'n'
+        if type(a:value) == v:t_float
+            throw "ai.nvim: n must be an integer"
+        endi
+        if type(a:value) != v:t_number
+            throw "ai.nvim: n must be an integer"
+        endi
+    endi
+endf
+
+function! s:set_model_param(model, param, value_str) abort
+    let valid_params = keys(g:ai_model_param_defaults)
+    if index(valid_params, a:param) == -1
+        throw $"ai.nvim: invalid model param '{a:param}'. Valid: {join(valid_params, ', ')}"
+    endi
+
+    " Parse value: try integer first, then float
+    let value = a:value_str
+    if a:value_str =~ '^\d\+$'
+        let value = str2nr(a:value_str)
+    elseif a:value_str =~ '^\d*\.\d\+$'
+        let value = str2float(a:value_str)
+    else
+        throw $"ai.nvim: invalid value '{a:value_str}' for param '{a:param}'"
+    endi
+
+    call s:validate_model_param(a:param, value)
+
+    if !has_key(g:ai_model_params, a:model)
+        let g:ai_model_params[a:model] = {}
+    endi
+    let g:ai_model_params[a:model][a:param] = value
+endf
+
 
 function! ai#nvim_get_dir() abort
     if !exists("g:i_am_in_a_test")
@@ -164,6 +246,17 @@ function! ai#completion(arglead, cmdline, curpos) abort
                 return chats
             endif
             return []
+        endif
+
+        " Completion for :Ai <model> <Tab> — offer model params
+        if index(providers#get_models(), subcommand) != -1
+            if arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead)
+                let params = keys(g:ai_model_param_defaults)
+                if !empty(a:arglead)
+                    call filter(params, {_, val -> stridx(val, a:arglead) == 0})
+                endif
+                return params
+            endif
         endif
         
         " Block completion for other cases after the first argument

@@ -180,12 +180,12 @@ function! s:build_submit_chat_curl_cmd(messages) abort
         \]
 
     let body = json_encode(#{
-        \   temperature: 0.1,
-        \   n: 1,
+        \   temperature: ai#get_model_param(g:ai_model, 'temperature'),
+        \   n: ai#get_model_param(g:ai_model, 'n'),
         \   messages: messages,
-        \   max_tokens: 16384,
+        \   max_tokens: ai#get_model_param(g:ai_model, 'max_tokens'),
         \   stream: v:true,
-        \   top_p: 1,
+        \   top_p: ai#get_model_param(g:ai_model, 'top_p'),
         \   model: g:ai_model
         \})
 
