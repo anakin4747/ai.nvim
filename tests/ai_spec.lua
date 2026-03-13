@@ -1095,3 +1095,15 @@ ai_describe(":Ai clean", function()
         assert(vim.tbl_contains(completion, chat_name))
     end)
 end)
+
+ai_describe(":Ai mrproper", function()
+
+    it("deletes the ai.nvim dir", function()
+        local dir = vim.g.ai_dir
+        assert(vim.fn.isdirectory(dir) == 1)
+
+        vim.cmd('Ai mrproper')
+
+        assert(vim.fn.isdirectory(dir) == 0)
+    end)
+end)
