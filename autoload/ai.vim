@@ -364,6 +364,13 @@ function! ai#handle_clean(...) abort
     endif
 endf
 
+function! ai#handle_cleanall(...) abort
+    let dir = $"{ai#nvim_get_dir()}/chats/"
+    for fname in glob(dir . "*.md", v:false, v:true)
+        call delete(fname)
+    endfo
+endf
+
 function! ai#handle_grep(...) abort
     let pattern = a:000->get(0)->split()->get(1, "")
     if pattern == ""
