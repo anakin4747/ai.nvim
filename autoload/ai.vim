@@ -212,11 +212,9 @@ function! ai#build_curl_cmd(url, method, headers, body = "") abort
 endf
 
 function! ai#log(msg, data, datatype = "") abort
-    let loggin = v:true
-
     let data = a:data
 
-    if !loggin
+    if !get(g:, 'ai_logging', v:true)
         return
     endi
 
@@ -393,7 +391,16 @@ function! ai#handle_grep(...) abort
 endf
 
 function! ai#handle_log(...) abort
+    let sub = a:000->get(0)->split()->get(1, "")
+    if sub ==# 'enable'
+        let g:ai_logging = v:true
+        return
+    elseif sub ==# 'disable'
+        let g:ai_logging = v:false
+        return
+    endi
     execute $"edit {ai#nvim_get_dir()}/log.md"
+    normal! G
 endf
 
 function! ai#handle_messages(...) abort
