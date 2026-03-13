@@ -841,6 +841,16 @@ ai_describe(":Ai log", function()
         local actual = vim.api.nvim_win_get_cursor(0)[1]
         assert.are.same(expected, actual)
     end)
+
+    it("enable enables logging", function()
+        vim.cmd('Ai log enable')
+        assert.is_true(vim.g.ai_logging == true)
+    end)
+
+    it("disable disables logging", function()
+        vim.cmd('Ai log disable')
+        assert.is_true(vim.g.ai_logging == false)
+    end)
 end)
 
 ai_describe(":Ai l", function()
