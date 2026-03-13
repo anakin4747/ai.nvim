@@ -1011,6 +1011,32 @@ ai_describe(":Ai chats", function()
             assert(vim.fn.match(fname, pattern))
         end
     end)
+
+    it("<chat> opens that chat", function()
+        vim.cmd('Ai! dummy')
+        local expected = vim.api.nvim_buf_get_name(0)
+        local chat_name = vim.fn.fnamemodify(expected, ":t")
+
+        vim.cmd('enew')
+        assert.not_equal(expected, vim.api.nvim_buf_get_name(0))
+
+        vim.cmd('Ai chats ' .. chat_name)
+
+        local actual = vim.api.nvim_buf_get_name(0)
+        assert.equal(expected, actual)
+    end)
+end)
+
+ai_describe(":Ai chats <Tab>", function()
+    it("completes with chat filenames", function()
+        vim.cmd('Ai! dummy')
+        local expected = vim.api.nvim_buf_get_name(0)
+        local chat_name = vim.fn.fnamemodify(expected, ":t")
+
+        local completion = vim.fn['ai#completion']("", "Ai chats ", "")
+
+        assert(vim.tbl_contains(completion, chat_name))
+    end)
 end)
 
 ai_describe(":Ai grep", function()
