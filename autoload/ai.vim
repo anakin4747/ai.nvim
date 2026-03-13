@@ -5,22 +5,27 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
     let prompt = a:prompt
     let first_word = prompt->split()->get(0, "")
 
-    let cmd = s:cmd_or_abbrev(first_word)
-    if cmd != ""
-        call call(g:ai_commands[cmd]['func'], [prompt])
-        if g:ai_commands[cmd]->get('exit', v:false)
-            return
-        endi
-    endi
-
-    let model_passed = s:check_prompt_for_model(prompt)
-    if model_passed != ""
-        let g:ai_model = model_passed
-        " remove first word from prompt
+    " :Ai -- <prompt> treats the rest as a literal prompt
+    if first_word ==# '--'
         let prompt = join(split(prompt)[1:])
+    else
+        let cmd = s:cmd_or_abbrev(first_word)
+        if cmd != ""
+            call call(g:ai_commands[cmd]['func'], [prompt])
+            if g:ai_commands[cmd]->get('exit', v:false)
+                return
+            endi
+        endi
 
-        if prompt == ""
-            return
+        let model_passed = s:check_prompt_for_model(prompt)
+        if model_passed != ""
+            let g:ai_model = model_passed
+            " remove first word from prompt
+            let prompt = join(split(prompt)[1:])
+
+            if prompt == ""
+                return
+            endi
         endi
     endi
 
