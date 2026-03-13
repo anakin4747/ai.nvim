@@ -38,6 +38,12 @@ g== for running current codeblocks in a :terminal
 :'<,'>g= runs the highlighted codeblocks in a :terminal
 responses respect '&textwidth' outside of codeblocks
 
+AGENTS.md file gets listed picked up the same way you will do file watching so
+that it can be easily deleted.
+
+The lines for agents.md and watchers gets expanded immediately on send. Don't
+worrying about removing all previous versions
+
 - Soon you will need to investigate how to dynamically generate tests to
   account for every combination of every feature
   ```
@@ -241,4 +247,34 @@ structure
 Once the chat responds the chat should be written to
 
 ---
+
+Add permissions for your codebase via things like
+
+```
+read-only: TODO.md CHANGELOG.md
+```
+
+---
+
+nameing of chats via name: but its really a symlink to the chat. so you could
+also provide as many names for a chat as you want.
+
+```chat
+
+# ME
+
+name: whatever man
+
+...
+...
+...
+
+# ME
+
+name: another name
+
+```
+
+And now on each chat submission a symlink gets created for each of those names
+and now the tab completion should find the symlinks too
 
