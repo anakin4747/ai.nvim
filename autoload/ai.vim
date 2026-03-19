@@ -2,46 +2,9 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
     let ai_dir = ai#nvim_get_dir()
 
-    let prompt = a:prompt
-    let first_word = prompt->split()->get(0, "")
-
-    " :Ai -- <prompt> treats the rest as a literal prompt
-    if first_word ==# '--'
-        let prompt = join(split(prompt)[1:])
-    else
-        let cmd = s:cmd_or_abbrev(first_word)
-        if cmd != ""
-            call call(g:ai_commands[cmd]['func'], [prompt])
-            if g:ai_commands[cmd]->get('exit', v:false)
-                return
-            endi
-        endi
-
-        let model_passed = s:check_prompt_for_model(prompt)
-        if model_passed != ""
-            let g:ai_model = model_passed
-            " remove first word from prompt
-            let prompt = join(split(prompt)[1:])
-
-            if prompt == ""
-                return
-            endi
-
-            " :Ai <model> <param> or :Ai <model> <param>=<value>
-            let second_word = split(prompt)->get(0, "")
-            let eq_idx = stridx(second_word, '=')
-            if eq_idx > 0
-                " Looks like a param assignment — validate the param name
-                let param = second_word[:eq_idx - 1]
-                let val_str = second_word[eq_idx + 1:]
-                call s:set_model_param(model_passed, param, val_str)
-                return
-            elseif !empty(second_word) && index(keys(g:ai_model_param_defaults), second_word) != -1 && split(prompt)->len() == 1
-                let val = ai#get_model_param(model_passed, second_word)
-                execute $"lua vim.notify('{second_word} = {val}')"
-                return
-            endi
-        endi
+    let [done, prompt] = s:resolve_prompt(a:prompt)
+    if done
+        return
     endi
 
     let chats_dir = $"{ai_dir}/chats"
@@ -79,6 +42,73 @@ function! ai#main(bang, range, line1, line2, mods = "", prompt = "") abort
 
     silent! write
 
+endf
+
+" Returns [done, prompt] where done=1 means caller should return early.
+function! s:resolve_prompt(prompt) abort
+    let prompt = a:prompt
+    let first_word = prompt->split()->get(0, "")
+
+    " :Ai -- <prompt> treats the rest as a literal prompt
+    if first_word ==# '--'
+        return [0, join(split(prompt)[1:])]
+    endi
+
+    let [done, prompt] = s:dispatch_command(first_word, prompt)
+    if done
+        return [1, ""]
+    endi
+
+    return s:apply_model_selection(prompt)
+endf
+
+" Dispatch to a registered command if first_word matches. Returns [done, prompt].
+function! s:dispatch_command(first_word, prompt) abort
+    let cmd = s:cmd_or_abbrev(a:first_word)
+    if cmd == ""
+        return [0, a:prompt]
+    endi
+
+    call call(g:ai_commands[cmd]['func'], [a:prompt])
+    if g:ai_commands[cmd]->get('exit', v:false)
+        return [1, ""]
+    endi
+
+    return [0, a:prompt]
+endf
+
+" Handle model selection and optional param get/set. Returns [done, prompt].
+function! s:apply_model_selection(prompt) abort
+    let model_passed = s:check_prompt_for_model(a:prompt)
+    if model_passed == ""
+        return [0, a:prompt]
+    endi
+
+    let g:ai_model = model_passed
+    let prompt = join(split(a:prompt)[1:])
+
+    if prompt == ""
+        return [1, ""]
+    endi
+
+    " :Ai <model> <param> or :Ai <model> <param>=<value>
+    let second_word = split(prompt)->get(0, "")
+    let eq_idx = stridx(second_word, '=')
+
+    if eq_idx > 0
+        let param = second_word[:eq_idx - 1]
+        let val_str = second_word[eq_idx + 1:]
+        call s:set_model_param(model_passed, param, val_str)
+        return [1, ""]
+    endi
+
+    if !empty(second_word) && index(keys(g:ai_model_param_defaults), second_word) != -1 && split(prompt)->len() == 1
+        let val = ai#get_model_param(model_passed, second_word)
+        execute $"lua vim.notify('{second_word} = {val}')"
+        return [1, ""]
+    endi
+
+    return [0, prompt]
 endf
 
 function! s:cmd_or_abbrev(abbrev)
