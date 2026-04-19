@@ -267,6 +267,18 @@ function! ai#completion(arglead, cmdline, curpos) abort
 
     let subcommand = args[1]
 
+    " Completion for :Ai log <Tab>
+    if subcommand ==# 'log'
+        if arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead)
+            let options = ['enable', 'disable']
+            if !empty(a:arglead)
+                call filter(options, {_, val -> stridx(val, a:arglead) == 0})
+            endif
+            return options
+        endi
+        return []
+    endi
+
     " Completion for :Ai chats <Tab> and :Ai clean <Tab>
     if subcommand ==# 'chats' || subcommand ==# 'clean'
         if arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead)
@@ -280,6 +292,8 @@ function! ai#completion(arglead, cmdline, curpos) abort
             endif
             return chats
         endi
+        return []
+    endi
         return []
     endi
 

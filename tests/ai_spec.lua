@@ -898,6 +898,21 @@ ai_describe(":Ai log", function()
     end)
 end)
 
+ai_describe(":Ai log <Tab>", function()
+
+    it("completes with enable and disable", function()
+        local completion = vim.fn['ai#completion']("", "Ai log ", "")
+        assert(vim.tbl_contains(completion, "enable"))
+        assert(vim.tbl_contains(completion, "disable"))
+    end)
+
+    it("completes en<Tab> with enable", function()
+        local completion = vim.fn['ai#completion']("en", "Ai log en", "")
+        assert(vim.tbl_contains(completion, "enable"))
+        assert(not vim.tbl_contains(completion, "disable"))
+    end)
+end)
+
 ai_describe(":Ai l", function()
 
     it("opens the log.md", function()
