@@ -261,40 +261,44 @@ function! ai#completion(arglead, cmdline, curpos) abort
     let args = a:cmdline->split()
     let arg_count = len(args)
 
-    " Subcommand completion
-    if arg_count >= 2
-        let subcommand = args[1]
-        
-        " Completion for :Ai chats <Tab> and :Ai clean <Tab>
-        if (subcommand ==# 'chats' || subcommand ==# 'clean') && (arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead))
+    if arg_count < 2
+        return s:first_arg_completions(a:arglead)
+    endi
+
+    let subcommand = args[1]
+
+    " Completion for :Ai chats <Tab> and :Ai clean <Tab>
+    if subcommand ==# 'chats' || subcommand ==# 'clean'
+        if arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead)
             let dir = $"{ai#nvim_get_dir()}/chats/"
-            if isdirectory(dir)
-                let chats = systemlist($"ls -1t {dir}")
-                if !empty(a:arglead)
-                    call filter(chats, {_, val -> stridx(val, a:arglead) == 0})
-                endif
-                return chats
+            if !isdirectory(dir)
+                return []
+            endi
+            let chats = systemlist($"ls -1t {dir}")
+            if !empty(a:arglead)
+                call filter(chats, {_, val -> stridx(val, a:arglead) == 0})
             endif
-            return []
-        endif
+            return chats
+        endi
+        return []
+    endi
 
-        " Completion for :Ai <model> <Tab> — offer model params
-        if index(providers#get_models(), subcommand) != -1
-            if arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead)
-                let params = keys(g:ai_model_param_defaults)
-                if !empty(a:arglead)
-                    call filter(params, {_, val -> stridx(val, a:arglead) == 0})
-                endif
-                return params
+    " Completion for :Ai <model> <Tab> — offer model params
+    if index(providers#get_models(), subcommand) != -1
+        if arg_count == 2 && empty(a:arglead) || arg_count == 3 && !empty(a:arglead)
+            let params = keys(g:ai_model_param_defaults)
+            if !empty(a:arglead)
+                call filter(params, {_, val -> stridx(val, a:arglead) == 0})
             endif
-        endif
-        
-        " Block completion for other cases after the first argument
-        if arg_count > 2 || (arg_count == 2 && empty(a:arglead))
-            return []
-        endif
-    endif
+            return params
+        endi
+        return []
+    endi
 
+    return []
+endf
+
+function! s:first_arg_completions(arglead) abort
     let possible_completions = []
     let possible_completions += keys(g:ai_commands)
     let possible_completions += providers#get_models()
