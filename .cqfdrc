@@ -6,6 +6,7 @@ name='ai_nvim'
 command=""
 docker_run_args=" \
     -v $HOME/.config/github-copilot/apps.json:$HOME/.config/github-copilot/apps.json \
+    -v $(git rev-parse --git-dir):$(git rev-parse --git-dir) \
 "
 
 # vi: ft=ini
