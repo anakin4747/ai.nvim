@@ -7,6 +7,7 @@ RUN pacman -Syu --noconfirm \
     jq \
     make \
     neovim \
+    sudo \
     which
 
 COPY plenary-patches /plenary-patches
