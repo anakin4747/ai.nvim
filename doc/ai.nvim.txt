@@ -21,6 +21,13 @@ Ai							*:Ai*
 			When [prompt] is provided it passed the prompt to the
 			chat as is.
 
+							*:Ai_bug*
+:Ai bug
+			Creates a GitHub issue with the contents of the
+			ai.nvim log file. Requires the `gh` CLI tool to be
+			installed and authenticated. Use |:Ai_log| to enable
+			logging before reproducing the bug.
+
 							*:Ai_messages*
 :Ai m[essages]
 			Sends *:messages* output to the chat. Very usefull for

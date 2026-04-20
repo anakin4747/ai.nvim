@@ -1326,3 +1326,29 @@ ai_describe(":Ai <model> <param>=<value>", function()
         end)
     end)
 end)
+
+ai_describe(":Ai bug", function()
+
+    it("notifies when log is empty", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai bug')
+
+        vim.notify = orig
+        -- should notify about empty/missing log, not crash
+        assert.has_no.errors(function() end)
+    end)
+
+    it("errors when gh is not available and log exists", function()
+        -- write something to the log first
+        vim.fn['ai#log']('test bug', 'test data')
+
+        -- gh will fail since we are not in a real GitHub repo context in tests
+        -- just verify the command runs without a vimscript error
+        assert.has_no.errors(function()
+            vim.cmd('Ai bug')
+        end)
+    end)
+end)

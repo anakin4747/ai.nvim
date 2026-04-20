@@ -17,6 +17,7 @@ let s:ai_model_param_defaults = {
 let g:ai_model_param_defaults = s:ai_model_param_defaults
 
 let g:ai_commands = {
+    \ 'bug': {'func': function('ai#handle_bug'), 'exit': v:true},
     \ 'chats': {'func': function('ai#handle_chats'), 'exit': v:true},
     \ 'clean': {'func': function('ai#handle_clean'), 'exit': v:true},
     \ 'cleanall': {'func': function('ai#handle_cleanall'), 'exit': v:true},

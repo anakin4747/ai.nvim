@@ -529,6 +529,44 @@ function! ai#handle_log(...) abort
     normal! G
 endf
 
+function! ai#handle_bug(...) abort
+    let log_path = $"{ai#nvim_get_dir()}/log.md"
+
+    if !filereadable(log_path)
+        echohl ErrorMsg
+        echomsg 'ai.nvim: no log file found, enable logging with :Ai log enable'
+        echohl None
+        return
+    endi
+
+    let log_contents = readfile(log_path)->join("\n")
+
+    if log_contents == ''
+        echohl ErrorMsg
+        echomsg 'ai.nvim: log is empty'
+        echohl None
+        return
+    endi
+
+    let body = $"## Bug Report\n\n### Log\n\n```\n{log_contents}\n```"
+    let cmd = ['gh', 'issue', 'create',
+        \ '--repo', 'anakin4747/ai.nvim',
+        \ '--title', 'Bug report from :Ai bug',
+        \ '--body', body,
+        \]
+
+    let result = system(join(cmd->map({_, v -> shellescape(v)})))
+    if v:shell_error != 0
+        echohl ErrorMsg
+        echomsg $'ai.nvim: gh issue create failed: {result}'
+        echohl None
+        return
+    endi
+
+    let url = result->trim()
+    execute $"lua vim.notify('Bug report created: {url}')"
+endf
+
 function! ai#handle_messages(...) abort
     redir => msg
     silent! messages
