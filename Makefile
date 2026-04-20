@@ -2,8 +2,9 @@
 .PHONY: cqfd
 cqfd:
 	@git submodule update --init > /dev/null
-	@./scripts/cqfd/cqfd init > /dev/null
-	@./scripts/cqfd/cqfd run make tests
+	@mkdir -p /var/lib/openclaw/cqfd-tmp
+	@TMPDIR=/var/lib/openclaw/cqfd-tmp USER=openclaw ./scripts/cqfd/cqfd init > /dev/null
+	@TMPDIR=/var/lib/openclaw/cqfd-tmp USER=openclaw ./scripts/cqfd/cqfd run make test
 
 .PHONY: test tests
 test tests:
