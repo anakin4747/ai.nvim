@@ -1,0 +1,42 @@
+*ai.nvim*
+
+    A lightweight Neovim AI chat plugin.
+    Written using entirely with Vimscript and TDD.
+
+==============================================================================
+COMMANDS
+
+Ai							*:Ai*
+
+:[range]Ai[!] [model] [prompt]
+			Opens last ai.nvim chat.
+			When [range] is passed the selected text is appended
+			to the last ai.nvim chat wrapped in markdown
+			codeblocks set based on 'filetype'.
+			When [!] is added a new chat is created.
+			When [model] is provided it selects the model to use
+			for the chat.
+			Note: setting the chat [model] currently does not
+			persist a Neovim session.
+			When [prompt] is provided it passed the prompt to the
+			chat as is.
+
+							*:Ai_messages*
+:Ai m[essages]
+			Sends *:messages* output to the chat. Very usefull for
+			troubleshooting Neovim error messages.
+
+							*:Ai_chats*
+:Ai c[hats]
+			Opens a quickfix list of all ai.nvim chats.
+
+							*:Ai_grep*
+:Ai g[rep] {pattern}
+			Opens a quickfix list of all matches of {pattern}
+			in ai.nvim chats using *:vimgrep*.
+
+							*:Ai_log*
+:Ai l[og]
+			Opens ai.nvim logs.
+
+vim:tw=78:ts=8:noet:ft=help:norl:

@@ -1,0 +1,1328 @@
+require("plenary.busted")
+
+local this_repo = vim.fn.expand('<sfile>:p:h')
+local default_mock_dir = this_repo .. "/tests/fixtures/ai.nvim"
+
+local function fixture_dir(test_name)
+    return this_repo .. "/tests/fixtures/" .. test_name .. "/ai.nvim"
+end
+
+local function readjsonfile(path)
+    local stat = vim.uv.fs_stat(path)
+    local fd = vim.uv.fs_open(path, "r", tonumber('444', 8))
+    local data = vim.uv.fs_read(fd, stat.size):gsub("%z", "")
+    vim.uv.fs_close(fd)
+    return data
+end
+
+local jsonschema = require('tests.jsonschema')
+
+local is_valid_token_json = jsonschema.generate_validator({
+    type = "object",
+    properties = {
+        agent_mode_auto_approval = { type = "boolean" },
+        annotations_enabled = { type = "boolean" },
+        azure_only = { type = "boolean" },
+        blackbird_clientside_indexing = { type = "boolean" },
+        chat_enabled = { type = "boolean" },
+        chat_jetbrains_enabled = { type = "boolean" },
+        code_quote_enabled = { type = "boolean" },
+        code_review_enabled = { type = "boolean" },
+        codesearch = { type = "boolean" },
+        copilotignore_enabled = { type = "boolean" },
+        endpoints = {
+            type = "object",
+            properties = {
+                api = { type = "string" },
+                ["origin-tracker"] = { type = "string" },
+                proxy = { type = "string" },
+                telemetry = { type = "string" }
+            },
+            required = { "api", "origin-tracker", "proxy", "telemetry" }
+        },
+        expires_at = { type = "number" },
+        individual = { type = "boolean" },
+        organization_list = {
+            type = "array",
+            items = { type = "string" }
+        },
+        prompt_8k = { type = "boolean" },
+        public_suggestions = { type = "string" },
+        refresh_in = { type = "number" },
+        sku = { type = "string" },
+        snippy_load_test_enabled = { type = "boolean" },
+        telemetry = { type = "string" },
+        token = { type = "string" },
+        tracking_id = { type = "string" },
+        vsc_electron_fetcher_v2 = { type = "boolean" },
+        xcode = { type = "boolean" },
+        xcode_chat = { type = "boolean" }
+    },
+    required = {
+        "agent_mode_auto_approval", "annotations_enabled", "azure_only", "blackbird_clientside_indexing", "chat_enabled",
+        "chat_jetbrains_enabled", "code_quote_enabled", "code_review_enabled", "codesearch", "copilotignore_enabled",
+        "endpoints", "expires_at", "individual", "organization_list", "prompt_8k", "public_suggestions", "refresh_in",
+        "sku", "snippy_load_test_enabled", "telemetry", "token", "tracking_id", "vsc_electron_fetcher_v2", "xcode",
+        "xcode_chat"
+    }
+})
+
+local is_valid_models_json = jsonschema.generate_validator({
+    type = "object",
+    properties = {
+        data = {
+            type = "array",
+            items = {
+                type = "object",
+                properties = {
+                    id = { type = "string" },
+                    capabilities = {
+                        type = "object",
+                        properties = {
+                            supports = {
+                                type = "object",
+                                additionalProperties = {
+                                    anyOf = {
+                                        { type = "boolean" },
+                                        { type = "number" }
+                                    }
+                                }
+                            },
+                            limits = {
+                                type = "object",
+                                properties = {
+                                    vision = {
+                                        type = "object",
+                                        properties = {
+                                            supported_media_types = {
+                                                type = "array",
+                                                items = { type = "string" }
+                                            },
+                                            max_prompt_image_size = { type = "number" },
+                                            max_prompt_images = { type = "number" }
+                                        },
+                                        required = { "supported_media_types", "max_prompt_image_size", "max_prompt_images" }
+                                    },
+                                    max_prompt_tokens = { type = "number" },
+                                    max_context_window_tokens = { type = "number" },
+                                    max_output_tokens = { type = "number" },
+                                    max_inputs = { type = "number" }
+                                },
+                                additionalProperties = true
+                            },
+                            type = { type = "string" },
+                            tokenizer = { type = "string" },
+                            family = { type = "string" },
+                            object = { type = "string" }
+                        },
+                        required = { "supports", "type", "tokenizer", "family", "object" }
+                    },
+                    model_picker_enabled = { type = "boolean" },
+                    name = { type = "string" },
+                    policy = {
+                        type = "object",
+                        properties = {
+                            state = { type = "string" },
+                            terms = { type = "string" }
+                        },
+                        required = { "state", "terms" }
+                    },
+                    vendor = { type = "string" },
+                    object = { type = "string" },
+                    version = { type = "string" },
+                    preview = { type = "boolean" },
+                    model_picker_category = { type = "string" },
+                    supported_endpoints = {
+                        type = "array",
+                        items = { type = "string" }
+                    }
+                },
+                required = { "id", "capabilities", "model_picker_enabled", "name", "vendor", "object", "version", "preview" }
+            }
+        },
+        object = { type = "string" }
+    },
+    required = { "data", "object" }
+})
+
+vim.g.ai_dir = default_mock_dir
+
+vim.g.ai_localtime = 1763098419
+vim.g.ai_test_endpoints = nil
+
+local function teardown()
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+        vim.api.nvim_buf_delete(bufnr, { force = true })
+    end
+    vim.cmd("silent! only")
+
+    vim.g.i_am_in_a_test = true
+
+    vim.system({ "git", "clean", "-fq", vim.g.ai_dir, default_mock_dir }):wait()
+    vim.system({ "git", "restore", vim.g.ai_dir, default_mock_dir }):wait()
+    vim.g.ai_dir = default_mock_dir
+
+    vim.g.ai_test_endpoints = nil
+    vim.g.ai_test_endpoint_sequences = nil
+    vim.g.ai_responses = {}
+
+    vim.g.ai_model = 'gpt-4.1'
+    vim.g.ai_model_params = vim.empty_dict()
+
+    vim.fn['ai#wait_for_jobs']()
+end
+
+local function ai_describe(name, fn)
+    describe(name, function()
+        after_each(teardown)
+        fn()
+    end)
+end
+
+ai_describe(":Ai", function()
+
+    it("does not error", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai')
+        end)
+    end)
+
+    it("reuses the last chat name", function()
+        vim.cmd('Ai')
+        local expected = vim.api.nvim_buf_get_name(0)
+
+        vim.cmd('Ai')
+        local actual = vim.api.nvim_buf_get_name(0)
+
+        assert.equal(expected, actual)
+    end)
+
+    it("reuses the last chat window", function()
+        vim.cmd("Ai")
+        local expected = vim.api.nvim_get_current_win()
+
+        vim.cmd("Ai")
+        local actual = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected, actual)
+    end)
+
+    it("puts the cursor at the bottom of the chat", function()
+        vim.cmd("Ai")
+
+        local expected = vim.api.nvim_buf_line_count(0)
+        local actual = vim.api.nvim_win_get_cursor(0)[1]
+        assert.are.same(expected, actual)
+    end)
+
+    it("gets a new token if /chat/completions complains about expired token", function()
+
+        vim.g.ai_test_endpoints = {
+            ['/chat/completions'] = 'expired.json'
+        }
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        local old_token_json = readjsonfile(token_path)
+
+        vim.cmd('Ai gpt-4.1 wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_token_json = readjsonfile(token_path)
+        assert.are.not_same(old_token_json, new_token_json)
+        assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
+    end)
+
+    it("retries chat submission after fetching a new token if /chat/completions complains about expired token", function()
+
+        -- First call to /chat/completions returns expired, second returns good.
+        -- This requires the mock to support sequential responses per endpoint.
+        vim.g.ai_test_endpoint_sequences = {
+            ['/chat/completions'] = { 'expired.json', 'good.json' }
+        }
+
+        vim.cmd('Ai write me a hello world in rust')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        -- The full response should be present, proving the retry succeeded
+        assert.are.same({
+            '# ME',
+            '',
+            'write me a hello world in rust',
+            '',
+            '# AI.NVIM gpt-4.1',
+            '',
+            'Certainly! Here is a simple "Hello, world!" program in Rust:',
+            '',
+            '```rust',
+            'fn main() {',
+            '    println!("Hello, world!");',
+            '}',
+            '```',
+            '',
+            'To run this:',
+            '',
+            '1. Save it as `main.rs`.',
+            '2. Compile it with `rustc main.rs`.',
+            '3. Run the output with `./main` (on Linux/macOS) or `main.exe` (on Windows).',
+            '',
+            'Let me know if you need more help!',
+            '',
+            '# ME',
+            ''
+        }, lines)
+    end)
+
+    it("supports streaming", function()
+
+        vim.g.ai_test_endpoints = {
+            ['/chat/completions'] = {
+                'fragment1.json',
+                'fragment2.json',
+                'fragment3.json',
+                'fragment4.json',
+                'fragment5.json',
+            }
+        }
+
+        vim.cmd('Ai! write me fibanoci in rust')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            '# ME',
+            '',
+            'write me fibanoci in rust',
+            '',
+            '# AI.NVIM gpt-4.1',
+            '',
+            '```rust',
+            'fn fibonacci(n: u32) -> u32 {',
+            '    match n {',
+            '        0 => 0,',
+            '        1 => 1,',
+            '        _ => fibonacci(n - 1) + fibonacci(n - 2),',
+            '    }',
+            '}',
+            '',
+            'fn main() {',
+            '    for i in 0..10 {',
+            '        println!("{}", fibonacci(i));',
+            '    }',
+            '}',
+            '```',
+            '',
+            '# ME',
+            '',
+        }, actual)
+    end)
+
+    it("only writes responses to the last chat on submission", function()
+
+        vim.cmd('Ai! write me a hello world in rust')
+        vim.cmd.enew()
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        assert.are.same({''}, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+
+        vim.cmd('Ai')
+
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            '# ME',
+            '',
+            'write me a hello world in rust',
+            '',
+            '# AI.NVIM gpt-4.1',
+            '',
+            'Certainly! Here is a simple "Hello, world!" program in Rust:',
+            '',
+            '```rust',
+            'fn main() {',
+            '    println!("Hello, world!");',
+            '}',
+            '```',
+            '',
+            'To run this:',
+            '',
+            '1. Save it as `main.rs`.',
+            '2. Compile it with `rustc main.rs`.',
+            '3. Run the output with `./main` (on Linux/macOS) or `main.exe` (on Windows).',
+            '',
+            'Let me know if you need more help!',
+            '',
+            '# ME',
+            ''
+        }, actual)
+    end)
+end)
+
+ai_describe(":Ai!", function()
+
+    it("does not error", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai!')
+        end)
+    end)
+
+    it("creates a new empty chat", function()
+        vim.cmd('Ai')
+        local old_name = vim.api.nvim_buf_get_name(0)
+
+        vim.wait(1000)
+
+        vim.cmd('Ai!')
+        local new_name = vim.api.nvim_buf_get_name(0)
+
+        assert.not_equal(old_name, new_name)
+
+        local expected = { '# ME', '' }
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same(expected, actual)
+    end)
+
+    it("reuses the last chat window", function()
+        vim.cmd("Ai")
+        local expected = vim.api.nvim_get_current_win()
+
+        vim.cmd("Ai!")
+        local actual = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected, actual)
+    end)
+
+    it("puts the cursor at the bottom of the chat", function()
+        vim.cmd("Ai!")
+
+        local expected = vim.api.nvim_buf_line_count(0)
+        local actual = vim.api.nvim_win_get_cursor(0)[1]
+        assert.are.same(expected, actual)
+    end)
+end)
+
+ai_describe(":Ai[!] [prompt]", function()
+
+    it("accepts a prompt as an argument", function()
+        assert.has_no.errors(function()
+            vim.cmd('Ai make me toast')
+        end)
+        assert.has_no.errors(function()
+            vim.cmd('Ai! make me toast')
+        end)
+    end)
+
+    it("passes [prompt] to the buffer", function()
+        vim.cmd('Ai make me toast')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "make me toast"))
+
+        vim.cmd('Ai! make me toast')
+
+        lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "make me toast"))
+    end)
+
+    it("gets cached token if token is not expired on submit", function()
+        vim.g.ai_dir = fixture_dir("non-expired-remote-token")
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        local old_token_json = readjsonfile(token_path)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_token_json = readjsonfile(token_path)
+        assert.are.same(old_token_json, new_token_json)
+    end)
+
+    it("gets a new token if token is expired on submit", function()
+        vim.g.ai_dir = fixture_dir("expired-remote-token")
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        local old_token_json = readjsonfile(token_path)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_token_json = readjsonfile(token_path)
+        assert.are.not_same(old_token_json, new_token_json)
+        assert(is_valid_token_json(vim.fn.json_decode(new_token_json)))
+    end)
+
+    it("gets a new token if no token exists on submit", function()
+        vim.g.ai_dir = fixture_dir("no-token")
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+
+        assert(vim.fn.filereadable(token_path) == 0)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        assert(vim.fn.filereadable(token_path) == 1)
+
+        local new_token_json = readjsonfile(token_path)
+
+        local token
+        assert.has_no.errors(function()
+            token = vim.json.decode(new_token_json)
+        end)
+        assert(is_valid_token_json(token))
+    end)
+
+    it("gets a new token if token is malformed on submit", function()
+        vim.g.ai_dir = fixture_dir("bad-token")
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_token_json = readjsonfile(token_path)
+
+        local json
+
+        assert.has_no.errors(function()
+            json = vim.json.decode(new_token_json)
+        end)
+
+        assert(is_valid_token_json(json))
+
+        assert.is_not_nil(json.expires_at)
+    end)
+
+    it("gets new models if token is expired on submit", function()
+        vim.g.ai_dir = fixture_dir("expired-remote-token-get-models")
+
+        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
+        local old_models_mtime = vim.uv.fs_stat(models_path).mtime
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_models_mtime = vim.uv.fs_stat(models_path).mtime
+        assert.are.not_same(old_models_mtime, new_models_mtime)
+    end)
+
+    it("gets new models if no token exists on submit", function()
+        vim.g.ai_dir = fixture_dir("no-token-get-models")
+
+        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
+        local old_models_mtime = vim.uv.fs_stat(models_path).mtime
+
+        local token_path = vim.g.ai_dir .. "/providers/copilot/token.json"
+        assert(vim.fn.filereadable(token_path) == 0)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local new_models_mtime = vim.uv.fs_stat(models_path).mtime
+        assert.are.not_same(old_models_mtime, new_models_mtime)
+    end)
+
+    it("gets new models if no models exist on submit", function()
+        vim.g.ai_dir = fixture_dir("no-models")
+
+        -- ensure models.json does not exist
+        local models_path = vim.g.ai_dir .. "/providers/copilot/models.json"
+        assert(vim.fn.filereadable(models_path) == 0)
+
+        vim.cmd('Ai wow')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        assert(vim.fn.filereadable(models_path) == 1)
+
+        local new_models_json = readjsonfile(models_path)
+
+        local models
+        assert.has_no.errors(function()
+            models = vim.json.decode(new_models_json)
+        end)
+
+        assert(is_valid_models_json(models))
+    end)
+
+    it("populates the chat with a response", function()
+
+        vim.cmd('Ai write me a hello world in rust')
+        vim.fn['providers#submit_chat']()
+        vim.fn['ai#wait_for_jobs']()
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            '# ME',
+            '',
+            'write me a hello world in rust',
+            '',
+            '# AI.NVIM gpt-4.1',
+            '',
+            'Certainly! Here is a simple "Hello, world!" program in Rust:',
+            '',
+            '```rust',
+            'fn main() {',
+            '    println!("Hello, world!");',
+            '}',
+            '```',
+            '',
+            'To run this:',
+            '',
+            '1. Save it as `main.rs`.',
+            '2. Compile it with `rustc main.rs`.',
+            '3. Run the output with `./main` (on Linux/macOS) or `main.exe` (on Windows).',
+            '',
+            'Let me know if you need more help!',
+            '',
+            '# ME',
+            ''
+        }, lines)
+    end)
+
+    -- TODO: move to more accurate describe block
+    it("creates ai.nvim dir itself", function()
+        vim.g.ai_dir = fixture_dir("no-dir")
+
+        assert(vim.fn.isdirectory(vim.g.ai_dir) == 0)
+
+        vim.cmd([[
+            call providers#copilot#enqueue_token_fetch()
+            call ai#run_job_queue()
+            call ai#wait_for_jobs()
+        ]])
+
+        assert(vim.fn.isdirectory(vim.g.ai_dir) == 1)
+    end)
+end)
+
+ai_describe(":Ai <Tab>", function()
+
+    it("completes the first argument with models", function()
+        local completion = vim.fn['ai#completion']("", "Ai ", "")
+
+        assert(vim.tbl_contains(completion, "gemini-2.5-pro"))
+    end)
+end)
+
+ai_describe(":Ai g<Tab>", function()
+
+    it("completes with models that start with g", function()
+        local expected = {
+            'grep',
+            'gemini-2.5-pro',
+            'gpt-4.1',
+            'gpt-4o',
+            'gpt-5',
+            'gpt-5-codex',
+            'gpt-5-mini',
+        }
+
+        local actual = vim.fn['ai#completion']("g", "Ai g", "")
+
+        assert.are.same(expected, actual)
+    end)
+end)
+
+ai_describe(":Ai [model]", function()
+
+    it("sets the model to [model]", function()
+
+        vim.cmd('Ai claude-haiku-4.5')
+
+        assert(vim.g.ai_model, "claude-haiku-4.5")
+    end)
+
+    it("does not go to a chat", function()
+        local expected_buf = vim.api.nvim_get_current_buf()
+        local expected_win = vim.api.nvim_get_current_win()
+        vim.cmd('Ai claude-haiku-4.5')
+        local actual_buf = vim.api.nvim_get_current_buf()
+        local actual_win = vim.api.nvim_get_current_win()
+
+        assert.are.same(expected_buf, actual_buf)
+        assert.are.same(expected_win, actual_win)
+    end)
+
+    ai_describe("[prompt]", function()
+        it("does not pass [model] to the chat", function()
+
+            vim.cmd('Ai claude-haiku-4.5 sample chat')
+
+            local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+            assert.are.same({
+                "# ME",
+                "",
+                "sample chat"
+            }, lines)
+        end)
+    end)
+
+    it("<Tab> does not complete after first argument", function()
+        local completion = vim.fn['ai#completion']("", "Ai dummy ", "")
+
+        assert.same({}, completion)
+    end)
+end)
+
+ai_describe(":[range]Ai", function()
+
+    it("accepts a range without error", function()
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, { "a", "b", "c", "d" })
+
+        assert.has_no.errors(function()
+            vim.cmd('1,3Ai')
+        end)
+    end)
+
+    it("passes the selected range to the buffer", function()
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "De La Soul",
+            "Wu-Tang",
+            "C-Murder",
+            "A Tribe Called Quest",
+        })
+
+        vim.cmd('2,3Ai')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "Wu-Tang"))
+        assert(vim.tbl_contains(lines, "C-Murder"))
+    end)
+
+    it("[prompt] passes the selected range and [prompt] to the buffer", function()
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "De La Soul",
+            "Wu-Tang",
+            "C-Murder",
+            "A Tribe Called Quest",
+        })
+
+        vim.cmd('2,3Ai make me toast')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "Wu-Tang"))
+        assert(vim.tbl_contains(lines, "C-Murder"))
+        assert(vim.tbl_contains(lines, "make me toast"))
+    end)
+
+    it("wraps ranges in codeblocks if filetype is set", function()
+        vim.cmd('edit /tmp/test.lua')
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "line 1",
+            "line 2",
+            "line 3",
+        })
+        vim.bo.filetype = "lua"
+
+        vim.cmd('1,3Ai')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "```lua",
+            "line 1",
+            "line 2",
+            "line 3",
+            "```"
+        }, lines)
+    end)
+
+    it("wraps ranges in codeblocks", function()
+        vim.cmd('edit /tmp/test')
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "line 1",
+            "line 2",
+            "line 3",
+        })
+        vim.bo.filetype = ""
+
+        vim.cmd('1,3Ai')
+
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "```",
+            "line 1",
+            "line 2",
+            "line 3",
+            "```"
+        }, actual)
+    end)
+
+    it("works for single line ranges", function()
+        vim.cmd('edit /tmp/test')
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+            "line 1",
+            "line 2",
+            "line 3",
+        })
+
+        vim.cmd('2Ai')
+
+        local actual = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "```",
+            "line 2",
+            "```"
+        }, actual)
+    end)
+end)
+
+ai_describe(":vert Ai", function()
+
+    it("accepts a prompt as an argument with a vertical prefix", function()
+        assert.has_no.errors(function()
+            vim.cmd('vertical Ai make me toast')
+        end)
+    end)
+end)
+
+ai_describe("ai#nvim_get_dir()", function()
+
+    it("returns a normal ai.nvim directory", function()
+        vim.g.i_am_in_a_test = nil
+
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.are_match('.local/state', actual)
+    end)
+
+    it("returns the default mock directory under test", function()
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.equal(default_mock_dir, actual)
+    end)
+
+    it("returns a specific mock directory under test if specified", function()
+        vim.g.ai_dir = this_repo .. "/tests/fixtures/specific-test-case/ai.nvim"
+        local actual = vim.fn['ai#nvim_get_dir']()
+        assert.equal(vim.g.ai_dir, actual)
+    end)
+end)
+
+ai_describe("providers#get()", function()
+
+    it("returns a list of providers", function()
+        local expected = { "copilot" }
+        local actual = vim.fn['providers#get']()
+        assert.same(expected, actual)
+    end)
+end)
+
+ai_describe("providers#get_models()", function()
+
+    it("returns all models for all providers", function()
+        local expected = {
+            'claude-haiku-4.5',
+            'claude-sonnet-4.5',
+            'gemini-2.5-pro',
+            'gpt-4.1',
+            'gpt-4o',
+            'gpt-5',
+            'gpt-5-codex',
+            'gpt-5-mini',
+        }
+
+        local actual = vim.fn['providers#get_models']()
+
+        assert.same(expected, actual)
+    end)
+end)
+
+ai_describe("providers#copilot#submit_chat()", function()
+
+    it("debounces chat submission by throwing an error", function()
+        vim.cmd('Ai! wow')
+        vim.fn['providers#copilot#submit_chat']()
+        assert.has.errors(function()
+            vim.fn['providers#copilot#submit_chat']()
+        end)
+        vim.fn['ai#wait_for_jobs']()
+    end)
+end)
+
+ai_describe("providers#copilot#get_local_token()", function()
+
+    it("successfully gets oauth_token from apps.json", function()
+        local expected = "^ghu_[[:alnum:]]\\{36}$"
+        local actual = vim.fn['providers#copilot#get_local_token']()
+        assert(vim.fn.match(actual, expected) ~= -1)
+    end)
+end)
+
+ai_describe(":Ai log", function()
+
+    it("opens the log.md", function()
+        vim.cmd('Ai log')
+        assert.are_match("log.md", vim.api.nvim_buf_get_name(0))
+    end)
+
+    it("puts the cursor at the bottom of the log", function()
+        vim.cmd('Ai log')
+        local expected = vim.api.nvim_buf_line_count(0)
+        local actual = vim.api.nvim_win_get_cursor(0)[1]
+        assert.are.same(expected, actual)
+    end)
+
+    it("enable enables logging", function()
+        vim.cmd('Ai log enable')
+        assert.is_true(vim.g.ai_logging == true)
+    end)
+
+    it("disable disables logging", function()
+        vim.cmd('Ai log disable')
+        assert.is_true(vim.g.ai_logging == false)
+    end)
+end)
+
+ai_describe(":Ai l", function()
+
+    it("opens the log.md", function()
+        vim.cmd('Ai l')
+        assert.are_match("log.md", vim.api.nvim_buf_get_name(0))
+    end)
+end)
+
+ai_describe(":Ai messages", function()
+
+    it("sends the contents of :messages to the chat", function()
+
+        vim.cmd([[
+            messages clear
+            Ai
+            echomsg "test-message-payload"
+        ]])
+
+        vim.cmd('Ai messages')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "```neovim_messages",
+            "test-message-payload",
+            "```",
+        }, lines)
+    end)
+end)
+
+ai_describe(":Ai mes", function()
+
+    it("sends the contents of :messages to the chat", function()
+
+        vim.cmd([[
+            messages clear
+            Ai
+            echomsg "test-message-payload"
+        ]])
+
+        vim.cmd('Ai mes')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "```neovim_messages",
+            "test-message-payload",
+            "```",
+        }, lines)
+    end)
+end)
+
+ai_describe("g:ai_responses", function()
+
+    describe("for copilot endpoint", function()
+
+        it("/copilot_internal/v2/token returns valid json online", function()
+
+            vim.g.i_am_in_a_test = false
+
+            vim.cmd([[
+                call providers#copilot#enqueue_token_fetch()
+                call ai#run_job_queue()
+                call ai#wait_for_jobs()
+            ]])
+
+            local response = vim.g.ai_responses
+
+            local token
+            assert.has_no.errors(function()
+                token = vim.fn.json_decode(response)
+            end)
+
+            assert(is_valid_token_json(token))
+        end)
+
+        it("/copilot_internal/v2/token returns valid json offline", function()
+
+            vim.cmd([[
+                call providers#copilot#enqueue_token_fetch()
+                call ai#run_job_queue()
+                call ai#wait_for_jobs()
+            ]])
+
+            local response = vim.g.ai_responses
+
+            local token
+            assert.has_no.errors(function()
+                token = vim.fn.json_decode(response)
+            end)
+
+            assert(is_valid_token_json(token))
+        end)
+
+        it("/models returns valid json online", function()
+
+            vim.g.i_am_in_a_test = false
+
+            vim.cmd([[
+                call providers#copilot#enqueue_models_fetch()
+                call ai#run_job_queue()
+                call ai#wait_for_jobs()
+            ]])
+
+            local response = vim.g.ai_responses
+
+            local models
+            assert.has_no.errors(function()
+                models = vim.fn.json_decode(response)
+            end)
+
+            assert(is_valid_models_json(models))
+        end)
+
+        it("/models returns valid json offline", function()
+
+            vim.cmd([[
+                call providers#copilot#enqueue_models_fetch()
+                call ai#run_job_queue()
+                call ai#wait_for_jobs()
+            ]])
+
+            local response = vim.g.ai_responses
+
+            local models
+            assert.has_no.errors(function()
+                models = vim.fn.json_decode(response)
+            end)
+
+            assert(is_valid_models_json(models))
+        end)
+    end)
+end)
+
+ai_describe("vim.g.ai_test_endpoints", function()
+
+    it("can be used to mock endpoints", function()
+
+        vim.g.ai_test_endpoints = {
+            ['/chat/completions'] = 'expired.json'
+        }
+
+        vim.cmd([[
+            call providers#copilot#enqueue_chat_submission()
+            call ai#run_job_queue()
+            call ai#wait_for_jobs()
+        ]])
+
+        local response = vim.g.ai_responses[1]
+
+        assert.are_match('unauthorized: token expired', response)
+    end)
+end)
+
+ai_describe(":Ai chats", function()
+
+    it("lists all chats in a quickfix list", function()
+
+        vim.cmd('Ai! chats')
+
+        local qflist = vim.fn.getqflist()
+
+        assert(#qflist > 0)
+
+        local pattern = '.*/ai-chat.*\\.md'
+
+        for _, item in ipairs(qflist) do
+            local fname = vim.fn.bufname(item.bufnr)
+            assert(vim.fn.match(fname, pattern))
+        end
+    end)
+
+    it("<chat> opens that chat", function()
+        vim.cmd('Ai! dummy')
+        local expected = vim.api.nvim_buf_get_name(0)
+        local chat_name = vim.fn.fnamemodify(expected, ":t")
+
+        vim.cmd('enew')
+        assert.not_equal(expected, vim.api.nvim_buf_get_name(0))
+
+        vim.cmd('Ai chats ' .. chat_name)
+
+        local actual = vim.api.nvim_buf_get_name(0)
+        assert.equal(expected, actual)
+    end)
+end)
+
+ai_describe(":Ai chats <Tab>", function()
+    it("completes with chat filenames", function()
+        vim.cmd('Ai! dummy')
+        local expected = vim.api.nvim_buf_get_name(0)
+        local chat_name = vim.fn.fnamemodify(expected, ":t")
+
+        local completion = vim.fn['ai#completion']("", "Ai chats ", "")
+
+        assert(vim.tbl_contains(completion, chat_name))
+    end)
+end)
+
+ai_describe(":Ai cleanall", function()
+
+    it("deletes all chats", function()
+        vim.cmd('Ai! one')
+        vim.cmd('Ai! two')
+        vim.cmd('Ai! three')
+
+        local chats_dir = vim.g.ai_dir .. "/chats"
+        assert(#vim.fn.glob(chats_dir .. "/*.md", false, true) > 0)
+
+        vim.cmd('Ai cleanall')
+
+        assert(#vim.fn.glob(chats_dir .. "/*.md", false, true) == 0)
+    end)
+end)
+
+ai_describe(":Ai grep", function()
+
+    it("<pattern> searches through all chats for <pattern>", function()
+        vim.cmd('Ai abc-xyz')
+        vim.cmd('silent Ai! grep abc-xyz')
+        local qflist = vim.fn.getqflist()
+        assert(#qflist == 1)
+
+        local qf_item = qflist[1]
+        local bufnr = qf_item.bufnr
+        local lnum = qf_item.lnum
+        local line = vim.api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
+        assert(string.find(line, "abc-xyz", 1, true))
+    end)
+
+    it("sorts results by most recent chat first", function()
+        vim.cmd('Ai unique-grep-term')
+        local first_chat = vim.api.nvim_buf_get_name(0)
+
+        vim.wait(1000)
+
+        vim.cmd('Ai! unique-grep-term')
+        local second_chat = vim.api.nvim_buf_get_name(0)
+
+        vim.cmd('silent Ai! grep unique-grep-term')
+        local qflist = vim.fn.getqflist()
+        assert(#qflist == 2)
+
+        local first_result = vim.fn.fnamemodify(vim.fn.bufname(qflist[1].bufnr), ":p")
+        local second_result = vim.fn.fnamemodify(vim.fn.bufname(qflist[2].bufnr), ":p")
+
+        assert.equal(second_chat, first_result)
+        assert.equal(first_chat, second_result)
+    end)
+end)
+
+ai_describe(":Ai clean", function()
+
+    it("<chat> deletes that chat", function()
+        vim.cmd('Ai! dummy')
+        local chat_path = vim.api.nvim_buf_get_name(0)
+        local chat_name = vim.fn.fnamemodify(chat_path, ":t")
+
+        assert(vim.fn.filereadable(chat_path) == 1)
+
+        vim.cmd('Ai clean ' .. chat_name)
+
+        assert(vim.fn.filereadable(chat_path) == 0)
+    end)
+
+    it("<Tab> completes with chat filenames", function()
+        vim.cmd('Ai! dummy')
+        local chat_path = vim.api.nvim_buf_get_name(0)
+        local chat_name = vim.fn.fnamemodify(chat_path, ":t")
+
+        local completion = vim.fn['ai#completion']("", "Ai clean ", "")
+
+        assert(vim.tbl_contains(completion, chat_name))
+    end)
+end)
+
+ai_describe(":Ai mrproper", function()
+
+    it("deletes the ai.nvim dir", function()
+        local dir = vim.g.ai_dir
+        assert(vim.fn.isdirectory(dir) == 1)
+
+        vim.cmd('Ai mrproper')
+
+        assert(vim.fn.isdirectory(dir) == 0)
+    end)
+end)
+
+ai_describe(":Ai -- [prompt]", function()
+
+    it("treats the rest as a prompt even when it matches a subcommand", function()
+        vim.cmd('Ai -- chats')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "chats",
+        }, lines)
+    end)
+
+    it("treats the rest as a prompt even when it matches a model", function()
+        vim.cmd('Ai -- gpt-4.1')
+
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+        assert.are.same({
+            "# ME",
+            "",
+            "gpt-4.1",
+        }, lines)
+    end)
+end)
+
+ai_describe(":Ai <model> <param>", function()
+
+    it("prints the value of temperature", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai gpt-4.1 temperature')
+
+        vim.notify = orig
+        assert(#output > 0)
+        assert(string.find(output[1], "temperature", 1, true))
+    end)
+
+    it("prints the value of top_p", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai gpt-4.1 top_p')
+
+        vim.notify = orig
+        assert(#output > 0)
+        assert(string.find(output[1], "top_p", 1, true))
+    end)
+
+    it("prints the value of max_tokens", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai gpt-4.1 max_tokens')
+
+        vim.notify = orig
+        assert(#output > 0)
+        assert(string.find(output[1], "max_tokens", 1, true))
+    end)
+
+    it("prints the value of n", function()
+        local output = {}
+        local orig = vim.notify
+        vim.notify = function(msg) table.insert(output, msg) end
+
+        vim.cmd('Ai gpt-4.1 n')
+
+        vim.notify = orig
+        assert(#output > 0)
+        assert(string.find(output[1], "n", 1, true))
+    end)
+
+    it("does not error on unknown word (treated as prompt)", function()
+        assert.has.no.errors(function()
+            vim.cmd('Ai gpt-4.1 invalid_param')
+        end)
+    end)
+end)
+
+ai_describe(":Ai <model> <param>=<value>", function()
+
+    it("sets temperature", function()
+        vim.cmd('Ai gpt-4.1 temperature=0.5')
+        assert.equal(0.5, vim.fn['ai#get_model_param']('gpt-4.1', 'temperature'))
+    end)
+
+    it("sets top_p", function()
+        vim.cmd('Ai gpt-4.1 top_p=0.9')
+        assert.equal(0.9, vim.fn['ai#get_model_param']('gpt-4.1', 'top_p'))
+    end)
+
+    it("sets max_tokens", function()
+        vim.cmd('Ai gpt-4.1 max_tokens=4096')
+        assert.equal(4096, vim.fn['ai#get_model_param']('gpt-4.1', 'max_tokens'))
+    end)
+
+    it("sets n", function()
+        vim.cmd('Ai gpt-4.1 n=2')
+        assert.equal(2, vim.fn['ai#get_model_param']('gpt-4.1', 'n'))
+    end)
+
+    it("errors on invalid param", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 invalid_param=1')
+        end)
+    end)
+
+    it("errors on invalid value for temperature (out of range)", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 temperature=5')
+        end)
+    end)
+
+    it("errors on invalid value for top_p (out of range)", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 top_p=2')
+        end)
+    end)
+
+    it("errors on invalid value for max_tokens (non-integer)", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 max_tokens=1.5')
+        end)
+    end)
+
+    it("errors on invalid value for n (non-integer)", function()
+        assert.has.errors(function()
+            vim.cmd('Ai gpt-4.1 n=1.5')
+        end)
+    end)
+end)

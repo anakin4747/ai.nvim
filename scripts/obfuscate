@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# token.json secrets
+md5=$(md5sum <<< "dummy" | awk '{print $1}')
+sha256=$(sha256sum <<< "dummy" | awk '{print $1}')
+
+# chat.data secrets
+id=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c29)
+fingerprint=$(tr -dc 'a-f0-9' < /dev/urandom | head -c10)
+
+sed \
+    --regexp-extended \
+    --expression "s/\b[[:alnum:]]{32}\b/$md5/g" \
+    --expression "s/\b[[:alnum:]]{64}\b/$sha256/g" \
+    --expression "s/ip=[0-9\.]+;/ip=8.8.8.8;/g" \
+    --expression "s/chatcmpl-[A-Za-z0-9]{29}/chatcmpl-$id/g" \
+    --expression "s/fp_[a-f0-9]{10}/fp_$fingerprint/g"
