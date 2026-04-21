@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: ci-approval
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Create mock Copilot apps.json
+        run: |
+          mkdir -p "$HOME/.config/github-copilot"
+          echo '{}' > "$HOME/.config/github-copilot/apps.json"
+
+      - name: Run offline tests
+        run: OFFLINE_ONLY=1 make
