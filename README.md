@@ -125,6 +125,12 @@ To run the tests without cqfd:
 make test
 ```
 
+To run only the offline tests (no Copilot credentials required):
+
+```sh
+OFFLINE_ONLY=1 make test
+```
+
 ## CLOC
 
 This plugin was made out of spite against the growing trend of all lua-based
