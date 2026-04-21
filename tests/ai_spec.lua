@@ -179,6 +179,14 @@ local function ai_describe(name, fn)
     end)
 end
 
+local function online_it(name, fn)
+    if vim.env.OFFLINE_ONLY == '1' then
+        pending(name)
+    else
+        it(name, fn)
+    end
+end
+
 ai_describe(":Ai", function()
 
     it("does not error", function()
@@ -958,7 +966,7 @@ ai_describe("g:ai_responses", function()
 
     describe("for copilot endpoint", function()
 
-        it("/copilot_internal/v2/token returns valid json online", function()
+        online_it("/copilot_internal/v2/token returns valid json online", function()
 
             vim.g.i_am_in_a_test = false
 
@@ -996,7 +1004,7 @@ ai_describe("g:ai_responses", function()
             assert(is_valid_token_json(token))
         end)
 
-        it("/models returns valid json online", function()
+        online_it("/models returns valid json online", function()
 
             vim.g.i_am_in_a_test = false
 
