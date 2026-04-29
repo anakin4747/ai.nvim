@@ -538,5 +538,14 @@ function! ai#handle_messages(...) abort
     call extend(lines, split(msg, "\n"))
     call add(lines, '```')
 
-    call appendbufline(bufnr(), "$", lines)
+    let chat_path = ai#get_last_chat_path()
+    if chat_path == ''
+        echohl ErrorMsg
+        echomsg 'ai.nvim: no chat exists yet'
+        echohl None
+        return
+    endi
+
+    let bufnr = s:open_chat(chat_path)
+    call appendbufline(bufnr, "$", lines)
 endf
