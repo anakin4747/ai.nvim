@@ -16,3 +16,7 @@ RUN mkdir -p /usr/local/share/nvim/site/pack/plenary/start && \
     cd /usr/local/share/nvim/site/pack/plenary/start && \
     git clone --depth 1 https://github.com/nvim-lua/plenary.nvim.git && \
     git -C plenary.nvim apply /plenary-patches/*.patch
+
+RUN mkdir -p /root/.config/github-copilot && \
+    echo '{"github.com":{"oauth_token":"ghu_fakefakefakefakefakefake000000000000"}}' \
+    > /root/.config/github-copilot/apps.json
