@@ -392,7 +392,10 @@ function! ai#enqueue_job(job) abort
 endf
 
 function! ai#wait_for_jobs() abort
-    while g:ai_job_running
+    while g:ai_job_running || len(g:ai_job_queue) > 0
+        if !g:ai_job_running
+            call ai#run_job_queue()
+        endi
         sleep 10m
     endw
 endf
