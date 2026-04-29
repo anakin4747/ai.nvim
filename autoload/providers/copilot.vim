@@ -76,9 +76,10 @@ endf
 
 function! s:build_token_curl_cmd() abort
     let url = "https://api.github.com/copilot_internal/v2/token"
+    let token = providers#copilot#get_local_token()
 
     let headers = [
-        \   $"authorization: Bearer {providers#copilot#get_local_token()}",
+        \   $"authorization: Bearer {token}",
         \   $"accept: application/json",
         \]
 
