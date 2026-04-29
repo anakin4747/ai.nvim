@@ -939,6 +939,27 @@ ai_describe(":Ai messages", function()
             "```",
         }, lines)
     end)
+
+    it("sends to the last chat even when a chat window is not open", function()
+
+        vim.cmd([[
+            messages clear
+            Ai
+            echomsg "test-message-payload"
+        ]])
+
+        local chat_name = vim.api.nvim_buf_get_name(0)
+
+        vim.cmd('enew')
+
+        vim.cmd('Ai messages')
+
+        local lines = vim.api.nvim_buf_get_lines(
+            vim.fn.bufnr(chat_name), 0, -1, false)
+
+        assert(vim.tbl_contains(lines, "```neovim_messages"))
+        assert(vim.tbl_contains(lines, "test-message-payload"))
+    end)
 end)
 
 ai_describe(":Ai mes", function()
