@@ -154,12 +154,13 @@ local function teardown()
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
         vim.api.nvim_buf_delete(bufnr, { force = true })
     end
+    vim.cmd("silent! %bwipeout!")
     vim.cmd("silent! only")
 
     vim.g.i_am_in_a_test = true
 
-    vim.system({ "git", "clean", "-fq", vim.g.ai_dir, default_mock_dir }):wait()
-    vim.system({ "git", "restore", vim.g.ai_dir, default_mock_dir }):wait()
+    vim.fn.system({ "git", "clean", "-fdq", vim.g.ai_dir, default_mock_dir })
+    vim.fn.system({ "git", "restore", vim.g.ai_dir, default_mock_dir })
     vim.g.ai_dir = default_mock_dir
 
     vim.g.ai_test_endpoints = nil
@@ -170,6 +171,8 @@ local function teardown()
     vim.g.ai_model_params = vim.empty_dict()
 
     vim.fn['ai#wait_for_jobs']()
+    vim.g.ai_job_queue = {}
+    vim.g.ai_job_running = false
 end
 
 local function ai_describe(name, fn)
