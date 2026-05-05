@@ -916,7 +916,7 @@ end)
 
 ai_describe(":Ai messages", function()
 
-    it("sends the contents of :messages to the chat", function()
+    it("sends the contents of :messages to the last chat file", function()
 
         vim.cmd([[
             messages clear
@@ -924,9 +924,11 @@ ai_describe(":Ai messages", function()
             echomsg "test-message-payload"
         ]])
 
+        local chat_path = vim.fn["ai#get_last_chat_path"]()
+
         vim.cmd('Ai messages')
 
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        local lines = vim.fn.readfile(chat_path)
 
         assert.are.same({
             "# ME",
@@ -940,7 +942,7 @@ end)
 
 ai_describe(":Ai mes", function()
 
-    it("sends the contents of :messages to the chat", function()
+    it("sends the contents of :messages to the last chat file", function()
 
         vim.cmd([[
             messages clear
@@ -948,9 +950,11 @@ ai_describe(":Ai mes", function()
             echomsg "test-message-payload"
         ]])
 
+        local chat_path = vim.fn["ai#get_last_chat_path"]()
+
         vim.cmd('Ai mes')
 
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        local lines = vim.fn.readfile(chat_path)
 
         assert.are.same({
             "# ME",

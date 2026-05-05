@@ -538,5 +538,6 @@ function! ai#handle_messages(...) abort
     call extend(lines, split(msg, "\n"))
     call add(lines, '```')
 
-    call appendbufline(bufnr(), "$", lines)
+    let chat_path = ai#get_last_chat_path()
+    call writefile(lines, chat_path, 'a')
 endf
